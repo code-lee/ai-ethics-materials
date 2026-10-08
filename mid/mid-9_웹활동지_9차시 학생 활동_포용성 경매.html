@@ -1,0 +1,2178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>9차시 AI 포용성 경매</title>
+<style>
+  :root{
+    --bg1:#fff8ef;
+    --bg2:#fef3ff;
+    --bg3:#eef8ff;
+    --ink:#22304a;
+    --sub:#51617e;
+    --line:#d7def5;
+    --blue:#4d7cff;
+    --navy:#223a9b;
+    --mint:#2fc8b3;
+    --orange:#ff9a3c;
+    --red:#ff5d73;
+    --green:#5ebc60;
+    --gold:#ffc83d;
+    --purple:#9b6cff;
+    --card:#ffffffee;
+    --shadow:0 14px 30px rgba(79,100,165,.16);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 12% 15%, #ffe3b3 0 5%, transparent 5.2%),
+      radial-gradient(circle at 85% 10%, #d8e8ff 0 6%, transparent 6.2%),
+      radial-gradient(circle at 92% 78%, #ffd7ef 0 6%, transparent 6.2%),
+      linear-gradient(145deg,var(--bg1),var(--bg2) 45%,var(--bg3));
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:1380px;
+    margin:0 auto;
+    padding:22px;
+  }
+  .page{
+    background:rgba(255,255,255,.78);
+    backdrop-filter: blur(9px);
+    border:4px solid #fff;
+    border-radius:34px;
+    box-shadow:0 22px 45px rgba(64,84,145,.18);
+    overflow:hidden;
+  }
+  .hero{
+    position:relative;
+    padding:24px 28px 20px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.86), rgba(255,255,255,.72)),
+      linear-gradient(120deg,#ffe9c8,#fff3f8 52%,#ebf5ff);
+    border-bottom:3px dashed #d6ddf8;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns: 1.1fr .9fr;
+    gap:18px;
+    align-items:center;
+  }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 18px;
+    border-radius:999px;
+    font-weight:900;
+    color:white;
+    background:linear-gradient(90deg,#2744ba,#4b7cff);
+    box-shadow:0 8px 18px rgba(58,90,207,.25);
+    margin-bottom:14px;
+  }
+  .title{
+    font-size:clamp(40px,4vw,68px);
+    line-height:1.03;
+    margin:0 0 10px;
+    font-weight:1000;
+    letter-spacing:-1.7px;
+  }
+  .rainbow{
+    background:linear-gradient(90deg,#2d4bff,#6c5cff 18%,#ff648c 38%,#ff9b22 58%,#38b66d 78%,#1aa4ff);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .subtitle{
+    font-size:clamp(18px,2vw,30px);
+    font-weight:900;
+    color:#30427d;
+    margin:0 0 12px;
+  }
+  .hero p{
+    margin:8px 0;
+    color:var(--sub);
+    line-height:1.72;
+    font-size:16px;
+  }
+  .hero-card{
+    background:linear-gradient(155deg,#fff,#f8fbff);
+    border:3px solid #dfe6ff;
+    border-radius:28px;
+    padding:18px;
+    box-shadow:var(--shadow);
+  }
+  .budget-box{
+    text-align:center;
+    padding:8px 0 4px;
+  }
+  .budget-box h3{
+    margin:0 0 6px;
+    font-size:21px;
+    color:#30427d;
+  }
+  .budget-big{
+    font-size:54px;
+    font-weight:1000;
+    line-height:1;
+    color:#ff4f69;
+    margin-bottom:8px;
+  }
+  .coins{
+    display:flex; flex-wrap:wrap; gap:8px; justify-content:center;
+  }
+  .coin{
+    width:46px; height:46px; border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, #fff6a0, #ffc933 58%, #f5a400 100%);
+    border:2px solid #f0ad00;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.7), 0 6px 14px rgba(228,160,11,.28);
+    display:grid; place-items:center;
+    font-weight:1000; color:#8b5800;
+  }
+  .mascot{
+    position:absolute; right:22px; top:12px; font-size:38px; opacity:.24;
+  }
+  .section{
+    padding:22px 24px;
+  }
+  .section-title{
+    display:flex; align-items:center; gap:10px;
+    margin:0 0 14px;
+    font-size:28px;
+    font-weight:1000;
+    color:#263a7d;
+  }
+  .section-title .pill{
+    background:linear-gradient(90deg,#7f5dff,#5fc6ff);
+    color:#fff;
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:16px;
+    letter-spacing:.2px;
+    box-shadow:0 6px 14px rgba(91,112,233,.2);
+  }
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+  .card{
+    background:var(--card);
+    border:2.5px solid #e1e6fb;
+    border-radius:26px;
+    box-shadow:var(--shadow);
+    padding:18px;
+  }
+  .card h3,.card h4{margin:0 0 10px}
+  .notice{
+    background:linear-gradient(90deg,#fff8db,#fff1c2);
+    border:2px solid #ffd36a;
+    color:#835800;
+    border-radius:18px;
+    padding:12px 14px;
+    font-size:14px;
+    line-height:1.6;
+    margin-top:12px;
+  }
+  .small{
+    font-size:14px;
+    color:var(--sub);
+    line-height:1.65;
+  }
+  .shop-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+  }
+  .tier{
+    border-radius:28px;
+    padding:16px;
+    background:linear-gradient(180deg,#fff, #fbfdff);
+    border:3px solid #dfe4fb;
+    box-shadow:var(--shadow);
+  }
+  .tier-header{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:12px;
+  }
+  .tier-header h3{font-size:24px; margin:0; color:#23377a}
+  .cost-badge{
+    padding:8px 14px; border-radius:999px; color:#fff; font-weight:1000; font-size:15px;
+  }
+  .cost-1{background:linear-gradient(90deg,#33b86f,#77d05c)}
+  .cost-2{background:linear-gradient(90deg,#3c73ff,#5eb7ff)}
+  .cost-3{background:linear-gradient(90deg,#ff648c,#ff9451)}
+  .feature{
+    display:flex; align-items:flex-start; gap:10px;
+    padding:12px 10px;
+    border-radius:18px;
+    border:2px solid #edf1ff;
+    background:#fff;
+    margin-bottom:10px;
+  }
+  .feature:last-child{margin-bottom:0}
+  .feature input{display:none}
+  .feature .icon{
+    width:42px; height:42px; border-radius:14px;
+    display:grid; place-items:center; font-size:22px; flex:0 0 auto;
+    background:#f3f6ff;
+  }
+  .feature-title{
+    font-weight:1000; color:#243771; margin-bottom:4px;
+  }
+  .feature-desc{
+    font-size:13px; color:var(--sub); line-height:1.45;
+  }
+  .feature label{
+    display:flex; gap:10px; width:100%; cursor:pointer;
+  }
+  .feature.selected{
+    border-color:#6e83ff;
+    background:linear-gradient(180deg,#f7faff,#eef4ff);
+    box-shadow:0 10px 22px rgba(96,119,232,.18);
+    transform:translateY(-2px);
+  }
+
+  .status-board{
+    display:grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap:18px;
+  }
+  .board-list{display:grid; gap:10px;}
+  .slot{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:14px;
+    padding:12px 14px;
+    border-radius:18px;
+    background:#fff;
+    border:2px dashed #d9e0fb;
+    min-height:62px;
+  }
+  .slot b{font-size:15px; color:#31407f}
+  .slot span{font-size:14px; color:#50607b}
+  .reason-box textarea, .input-line, .long-input{
+    width:100%;
+    border:2px solid #dfe4fb;
+    background:#fff;
+    border-radius:16px;
+    padding:12px 14px;
+    font:inherit;
+    color:var(--ink);
+  }
+  textarea{min-height:100px; resize:vertical}
+  .user-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:16px;
+  }
+  .user-card{
+    background:linear-gradient(180deg,#fff,#fafcff);
+    border:2.5px solid #e1e6fb;
+    border-radius:24px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+  }
+  .user-top{
+    padding:14px 14px 8px;
+    text-align:center;
+    border-bottom:2px dashed #e3e8fb;
+  }
+  .avatar{
+    width:64px; height:64px; border-radius:50%;
+    margin:0 auto 8px;
+    display:grid; place-items:center; font-size:32px;
+    background:linear-gradient(135deg,#ffefcd,#ffe0e8 54%,#dce8ff);
+    border:3px solid #fff;
+    box-shadow:0 8px 18px rgba(110,125,181,.18);
+  }
+  .user-name{
+    font-weight:1000; color:#24407f; font-size:20px;
+  }
+  .user-need{
+    color:#465673; font-size:14px; line-height:1.5; min-height:44px;
+  }
+  .user-body{
+    padding:14px;
+    display:grid;
+    gap:10px;
+  }
+  .check-group{
+    display:grid;
+    gap:8px;
+  }
+  .check-item{
+    display:flex; align-items:center; gap:9px;
+    font-size:14px; color:#394b67;
+  }
+  .check-item input{
+    width:18px; height:18px;
+    accent-color:#507dff;
+  }
+
+  .swap-grid{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    gap:18px;
+    align-items:center;
+  }
+  .arrow{
+    font-size:38px;
+    color:#6382ff;
+    font-weight:1000;
+    text-align:center;
+  }
+
+  .debate-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:18px;
+  }
+  .criteria-box{
+    display:grid;
+    gap:10px;
+    padding:14px;
+    border-radius:20px;
+    background:#fff;
+    border:2px dashed #d8e1fb;
+  }
+
+  .final-grid{
+    display:grid;
+    grid-template-columns: 1.1fr .9fr .9fr;
+    gap:18px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    overflow:hidden;
+    border-radius:16px;
+  }
+  th,td{
+    border:1.8px solid #dde3fb;
+    padding:10px 8px;
+    font-size:14px;
+    text-align:center;
+    background:#fff;
+  }
+  th{
+    background:#f2f6ff;
+    color:#2d427f;
+    font-weight:1000;
+  }
+
+  .btn-row{
+    display:flex; flex-wrap:wrap; gap:12px;
+    margin-top:18px;
+  }
+  button{
+    border:none;
+    cursor:pointer;
+    border-radius:16px;
+    padding:14px 18px;
+    font:inherit;
+    font-weight:1000;
+    box-shadow:0 10px 22px rgba(94,116,197,.18);
+    transition:.18s ease;
+  }
+  button:hover{transform:translateY(-1px)}
+  .main-btn{background:linear-gradient(90deg,#2f72ff,#715dff); color:#fff;}
+  .sub-btn{background:#fff; color:#324889; border:2px solid #dbe4ff;}
+  .accent-btn{background:linear-gradient(90deg,#ff9f4f,#ff668f); color:#fff;}
+  .ok{
+    background:linear-gradient(90deg,#effff3,#eefcf8);
+    border:2px solid #7bd2a9;
+    color:#17684a;
+  }
+  .warn{
+    background:linear-gradient(90deg,#fff7ea,#fff1f3);
+    border:2px solid #ffb985;
+    color:#8d4a1e;
+  }
+  .feedback{
+    margin-top:14px;
+    padding:14px 16px;
+    border-radius:18px;
+    display:none;
+    line-height:1.7;
+    font-size:14px;
+  }
+  .feedback.show{display:block}
+  .pill-coin{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:8px 12px; border-radius:999px; font-weight:1000;
+    background:#fff; border:2px solid #f4df8d; color:#855d00;
+  }
+  .sticky-tip{
+    position:sticky; bottom:12px;
+    margin-top:18px;
+    background:linear-gradient(90deg,#1f2d66,#3042a0);
+    color:#fff;
+    border-radius:18px;
+    padding:12px 16px;
+    box-shadow:0 14px 28px rgba(34,52,117,.28);
+  }
+  .line{
+    width:100%;
+    height:1px;
+    background:linear-gradient(90deg,transparent,#d6defa,transparent);
+    margin:6px 0 16px;
+  }
+  .highlight{
+    color:#ff5d73;
+    font-weight:1000;
+  }
+  .muted{
+    color:#6c7b96;
+  }
+  .footer-note{
+    padding:0 24px 24px;
+  }
+
+  @media (max-width:1200px){
+    .shop-grid, .user-grid, .final-grid, .debate-grid, .status-board, .grid-2, .grid-3, .hero-grid{
+      grid-template-columns:1fr;
+    }
+  }
+  @media (max-width:900px){
+    .swap-grid{grid-template-columns:1fr}
+    .user-grid{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:640px){
+    .wrap{padding:10px}
+    .hero,.section{padding:16px}
+    .user-grid{grid-template-columns:1fr}
+    .title{font-size:36px}
+  }
+
+  .write-card{
+    position:relative;
+    border:2px solid #dfe6fb;
+    border-radius:22px;
+    padding:16px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.96), rgba(248,251,255,.96));
+    box-shadow:0 10px 22px rgba(72,92,160,.10);
+    overflow:hidden;
+  }
+  .write-card::before{
+    content:"";
+    position:absolute;
+    left:0; top:0; bottom:0;
+    width:7px;
+    background:linear-gradient(180deg,#6f7cff,#55c8ff,#ff8cab);
+  }
+  .write-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:8px;
+    font-weight:1000;
+    color:#2b3f82;
+    font-size:17px;
+  }
+  .write-guide{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-bottom:10px;
+  }
+  .guide-chip{
+    padding:6px 10px;
+    border-radius:999px;
+    background:#eef3ff;
+    border:1.5px solid #d5defb;
+    color:#53658d;
+    font-size:12px;
+    font-weight:900;
+  }
+  .lined-area{
+    width:100%;
+    min-height:118px;
+    border:2px solid #e1e6f7;
+    border-radius:16px;
+    padding:13px 14px;
+    font:inherit;
+    line-height:30px;
+    color:var(--ink);
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        #fff 0px,
+        #fff 29px,
+        #e8edf8 30px
+      );
+    resize:vertical;
+  }
+  .lined-area:focus{
+    outline:none;
+    border-color:#7a8cff;
+    box-shadow:0 0 0 4px rgba(122,140,255,.12);
+  }
+  .write-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-top:8px;
+    font-size:12px;
+    color:#78859d;
+  }
+  .char-badge{
+    padding:4px 8px;
+    border-radius:999px;
+    background:#f2f5ff;
+    border:1px solid #dde4fb;
+    font-weight:900;
+    color:#61709a;
+  }
+  .situation-toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin:10px 0 16px;
+    padding:12px 14px;
+    border-radius:18px;
+    background:linear-gradient(90deg,#f6f9ff,#fff7fb);
+    border:2px solid #e1e7fb;
+  }
+  .situation-toolbar b{color:#314684}
+  .situation-tag{
+    display:inline-flex;
+    align-items:center;
+    padding:5px 9px;
+    border-radius:999px;
+    background:#eef4ff;
+    color:#4c6194;
+    font-size:12px;
+    font-weight:1000;
+    margin-top:6px;
+  }
+  .mini-prompt{
+    margin-top:8px;
+    padding:9px 10px;
+    border-radius:13px;
+    background:#f7f9ff;
+    border:1.5px dashed #d6def7;
+    color:#62708e;
+    font-size:12px;
+    line-height:1.5;
+  }
+  .hint-panel{
+    display:none;
+    margin-top:12px;
+    padding:14px 16px;
+    border-radius:18px;
+    background:linear-gradient(90deg,#fff9e9,#fff4f8);
+    border:2px dashed #f2c570;
+    color:#6b5a35;
+    line-height:1.7;
+    font-size:14px;
+  }
+  .hint-panel.show{display:block}
+
+
+  .feature{
+    cursor:pointer;
+    user-select:none;
+  }
+  .feature:focus-visible{
+    outline:4px solid rgba(77,124,255,.28);
+    outline-offset:3px;
+  }
+  .feature.selected::after{
+    content:"✓ 선택";
+    margin-left:auto;
+    align-self:center;
+    flex:0 0 auto;
+    padding:6px 9px;
+    border-radius:999px;
+    background:#4d7cff;
+    color:#fff;
+    font-size:12px;
+    font-weight:1000;
+  }
+  .feature.selected{
+    display:flex;
+    align-items:center;
+  }
+  .feature.selected label{
+    flex:1;
+  }
+
+
+  .print-topbar{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin:0 0 12px;
+  }
+  .print-btn{
+    background:linear-gradient(90deg,#263d9d,#4f78ff);
+    color:#fff;
+    border:none;
+  }
+
+  @media print{
+    @page{
+      size:A4 landscape;
+      margin:10mm;
+    }
+
+    *{
+      -webkit-print-color-adjust:exact !important;
+      print-color-adjust:exact !important;
+    }
+
+    html,body{
+      background:#fff !important;
+    }
+
+    body{
+      font-size:11pt;
+    }
+
+    .wrap{
+      max-width:none !important;
+      margin:0 !important;
+      padding:0 !important;
+    }
+
+    .page{
+      border:none !important;
+      border-radius:0 !important;
+      box-shadow:none !important;
+      background:#fff !important;
+      overflow:visible !important;
+    }
+
+    .hero,
+    .section{
+      break-inside:avoid;
+      page-break-inside:avoid;
+    }
+
+    .card,
+    .tier,
+    .user-card,
+    .write-card,
+    .feature,
+    .summary,
+    .status-board,
+    .shop-grid,
+    .final-grid,
+    table,
+    tr{
+      break-inside:avoid;
+      page-break-inside:avoid;
+    }
+
+    .print-topbar,
+    .btn-row,
+    .situation-toolbar button,
+    #checkBudgetBtn,
+    #resetSelectionBtn,
+    #reviewBtn,
+    #sampleBtn,
+    #resetAllBtn,
+    button{
+      display:none !important;
+    }
+
+    .sticky-tip{
+      position:static !important;
+      box-shadow:none !important;
+      margin-top:10px !important;
+    }
+
+    .shop-grid{
+      grid-template-columns:repeat(3,1fr) !important;
+      gap:8px !important;
+    }
+
+    .user-grid{
+      grid-template-columns:repeat(5,1fr) !important;
+      gap:8px !important;
+    }
+
+    .final-grid{
+      grid-template-columns:1.1fr .9fr .9fr !important;
+      gap:8px !important;
+    }
+
+    .grid-2,
+    .debate-grid,
+    .status-board{
+      grid-template-columns:1fr 1fr !important;
+      gap:8px !important;
+    }
+
+    .feature,
+    .card,
+    .tier,
+    .user-card{
+      box-shadow:none !important;
+    }
+
+    .hero{
+      padding:14px 16px !important;
+    }
+
+    .section{
+      padding:14px 16px !important;
+    }
+
+    .title{
+      font-size:32pt !important;
+    }
+
+    .section-title{
+      font-size:18pt !important;
+    }
+
+    textarea,
+    input[type="text"],
+    .input-line,
+    .long-input,
+    .lined-area{
+      border:1px solid #bfc8df !important;
+      background:#fff !important;
+      color:#111 !important;
+      box-shadow:none !important;
+    }
+
+    textarea,
+    .lined-area{
+      min-height:72px !important;
+    }
+
+    .feedback{
+      display:block !important;
+      box-shadow:none !important;
+    }
+
+    .hint-panel{
+      display:none !important;
+    }
+  }
+
+
+  .swap-choice{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:0 0 14px;
+  }
+  .swap-option{
+    flex:1 1 220px;
+    position:relative;
+  }
+  .swap-option input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+  }
+  .swap-option label{
+    display:block;
+    cursor:pointer;
+    padding:14px 16px;
+    border:2px solid #dfe5fb;
+    border-radius:18px;
+    background:#fff;
+    font-weight:1000;
+    color:#405080;
+    box-shadow:0 8px 18px rgba(78,99,166,.08);
+    transition:.18s ease;
+    text-align:center;
+  }
+  .swap-option input:checked + label{
+    border-color:#6980ff;
+    background:linear-gradient(90deg,#eef3ff,#f8f6ff);
+    color:#2d42a0;
+    box-shadow:0 10px 22px rgba(79,100,215,.16);
+  }
+  .swap-disabled{
+    opacity:.48;
+    filter:grayscale(.15);
+  }
+  .swap-note{
+    padding:12px 14px;
+    margin-top:10px;
+    border-radius:16px;
+    background:#f6f8ff;
+    border:2px dashed #d5def8;
+    color:#60708e;
+    line-height:1.6;
+    font-size:14px;
+  }
+
+  .result-stage{
+    margin-top:20px;
+    padding:20px;
+    border-radius:28px;
+    background:linear-gradient(135deg,#f4f7ff,#fff8fb 48%,#f8fff8);
+    border:3px solid #e1e6fb;
+    box-shadow:0 14px 30px rgba(75,95,170,.12);
+  }
+  .result-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .result-head h3{
+    margin:0 0 5px;
+    font-size:28px;
+    color:#263d8c;
+  }
+  .result-head p{
+    margin:0;
+    color:#6a7894;
+    line-height:1.6;
+    font-size:14px;
+  }
+  .result-summary-grid{
+    display:grid;
+    grid-template-columns:1.2fr .8fr .8fr;
+    gap:12px;
+    margin-bottom:16px;
+  }
+  .result-mini{
+    background:#fff;
+    border:2px solid #e2e7fa;
+    border-radius:20px;
+    padding:14px;
+    min-height:130px;
+  }
+  .result-mini h4{
+    margin:0 0 8px;
+    color:#2d4388;
+    font-size:16px;
+  }
+  .result-mini ul{
+    margin:0;
+    padding-left:18px;
+    color:#55647f;
+    line-height:1.7;
+    font-size:14px;
+  }
+  .result-mini p{
+    margin:0;
+    color:#55647f;
+    line-height:1.7;
+    font-size:14px;
+  }
+  .poster-wrap{
+    display:none;
+    margin-top:14px;
+  }
+  .poster-wrap.show{display:block}
+  .poster-card{
+    background:#fff;
+    border:3px solid #dfe5f8;
+    border-radius:24px;
+    padding:10px;
+    overflow:auto;
+  }
+  #resultCanvas{
+    display:block;
+    width:100%;
+    max-width:1200px;
+    height:auto;
+    margin:0 auto;
+    border-radius:18px;
+    background:#fff;
+  }
+
+  @media print{
+    .result-stage{
+      break-inside:avoid;
+      page-break-inside:avoid;
+      box-shadow:none !important;
+      background:#fff !important;
+      border:1.5px solid #cbd4ea !important;
+    }
+    .poster-wrap{display:block !important;}
+    .poster-card{border:1px solid #cbd4ea !important;}
+  }
+
+  @media(max-width:900px){
+    .result-summary-grid{grid-template-columns:1fr}
+  }
+
+
+.final-select-grid{
+  display:grid;
+  grid-template-columns:1.2fr .8fr .8fr;
+  gap:16px;
+}
+.pick-panel{
+  background:#fff;
+  border:2.5px solid #e1e6fb;
+  border-radius:24px;
+  padding:16px;
+  box-shadow:var(--shadow);
+}
+.pick-panel h3{
+  margin:0 0 8px;
+  color:#293f87;
+}
+.pick-help{
+  margin:0 0 12px;
+  color:#6c7892;
+  font-size:13px;
+  line-height:1.55;
+}
+.final-feature-picks{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+.pick-chip{
+  border:2px solid #dfe5f8;
+  background:#fff;
+  border-radius:17px;
+  padding:11px 12px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-weight:900;
+  color:#3d4f78;
+  text-align:left;
+  transition:.16s ease;
+  box-shadow:none;
+}
+.pick-chip:hover{transform:translateY(-1px)}
+.pick-chip.selected{
+  border-color:#657cff;
+  background:linear-gradient(90deg,#eef3ff,#f7f5ff);
+  color:#2941a0;
+  box-shadow:0 8px 16px rgba(83,104,220,.12);
+}
+.pick-chip.disabled-choice{
+  opacity:.35;
+  cursor:not-allowed;
+}
+.pick-chip .mini-cost{
+  margin-left:auto;
+  flex:0 0 auto;
+  padding:4px 7px;
+  border-radius:999px;
+  background:#fff6cc;
+  border:1px solid #f0d574;
+  color:#8a6200;
+  font-size:11px;
+}
+.final-budget{
+  margin-top:12px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:11px 13px;
+  border-radius:16px;
+  background:#f5f8ff;
+  border:2px solid #dfe6fb;
+  font-weight:1000;
+  color:#3a4f87;
+}
+.single-pick-list{
+  display:grid;
+  gap:8px;
+}
+.single-pick{
+  width:100%;
+  border:2px solid #dfe5f8;
+  background:#fff;
+  color:#46597f;
+  border-radius:15px;
+  padding:10px 12px;
+  cursor:pointer;
+  font-weight:900;
+  text-align:left;
+  box-shadow:none;
+}
+.single-pick.selected{
+  border-color:#ff8c6d;
+  background:#fff4ee;
+  color:#a94b30;
+}
+.single-pick.next-selected{
+  border-color:#58b985;
+  background:#effcf4;
+  color:#24714b;
+}
+.priority-picks{
+  display:grid;
+  gap:8px;
+}
+.priority-btn{
+  width:100%;
+  border:2px solid #dfe5f8;
+  background:#fff;
+  color:#45577c;
+  border-radius:16px;
+  padding:11px 12px;
+  cursor:pointer;
+  font-weight:900;
+  text-align:left;
+  box-shadow:none;
+}
+.priority-btn.selected{
+  border-color:#865fff;
+  background:#f5f1ff;
+  color:#5b3bc2;
+}
+.final-choice-summary{
+  margin-top:14px;
+  padding:13px 15px;
+  border-radius:17px;
+  background:linear-gradient(90deg,#f5f8ff,#fff8f5);
+  border:2px dashed #d7e0f8;
+  color:#566684;
+  line-height:1.6;
+  font-size:14px;
+}
+@media(max-width:980px){
+  .final-select-grid{grid-template-columns:1fr}
+  .final-feature-picks{grid-template-columns:1fr}
+}
+@media print{
+  .pick-chip,
+  .single-pick,
+  .priority-btn{
+    box-shadow:none !important;
+  }
+}
+
+
+.custom-priority-wrap{
+  display:none;
+  margin-top:10px;
+}
+.custom-priority-wrap.show{
+  display:block;
+}
+.custom-priority-input{
+  width:100%;
+  border:2px solid #cfc7ff;
+  border-radius:15px;
+  padding:11px 12px;
+  font:inherit;
+  color:#35466f;
+  background:#fbfaff;
+}
+.custom-priority-input:focus{
+  outline:none;
+  border-color:#7f64e8;
+  box-shadow:0 0 0 4px rgba(127,100,232,.12);
+}
+.custom-priority-guide{
+  margin-top:6px;
+  color:#7b7198;
+  font-size:12px;
+  line-height:1.5;
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="page">
+    <div class="print-topbar">
+      <button type="button" class="print-btn" id="printBtn">🖨️ 활동 결과 출력 / PDF 저장</button>
+    </div>
+    <div class="hero">
+      <div class="mascot">🎪💡🪙</div>
+      <div class="hero-grid">
+        <div>
+          <div class="badge">🎉 9차시 활동 · AI 포용성 경매</div>
+          <h1 class="title">AI <span class="rainbow">포용성 경매</span></h1>
+          <div class="subtitle">“기능은 10개, 예산은 6코인! 무엇부터 살까?”</div>
+          <p><b>활동 상황</b> : 여러분은 학교에서 사용할 AI 학교생활 도우미를 만드는 개발팀입니다.
+          하지만 예산이 부족해서 모든 기능을 추가할 수 없습니다. 우리 모둠은 <span class="highlight">포용 코인 6개</span>로 꼭 필요한 기능을 골라야 합니다.</p>
+          <p>이 활동의 핵심은 <b>“모든 사람에게 똑같이 좋은 기능”</b>보다, <b>어떤 사용자가 불편을 겪는지</b>를 생각하고
+          <b>공정하게 우선순위를 정하는 힘</b>을 기르는 것입니다.</p>
+        </div>
+        <div class="hero-card budget-box">
+          <h3>개발 예산</h3>
+          <div class="budget-big">포용 코인 6개</div>
+          <div class="coins" id="heroCoins">
+            <div class="coin">1</div><div class="coin">2</div><div class="coin">3</div>
+            <div class="coin">4</div><div class="coin">5</div><div class="coin">6</div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title"><span class="pill">1</span> 기능 상점</h2>
+      <div class="shop-grid">
+        <div class="tier">
+          <div class="tier-header">
+            <h3>1코인 상점</h3>
+            <div class="cost-badge cost-1">1코인</div>
+          </div>
+
+          <div class="feature" data-id="summary3" data-name="핵심 3줄 요약" data-cost="1">
+            <label><input type="checkbox"><div class="icon">📝</div><div><div class="feature-title">핵심 3줄 요약</div><div class="feature-desc">긴 내용을 핵심만 3줄로 요약해요.</div></div></label>
+          </div>
+          <div class="feature" data-id="homebtn" data-name="처음으로 버튼" data-cost="1">
+            <label><input type="checkbox"><div class="icon">🏠</div><div><div class="feature-title">처음으로 버튼</div><div class="feature-desc">처음 화면으로 쉽게 돌아갈 수 있어요.</div></div></label>
+          </div>
+          <div class="feature" data-id="bigbtn" data-name="큰 버튼" data-cost="1">
+            <label><input type="checkbox"><div class="icon">🔘</div><div><div class="feature-title">큰 버튼</div><div class="feature-desc">버튼이 커서 누르기 쉬워요.</div></div></label>
+          </div>
+        </div>
+
+        <div class="tier">
+          <div class="tier-header">
+            <h3>2코인 상점</h3>
+            <div class="cost-badge cost-2">2코인</div>
+          </div>
+
+          <div class="feature" data-id="zoom" data-name="글씨 확대" data-cost="2">
+            <label><input type="checkbox"><div class="icon">🔎</div><div><div class="feature-title">글씨 확대</div><div class="feature-desc">글자를 크게 볼 수 있어요.</div></div></label>
+          </div>
+          <div class="feature" data-id="easykor" data-name="쉬운 한국어" data-cost="2">
+            <label><input type="checkbox"><div class="icon">🙂</div><div><div class="feature-title">쉬운 한국어</div><div class="feature-desc">어려운 말을 쉬운 표현으로 바꿔줘요.</div></div></label>
+          </div>
+          <div class="feature" data-id="voice" data-name="음성 읽기" data-cost="2">
+            <label><input type="checkbox"><div class="icon">🔊</div><div><div class="feature-title">음성 읽기</div><div class="feature-desc">화면 내용을 소리로 들려줘요.</div></div></label>
+          </div>
+          <div class="feature" data-id="caption" data-name="자막" data-cost="2">
+            <label><input type="checkbox"><div class="icon">💬</div><div><div class="feature-title">자막</div><div class="feature-desc">소리 내용을 글로 보여줘요.</div></div></label>
+          </div>
+          <div class="feature" data-id="imgdesc" data-name="그림 설명" data-cost="2">
+            <label><input type="checkbox"><div class="icon">🖼️</div><div><div class="feature-title">그림 설명</div><div class="feature-desc">그림과 사진이 어떤 내용인지 알려줘요.</div></div></label>
+          </div>
+          <div class="feature" data-id="keyboard" data-name="키보드 조작" data-cost="2">
+            <label><input type="checkbox"><div class="icon">⌨️</div><div><div class="feature-title">키보드 조작</div><div class="feature-desc">마우스 대신 키보드로도 사용할 수 있어요.</div></div></label>
+          </div>
+        </div>
+
+        <div class="tier">
+          <div class="tier-header">
+            <h3>3코인 상점</h3>
+            <div class="cost-badge cost-3">3코인</div>
+          </div>
+
+          <div class="feature" data-id="multi" data-name="여러 언어 지원" data-cost="3">
+            <label><input type="checkbox"><div class="icon">🌍</div><div><div class="feature-title">여러 언어 지원</div><div class="feature-desc">다른 언어로도 쓸 수 있어요.</div></div></label>
+          </div>
+          <div class="feature" data-id="custom" data-name="사용자 맞춤 모드" data-cost="3">
+            <label><input type="checkbox"><div class="icon">⚙️</div><div><div class="feature-title">사용자 맞춤 모드</div><div class="feature-desc">내가 원하는 방식만 골라서 볼 수 있어요.</div></div></label>
+          </div>
+          <div class="feature" data-id="barrierfree" data-name="계단 없는 길찾기" data-cost="3">
+            <label><input type="checkbox"><div class="icon">♿</div><div><div class="feature-title">계단 없는 길찾기</div><div class="feature-desc">계단·경사 없는 길을 안내해 줘요.</div></div></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="main-btn" id="checkBudgetBtn">ROUND 1 선택 확인하기</button>
+        <button class="sub-btn" id="resetSelectionBtn">선택 초기화</button>
+      </div>
+
+      <div class="feedback" id="budgetFeedback"></div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title"><span class="pill">2</span> ROUND 1 · 우리 모둠의 첫 선택</h2>
+      <div class="status-board">
+        <div class="card">
+          <h3>구입한 기능</h3>
+          <div class="board-list" id="selectedList">
+            <div class="slot"><b>①</b><span class="muted">아직 고른 기능이 없어요.</span></div>
+            <div class="slot"><b>②</b><span class="muted">예산 6코인 안에서 기능을 골라 보세요.</span></div>
+            <div class="slot"><b>③</b><span class="muted">최대 6코인을 사용할 수 있어요.</span></div>
+          </div>
+        </div>
+        <div class="card reason-box">
+          <h3>현재 예산 상태</h3>
+          <div class="slot"><b>사용한 코인</b><span id="usedCoins">0코인</span></div>
+          <div class="slot"><b>남은 코인</b><span id="leftCoins">6코인</span></div>
+          <div class="slot"><b>가장 먼저 선택한 기능</b><span id="firstChoice">아직 없음</span></div>
+          
+<div class="write-card">
+  <div class="write-title"><span>💭 우리 모둠의 첫 선택 설명</span><span class="char-badge" data-count-for="choiceReason">0자</span></div>
+  <div class="write-guide">
+    <span class="guide-chip">누구에게 도움이 되나요?</span>
+    <span class="guide-chip">어떤 불편을 줄이나요?</span>
+    <span class="guide-chip">왜 먼저 골랐나요?</span>
+  </div>
+  <textarea class="lined-area" id="choiceReason" placeholder="예: 우리 모둠은 ○○한 사용자가 겪는 불편을 먼저 줄이고 싶어서 이 기능을 선택했다."></textarea>
+  <div class="write-footer"><span>한 문장보다 ‘대상 + 불편 + 이유’를 함께 적어 보세요.</span></div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title"><span class="pill">3</span> ROUND 2 · 사용자 등장!</h2>
+      
+<p class="small">화면에 등장한 사용자의 상황을 보고, 우리 모둠이 고른 기능으로 충분히 도울 수 있는지 판단합니다. 부족하면 ROUND 3에서 교환해 볼 수 있습니다.</p>
+<div class="situation-toolbar">
+  <div><b>🎲 사용자 상황 카드</b><br><span class="small">페이지를 열 때마다 5개의 상황이 달라집니다.</span></div>
+  <button class="sub-btn" type="button" id="rerollUsersBtn">새 상황 다시 뽑기</button>
+</div>
+      <div class="user-grid">
+        <div class="user-card">
+          <div class="user-top"><div class="avatar" id="avatarA">👓</div><div class="user-name">사용자 A</div><div class="user-need" id="needA">상황을 불러오는 중...</div><div class="situation-tag" id="tagA">상황</div></div>
+          <div class="user-body">
+            <div class="check-group">
+              <label class="check-item"><input type="radio" name="ua"><span>충분히 가능</span></label>
+              <label class="check-item"><input type="radio" name="ua"><span>일부 가능</span></label>
+              <label class="check-item"><input type="radio" name="ua"><span>어렵다</span></label>
+            </div>
+            <input class="input-line" id="lackA" placeholder="어떤 기능이 필요하고, 왜 그런지 적어 보세요." />
+          </div>
+        </div>
+
+        <div class="user-card">
+          <div class="user-top"><div class="avatar" id="avatarB">🗣️</div><div class="user-name">사용자 B</div><div class="user-need" id="needB">상황을 불러오는 중...</div><div class="situation-tag" id="tagB">상황</div></div>
+          <div class="user-body">
+            <div class="check-group">
+              <label class="check-item"><input type="radio" name="ub"><span>충분히 가능</span></label>
+              <label class="check-item"><input type="radio" name="ub"><span>일부 가능</span></label>
+              <label class="check-item"><input type="radio" name="ub"><span>어렵다</span></label>
+            </div>
+            <input class="input-line" id="lackB" placeholder="어떤 기능이 필요하고, 왜 그런지 적어 보세요." />
+          </div>
+        </div>
+
+        <div class="user-card">
+          <div class="user-top"><div class="avatar" id="avatarC">🎧</div><div class="user-name">사용자 C</div><div class="user-need" id="needC">상황을 불러오는 중...</div><div class="situation-tag" id="tagC">상황</div></div>
+          <div class="user-body">
+            <div class="check-group">
+              <label class="check-item"><input type="radio" name="uc"><span>충분히 가능</span></label>
+              <label class="check-item"><input type="radio" name="uc"><span>일부 가능</span></label>
+              <label class="check-item"><input type="radio" name="uc"><span>어렵다</span></label>
+            </div>
+            <input class="input-line" id="lackC" placeholder="어떤 기능이 필요하고, 왜 그런지 적어 보세요." />
+          </div>
+        </div>
+
+        <div class="user-card">
+          <div class="user-top"><div class="avatar" id="avatarD">🧭</div><div class="user-name">사용자 D</div><div class="user-need" id="needD">상황을 불러오는 중...</div><div class="situation-tag" id="tagD">상황</div></div>
+          <div class="user-body">
+            <div class="check-group">
+              <label class="check-item"><input type="radio" name="ud"><span>충분히 가능</span></label>
+              <label class="check-item"><input type="radio" name="ud"><span>일부 가능</span></label>
+              <label class="check-item"><input type="radio" name="ud"><span>어렵다</span></label>
+            </div>
+            <input class="input-line" id="lackD" placeholder="어떤 기능이 필요하고, 왜 그런지 적어 보세요." />
+          </div>
+        </div>
+
+        <div class="user-card">
+          <div class="user-top"><div class="avatar" id="avatarE">📚</div><div class="user-name">사용자 E</div><div class="user-need" id="needE">상황을 불러오는 중...</div><div class="situation-tag" id="tagE">상황</div></div>
+          <div class="user-body">
+            <div class="check-group">
+              <label class="check-item"><input type="radio" name="ue"><span>충분히 가능</span></label>
+              <label class="check-item"><input type="radio" name="ue"><span>일부 가능</span></label>
+              <label class="check-item"><input type="radio" name="ue"><span>어렵다</span></label>
+            </div>
+            <input class="input-line" id="lackE" placeholder="어떤 기능이 필요하고, 왜 그런지 적어 보세요." />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title"><span class="pill">4</span> ROUND 3 · 교환 찬스</h2>
+      <div class="swap-choice">
+        <div class="swap-option">
+          <input type="radio" name="swapChoice" id="swapYes" value="yes">
+          <label for="swapYes">🔁 기능을 교환할래요</label>
+        </div>
+        <div class="swap-option">
+          <input type="radio" name="swapChoice" id="swapNo" value="no">
+          <label for="swapNo">✅ 지금 선택을 유지할래요</label>
+        </div>
+      </div>
+      <div class="swap-note" id="swapDecisionNote">
+        사용자 상황을 본 뒤 판단하세요. 이미 충분히 포용적인 선택이라면 <b>교환하지 않아도 됩니다.</b>
+      </div>
+
+      <div class="grid-2" id="swapArea">
+        <div class="card">
+          <div class="swap-grid">
+            <div>
+              <h3>버릴 기능</h3>
+              <input class="long-input" id="dropFeature" placeholder="예: 큰 버튼" />
+            </div>
+            <div class="arrow">➡️</div>
+            <div>
+              <h3>새로 살 기능</h3>
+              <input class="long-input" id="newFeature" placeholder="예: 자막" />
+            </div>
+          </div>
+          <div class="line"></div>
+          <div class="write-card">
+      <div class="write-title"><span>🔁 교환 이유</span><span class="char-badge" data-count-for="swapReason">0자</span></div>
+      <div class="write-guide">
+        <span class="guide-chip">누구를 더 고려했나요?</span>
+        <span class="guide-chip">무엇이 부족했나요?</span>
+        <span class="guide-chip">교환 후 무엇이 좋아지나요?</span>
+      </div>
+      <textarea class="lined-area" id="swapReason" placeholder="교환 전보다 어떤 사용자의 불편을 더 줄일 수 있는지 적어 보세요."></textarea>
+    </div>
+        </div>
+
+        <div class="card">
+          <h3>교환 전 체크</h3>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" id="swapCheck1"><span>새 기능이 더 많은 사람 또는 더 불편한 사람에게 도움이 되는가?</span></label>
+            <label class="check-item"><input type="checkbox" id="swapCheck2"><span>교환 후에도 예산 6코인 안에 들어가는가?</span></label>
+            <label class="check-item"><input type="checkbox" id="swapCheck3"><span>우리가 포기하게 되는 기능의 아쉬움도 생각했는가?</span></label>
+          </div>
+          <div class="notice">🎯 한 번의 교환은 단순히 “마음에 드는 기능 바꾸기”가 아니라,
+          <b>공정성 기준을 다시 세우는 과정</b>입니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title"><span class="pill">5</span> ROUND 4 · 공정성 토론</h2>
+      <div class="debate-grid">
+        <div class="card">
+          <h3>우리 모둠의 기준 선택</h3>
+          <div class="criteria-box">
+            <label class="check-item"><input type="checkbox" class="criteria"><span>가장 많은 사람에게 도움이 되는 기능을 먼저 넣어야 한다.</span></label>
+            <label class="check-item"><input type="checkbox" class="criteria"><span>가장 큰 불편을 겪는 사람을 먼저 고려해야 한다.</span></label>
+            <label class="check-item"><input type="checkbox" class="criteria"><span>안전과 권리에 영향을 주는 기능을 우선해야 한다.</span></label>
+            <label class="check-item"><input type="checkbox" class="criteria"><span>상황에 따라 다르게 결정해야 한다.</span></label>
+          </div>
+        </div>
+        <div class="card">
+          <h3>이유 쓰기</h3>
+          <input class="long-input" id="teamCriteria" placeholder="우리 모둠의 기준 한 줄 정리" />
+          <div style="height:10px"></div>
+          <div class="write-card">
+      <div class="write-title"><span>⚖️ 우리 모둠이 이 기준을 고른 이유</span><span class="char-badge" data-count-for="criteriaReason">0자</span></div>
+      <div class="write-guide">
+        <span class="guide-chip">누구를 먼저 고려?</span>
+        <span class="guide-chip">왜 더 공정한가?</span>
+      </div>
+      <textarea class="lined-area" id="criteriaReason" placeholder="우리 모둠이 생각하는 ‘공정함’이 무엇인지 이유와 함께 적어 보세요."></textarea>
+    </div>
+        </div>
+      </div>
+    </div>
+
+    
+<div class="section">
+  <h2 class="section-title"><span class="pill">6</span> FINAL · 우리 모둠의 포용성 예산안</h2>
+
+  <div class="final-select-grid">
+    <div class="pick-panel">
+      <h3>① 최종 기능 선택</h3>
+      <p class="pick-help">최종적으로 넣을 기능을 눌러 선택하세요. <b>총 6코인 안</b>에서 자유롭게 조합할 수 있습니다.</p>
+      <div class="final-feature-picks" id="finalFeaturePicks"></div>
+      <div class="final-budget">
+        <span>사용한 코인 <b id="finalUsedCoins">0</b> / 6</span>
+        <span>남은 코인 <b id="finalLeftCoins">6</b></span>
+      </div>
+    </div>
+
+    <div class="pick-panel">
+      <h3>② 이번에는 포기한 기능</h3>
+      <p class="pick-help">최종 선택에서 빠진 기능 중 하나를 눌러 보세요.</p>
+      <div class="single-pick-list" id="missedPickList"></div>
+
+      <div style="height:16px"></div>
+
+      <h3>③ 다음에 가장 먼저 추가할 기능</h3>
+      <p class="pick-help">예산이 더 생긴다면 어떤 기능을 먼저 추가할까요?</p>
+      <div class="single-pick-list" id="nextPickList"></div>
+    </div>
+
+    <div class="pick-panel">
+      <h3>④ 우리 모둠의 최종 우선순위</h3>
+      <p class="pick-help">가장 중요하다고 생각하는 기준 하나를 골라 주세요.</p>
+      <div class="priority-picks" id="priorityPicks">
+        <button type="button" class="priority-btn" data-priority="가장 큰 불편을 먼저 줄인다">🧩 가장 큰 불편을 먼저 줄인다</button>
+        <button type="button" class="priority-btn" data-priority="가장 많은 사람에게 도움이 되게 한다">👥 가장 많은 사람에게 도움이 되게 한다</button>
+        <button type="button" class="priority-btn" data-priority="안전과 권리에 꼭 필요한 기능을 먼저 넣는다">🛡️ 안전과 권리에 꼭 필요한 기능을 먼저 넣는다</button>
+        <button type="button" class="priority-btn" data-priority="상황에 따라 균형 있게 결정한다">⚖️ 상황에 따라 균형 있게 결정한다</button>
+        <button type="button" class="priority-btn" data-priority="__custom__">✍️ 기타 · 우리 모둠이 직접 정하기</button>
+      </div>
+      <div class="custom-priority-wrap" id="customPriorityWrap">
+        <input type="text" class="custom-priority-input" id="customPriorityInput"
+               placeholder="예: 혼자서는 사용하기 어려운 사람을 먼저 도와야 한다">
+        <div class="custom-priority-guide">우리 모둠만의 우선순위 기준을 한 문장으로 적어 주세요.</div>
+      </div>
+
+      <div class="final-choice-summary" id="finalChoiceSummary">
+        아직 FINAL 선택이 완료되지 않았어요.
+      </div>
+    </div>
+  </div>
+<div class="btn-row">
+        <button class="main-btn" id="reviewBtn">전체 활동 확인하기</button>
+        <button class="accent-btn" id="sampleBtn">생각 힌트 보기</button>
+        <button class="sub-btn" id="resetAllBtn">전체 초기화</button>
+        <button class="print-btn" type="button" id="printBtnBottom">🖨️ 출력 / PDF 저장</button>
+      </div>
+
+      <div class="feedback" id="finalFeedback"></div>
+      <div class="result-stage" id="resultStage">
+        <div class="result-head">
+          <div>
+            <h3>🏆 우리 모둠 최종 결과</h3>
+            <p>FINAL에서 고른 내용을 한눈에 보는 요약 카드입니다. 마지막에 이미지로 만들 수 있습니다.</p>
+          </div>
+          <div class="btn-row" style="margin:0;">
+            <button class="main-btn" type="button" id="makeResultBtn">🖼️ 결과 요약 이미지 만들기</button>
+            <button class="sub-btn" type="button" id="saveResultBtn" disabled>💾 이미지 저장</button>
+          </div>
+        </div>
+
+        <div class="result-summary-grid">
+          <div class="result-mini">
+            <h4>선택한 핵심 기능</h4>
+            <ul id="resultFunctionList"><li>FINAL 기능을 선택하면 여기에 표시됩니다.</li></ul>
+          </div>
+          <div class="result-mini">
+            <h4>우리의 공정성 기준</h4>
+            <p id="resultCriteria">아직 작성되지 않았어요.</p>
+          </div>
+          <div class="result-mini">
+            <h4>다음에 추가할 기능</h4>
+            <p id="resultNext">아직 작성되지 않았어요.</p>
+          </div>
+        </div>
+
+        <div class="poster-wrap" id="posterWrap">
+          <div class="poster-card">
+            <canvas id="resultCanvas" width="1400" height="900"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="hint-panel" id="thinkingHint">
+        <b>💡 생각 힌트</b><br>
+        • 기능을 고를 때는 “몇 명이 좋아할까?”뿐 아니라 “이 기능이 없으면 아예 사용하기 어려운 사람은 누구일까?”도 생각해 보세요.<br>
+        • 교환할 때는 편리함보다 <b>접근 자체를 가능하게 하는 기능</b>이 있는지 비교해 보세요.<br>
+        • 공정성은 모두에게 똑같이 주는 것과 항상 같지는 않습니다.
+      </div>
+
+      <div class="sticky-tip">
+        ✅ <b>활동 핵심</b> : “모두에게 똑같이”가 아니라, <b>누구에게 어떤 불편이 있는지 보고 공정하게 우선순위를 정하는 것</b>이 포용성입니다.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const budget = 6;
+const featureEls = [...document.querySelectorAll('.feature')];
+const budgetFeedback = document.getElementById('budgetFeedback');
+const finalFeedback = document.getElementById('finalFeedback');
+
+const swapArea = document.getElementById('swapArea');
+
+function updateSwapMode(){
+  const choice = document.querySelector('input[name="swapChoice"]:checked')?.value || '';
+  const noSwap = choice === 'no';
+  swapArea.classList.toggle('swap-disabled', noSwap);
+
+  const controls = swapArea.querySelectorAll('input, textarea');
+  controls.forEach(el=>{
+    el.disabled = noSwap;
+    if(noSwap){
+      if(el.type === 'checkbox' || el.type === 'radio') el.checked = false;
+      else el.value = '';
+    }
+  });
+
+  const note = document.getElementById('swapDecisionNote');
+  if(choice === 'yes'){
+    note.innerHTML = '🔁 사용자 상황을 다시 보고, <b>버릴 기능 → 새로 살 기능 → 교환 이유</b>를 작성하세요.';
+  }else if(choice === 'no'){
+    note.innerHTML = '✅ <b>교환하지 않기</b>를 선택했습니다. 현재 기능 구성이 충분하다고 생각하는 이유는 ROUND 4 공정성 토론에서 설명하면 됩니다.';
+  }else{
+    note.innerHTML = '사용자 상황을 본 뒤 판단하세요. 이미 충분히 포용적인 선택이라면 <b>교환하지 않아도 됩니다.</b>';
+  }
+}
+
+document.querySelectorAll('input[name="swapChoice"]').forEach(r=>{
+  r.addEventListener('change', updateSwapMode);
+});
+
+
+const userScenarioPool = [
+  {avatar:'🔎', tag:'보기', need:'작은 글씨가 잘 보이지 않아 안내문을 읽기 어렵습니다.', helpful:['글씨 확대','큰 버튼','음성 읽기']},
+  {avatar:'🌏', tag:'언어', need:'한국어가 아직 익숙하지 않아 어려운 표현을 이해하기 힘듭니다.', helpful:['쉬운 한국어','여러 언어 지원']},
+  {avatar:'🎧', tag:'듣기', need:'소리를 들을 수 없어 음성 안내만으로는 정보를 알기 어렵습니다.', helpful:['자막']},
+  {avatar:'♿', tag:'이동', need:'계단을 이용하기 어려워 이동 경로를 찾을 때 불편합니다.', helpful:['계단 없는 길찾기']},
+  {avatar:'📚', tag:'이해', need:'긴 설명을 한 번에 이해하기 어려워 핵심 내용을 찾기 힘듭니다.', helpful:['핵심 3줄 요약','쉬운 한국어']},
+  {avatar:'⌨️', tag:'조작', need:'마우스를 오래 사용하기 어려워 키보드만으로 화면을 조작하고 싶습니다.', helpful:['키보드 조작','큰 버튼']},
+  {avatar:'🖼️', tag:'이미지', need:'사진이나 그림만 제시되면 그 안의 정보를 알아보기 어렵습니다.', helpful:['그림 설명','음성 읽기']},
+  {avatar:'🔊', tag:'읽기', need:'화면의 긴 글을 눈으로 계속 읽기 어려워 소리로 듣는 편이 편합니다.', helpful:['음성 읽기','핵심 3줄 요약']},
+  {avatar:'🏠', tag:'길찾기', need:'화면을 여러 번 이동하면 처음 화면으로 돌아가는 방법을 자주 놓칩니다.', helpful:['처음으로 버튼','사용자 맞춤 모드']},
+  {avatar:'⚙️', tag:'맞춤', need:'필요한 기능만 골라 단순한 화면으로 사용하고 싶습니다.', helpful:['사용자 맞춤 모드','큰 버튼']},
+  {avatar:'👆', tag:'터치', need:'작은 버튼을 정확하게 누르기 어려워 자주 잘못 선택합니다.', helpful:['큰 버튼']},
+  {avatar:'🧩', tag:'복합', need:'한국어도 어렵고 긴 설명도 부담스러워 간단하고 쉬운 안내가 필요합니다.', helpful:['쉬운 한국어','핵심 3줄 요약','여러 언어 지원']}
+];
+
+let currentScenarios = [];
+
+function pickRandomScenarios(){
+  const shuffled = [...userScenarioPool].sort(()=>Math.random()-0.5);
+  currentScenarios = shuffled.slice(0,5);
+
+  currentScenarios.forEach((s,idx)=>{
+    const letter = String.fromCharCode(65+idx);
+    document.getElementById('avatar'+letter).textContent = s.avatar;
+    document.getElementById('need'+letter).textContent = s.need;
+    document.getElementById('tag'+letter).textContent = s.tag;
+  });
+
+  ['ua','ub','uc','ud','ue'].forEach(name=>{
+    document.querySelectorAll(`input[name="${name}"]`).forEach(r=>r.checked=false);
+  });
+  ['lackA','lackB','lackC','lackD','lackE'].forEach(id=>document.getElementById(id).value='');
+}
+
+function updateCharCount(id){
+  const el = document.getElementById(id);
+  const badge = document.querySelector(`[data-count-for="${id}"]`);
+  if(el && badge) badge.textContent = el.value.length + '자';
+}
+
+['choiceReason','swapReason','criteriaReason'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el){
+    el.addEventListener('input',()=>updateCharCount(id));
+    updateCharCount(id);
+  }
+});
+
+
+function getSelectedFeatures(){
+  return featureEls
+    .filter(el => el.querySelector('input').checked)
+    .map(el => ({
+      id: el.dataset.id,
+      name: el.dataset.name,
+      cost: Number(el.dataset.cost)
+    }));
+}
+
+function renderSelectedStyles(){
+  featureEls.forEach(el=>{
+    el.classList.toggle('selected', el.querySelector('input').checked);
+  });
+}
+
+function updateBoard(){
+  const selected = getSelectedFeatures();
+  const used = selected.reduce((a,b)=>a+b.cost,0);
+  const left = budget - used;
+
+  document.getElementById('usedCoins').textContent = used + '코인';
+  document.getElementById('leftCoins').textContent = left + '코인';
+  document.getElementById('firstChoice').textContent = selected[0]?.name || '아직 없음';
+
+  const list = document.getElementById('selectedList');
+  list.innerHTML = '';
+  if(selected.length === 0){
+    list.innerHTML = `
+      <div class="slot"><b>①</b><span class="muted">아직 고른 기능이 없어요.</span></div>
+      <div class="slot"><b>②</b><span class="muted">예산 6코인 안에서 기능을 골라 보세요.</span></div>
+      <div class="slot"><b>③</b><span class="muted">최대 6코인을 사용할 수 있어요.</span></div>`;
+    return;
+  }
+  selected.forEach((item, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'slot';
+    div.innerHTML = `<b>${String(idx+1).padStart(2,'0')} · ${item.name}</b><span class="pill-coin">🪙 ${item.cost}코인</span>`;
+    list.appendChild(div);
+  });
+  for(let i=selected.length;i<3;i++){
+    const div = document.createElement('div');
+    div.className = 'slot';
+    div.innerHTML = `<b>${String(i+1).padStart(2,'0')}</b><span class="muted">추가로 쓸 수도 있고, 남겨둘 수도 있어요.</span>`;
+    list.appendChild(div);
+  }
+}
+
+function checkBudget(){
+  const selected = getSelectedFeatures();
+  const used = selected.reduce((a,b)=>a+b.cost,0);
+  budgetFeedback.classList.add('show');
+
+  if(selected.length === 0){
+    budgetFeedback.className = 'feedback warn show';
+    budgetFeedback.innerHTML = '📝 아직 고른 기능이 없습니다. 우리 모둠이 가장 먼저 넣고 싶은 기능을 골라 보세요.';
+    return false;
+  }
+
+  if(used > budget){
+    budgetFeedback.className = 'feedback warn show';
+    budgetFeedback.innerHTML = `⚠️ 현재 <b>${used}코인</b>을 사용했습니다. 예산 6코인을 초과했어요. 기능을 다시 조정해 주세요.`;
+    return false;
+  } else {
+    budgetFeedback.className = 'feedback ok show';
+    budgetFeedback.innerHTML = `✅ 현재 선택은 <b>${used}코인</b>입니다. 예산 안에 들어갑니다. 이제 ROUND 2에서 어떤 사용자를 충분히 돕는지 살펴보세요.`;
+    return true;
+  }
+}
+
+featureEls.forEach(el=>{
+  const input = el.querySelector('input');
+
+  // 카드 어디를 눌러도 한 번만 선택/해제되도록 처리
+  el.setAttribute('tabindex', '0');
+  el.setAttribute('role', 'button');
+
+  el.addEventListener('click', (e)=>{
+    // label/input의 기본 체크 동작과 수동 토글이 겹쳐 두 번 바뀌는 현상 방지
+    e.preventDefault();
+    input.checked = !input.checked;
+    renderSelectedStyles();
+    updateBoard();
+  });
+
+  // 키보드 Enter/Space로도 선택 가능
+  el.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      input.checked = !input.checked;
+      renderSelectedStyles();
+      updateBoard();
+    }
+  });
+});
+
+document.getElementById('checkBudgetBtn').addEventListener('click', checkBudget);
+
+document.getElementById('resetSelectionBtn').addEventListener('click', ()=>{
+  featureEls.forEach(el => el.querySelector('input').checked = false);
+  renderSelectedStyles();
+  updateBoard();
+  budgetFeedback.className = 'feedback';
+  budgetFeedback.innerHTML = '';
+});
+
+function allRadiosAnswered(){
+  const groups = ['ua','ub','uc','ud','ue'];
+  return groups.every(name => document.querySelector(`input[name="${name}"]:checked`));
+}
+
+function criteriaChecked(){
+  return [...document.querySelectorAll('.criteria:checked')].length >= 1;
+}
+
+function finalFilledEnough(){
+  const priorityReady =
+    priorityChoice && (priorityChoice !== '__custom__' || customPriorityText.trim().length >= 5);
+
+  return finalSelection.length > 0 &&
+         finalSelectionCost() <= budget &&
+         !!missedChoice &&
+         !!nextChoice &&
+         !!priorityReady;
+}
+
+function swapChecksDone(){
+  return ['swapCheck1','swapCheck2','swapCheck3'].every(id => document.getElementById(id).checked);
+}
+
+
+const finalFeatureMeta = [
+  {id:'summary3', name:'핵심 3줄 요약', cost:1, icon:'📝', users:'긴 설명을 이해하기 어려운 사용자'},
+  {id:'homebtn', name:'처음으로 버튼', cost:1, icon:'🏠', users:'화면 이동이 어려운 사용자'},
+  {id:'bigbtn', name:'큰 버튼', cost:1, icon:'🔘', users:'작은 버튼을 누르기 어려운 사용자'},
+  {id:'zoom', name:'글씨 확대', cost:2, icon:'🔎', users:'작은 글씨를 보기 어려운 사용자'},
+  {id:'easykor', name:'쉬운 한국어', cost:2, icon:'🙂', users:'어려운 표현을 이해하기 힘든 사용자'},
+  {id:'voice', name:'음성 읽기', cost:2, icon:'🔊', users:'화면 글을 읽기 어려운 사용자'},
+  {id:'caption', name:'자막', cost:2, icon:'💬', users:'소리를 듣기 어려운 사용자'},
+  {id:'imgdesc', name:'그림 설명', cost:2, icon:'🖼️', users:'이미지 정보를 알아보기 어려운 사용자'},
+  {id:'keyboard', name:'키보드 조작', cost:2, icon:'⌨️', users:'마우스 사용이 어려운 사용자'},
+  {id:'multi', name:'여러 언어 지원', cost:3, icon:'🌍', users:'한국어가 익숙하지 않은 사용자'},
+  {id:'custom', name:'사용자 맞춤 모드', cost:3, icon:'⚙️', users:'단순하고 맞춤형 화면이 필요한 사용자'},
+  {id:'barrierfree', name:'계단 없는 길찾기', cost:3, icon:'♿', users:'계단 이용이 어려운 사용자'}
+];
+
+let finalSelection = [];
+let missedChoice = '';
+let nextChoice = '';
+let priorityChoice = '';
+let customPriorityText = '';
+
+function finalSelectionCost(){
+  return finalSelection.reduce((sum,id)=>{
+    const f = finalFeatureMeta.find(x=>x.id===id);
+    return sum + (f?.cost || 0);
+  },0);
+}
+
+function renderFinalFeaturePicks(){
+  const box = document.getElementById('finalFeaturePicks');
+  box.innerHTML = '';
+
+  finalFeatureMeta.forEach(f=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pick-chip' + (finalSelection.includes(f.id) ? ' selected' : '');
+    btn.innerHTML = `<span>${f.icon}</span><span>${f.name}</span><span class="mini-cost">${f.cost}코인</span>`;
+
+    const wouldCost = finalSelectionCost() + (finalSelection.includes(f.id) ? 0 : f.cost);
+    if(!finalSelection.includes(f.id) && wouldCost > budget){
+      btn.classList.add('disabled-choice');
+    }
+
+    btn.addEventListener('click', ()=>{
+      if(finalSelection.includes(f.id)){
+        finalSelection = finalSelection.filter(id=>id!==f.id);
+      }else{
+        if(finalSelectionCost()+f.cost > budget) return;
+        finalSelection.push(f.id);
+      }
+      // 선택된 기능이 '포기/다음'으로 지정되어 있으면 해제
+      if(finalSelection.includes(missedChoice)) missedChoice='';
+      if(finalSelection.includes(nextChoice)) nextChoice='';
+      renderFinalAll();
+    });
+    box.appendChild(btn);
+  });
+
+  document.getElementById('finalUsedCoins').textContent = finalSelectionCost();
+  document.getElementById('finalLeftCoins').textContent = budget-finalSelectionCost();
+}
+
+function renderSinglePickLists(){
+  const missed = document.getElementById('missedPickList');
+  const next = document.getElementById('nextPickList');
+  missed.innerHTML = '';
+  next.innerHTML = '';
+
+  const unselected = finalFeatureMeta.filter(f=>!finalSelection.includes(f.id));
+
+  if(unselected.length===0){
+    missed.innerHTML = '<div class="small">포기한 기능이 없습니다.</div>';
+    next.innerHTML = '<div class="small">추가 후보가 없습니다.</div>';
+    missedChoice='';
+    nextChoice='';
+    return;
+  }
+
+  unselected.forEach(f=>{
+    const b1=document.createElement('button');
+    b1.type='button';
+    b1.className='single-pick'+(missedChoice===f.id?' selected':'');
+    b1.textContent=`${f.icon} ${f.name}`;
+    b1.addEventListener('click',()=>{
+      missedChoice = missedChoice===f.id ? '' : f.id;
+      renderFinalAll();
+    });
+    missed.appendChild(b1);
+
+    const b2=document.createElement('button');
+    b2.type='button';
+    b2.className='single-pick'+(nextChoice===f.id?' next-selected':'');
+    b2.textContent=`${f.icon} ${f.name}`;
+    b2.addEventListener('click',()=>{
+      nextChoice = nextChoice===f.id ? '' : f.id;
+      renderFinalAll();
+    });
+    next.appendChild(b2);
+  });
+}
+
+function getPriorityLabel(){
+  if(priorityChoice === '__custom__'){
+    return customPriorityText.trim() || '기타 기준 작성 중';
+  }
+  return priorityChoice;
+}
+
+function renderPriority(){
+  document.querySelectorAll('.priority-btn').forEach(btn=>{
+    btn.classList.toggle('selected', btn.dataset.priority===priorityChoice);
+  });
+
+  const wrap = document.getElementById('customPriorityWrap');
+  wrap.classList.toggle('show', priorityChoice === '__custom__');
+}
+
+document.querySelectorAll('.priority-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    priorityChoice = btn.dataset.priority;
+    renderFinalAll();
+
+    if(priorityChoice === '__custom__'){
+      setTimeout(()=>document.getElementById('customPriorityInput')?.focus(), 0);
+    }
+  });
+});
+
+document.getElementById('customPriorityInput').addEventListener('input', (e)=>{
+  customPriorityText = e.target.value;
+  renderFinalChoiceSummary();
+  updateResultPreview();
+  document.getElementById('posterWrap')?.classList.remove('show');
+  document.getElementById('saveResultBtn').disabled = true;
+});
+
+function renderFinalChoiceSummary(){
+  const sel = finalSelection.map(id=>finalFeatureMeta.find(f=>f.id===id)).filter(Boolean);
+  const missed = finalFeatureMeta.find(f=>f.id===missedChoice);
+  const next = finalFeatureMeta.find(f=>f.id===nextChoice);
+
+  const parts=[];
+  if(sel.length) parts.push(`<b>최종 기능</b> ${sel.map(f=>f.name).join(', ')} (${finalSelectionCost()}코인)`);
+  if(missed) parts.push(`<b>포기</b> ${missed.name}`);
+  if(next) parts.push(`<b>다음 추가</b> ${next.name}`);
+  if(priorityChoice) parts.push(`<b>우선순위</b> ${getPriorityLabel()}`);
+
+  document.getElementById('finalChoiceSummary').innerHTML =
+    parts.length ? parts.join('<br>') : '아직 FINAL 선택이 완료되지 않았어요.';
+}
+
+function renderFinalAll(){
+  renderFinalFeaturePicks();
+  renderSinglePickLists();
+  renderPriority();
+  renderFinalChoiceSummary();
+  updateResultPreview();
+  document.getElementById('posterWrap')?.classList.remove('show');
+  const saveBtn=document.getElementById('saveResultBtn');
+  if(saveBtn) saveBtn.disabled=true;
+}
+
+document.getElementById('reviewBtn').addEventListener('click', ()=>{
+  const selected = getSelectedFeatures();
+  const used = selected.reduce((a,b)=>a+b.cost,0);
+  let messages = [];
+  let ok = true;
+
+  if(selected.length === 0){
+    ok = false;
+    messages.push('• ROUND 1 : 기능을 먼저 선택해 주세요.');
+  }
+  if(used > budget){
+    ok = false;
+    messages.push('• ROUND 1 : 예산 6코인을 넘지 않도록 조정해 주세요.');
+  }
+  if(document.getElementById('choiceReason').value.trim().length < 8){
+    ok = false;
+    messages.push('• ROUND 1 : 선택 이유를 조금 더 자세히 적어 주세요.');
+  }
+  if(!allRadiosAnswered()){
+    ok = false;
+    messages.push('• ROUND 2 : 사용자 A~E 모두에 대해 판단을 체크해 주세요.');
+  }
+  const lackIds = ['lackA','lackB','lackC','lackD','lackE'];
+  if(!lackIds.every(id => document.getElementById(id).value.trim().length > 0)){
+    ok = false;
+    messages.push('• ROUND 2 : 각 사용자에게 부족한 기능 또는 근거를 적어 주세요.');
+  }
+  const swapChoice = document.querySelector('input[name="swapChoice"]:checked')?.value || '';
+  if(!swapChoice){
+    ok = false;
+    messages.push('• ROUND 3 : 기능을 교환할지, 현재 선택을 유지할지 먼저 정해 주세요.');
+  }else if(swapChoice === 'yes'){
+    if(document.getElementById('dropFeature').value.trim().length === 0 ||
+       document.getElementById('newFeature').value.trim().length === 0 ||
+       document.getElementById('swapReason').value.trim().length < 8 ||
+       !swapChecksDone()){
+      ok = false;
+      messages.push('• ROUND 3 : 교환을 선택했다면 버릴 기능 / 새 기능 / 이유 / 체크 3가지를 모두 작성해 주세요.');
+    }
+  }
+  if(!criteriaChecked() || document.getElementById('teamCriteria').value.trim().length === 0 || document.getElementById('criteriaReason').value.trim().length < 8){
+    ok = false;
+    messages.push('• ROUND 4 : 공정성 기준과 이유를 작성해 주세요.');
+  }
+  if(!finalFilledEnough()){
+    ok = false;
+    messages.push('• FINAL : 최종 기능, 포기한 기능, 다음에 추가할 기능, 우선순위 기준을 모두 선택해 주세요.');
+  }
+
+  finalFeedback.classList.add('show');
+  if(ok){
+    finalFeedback.className = 'feedback ok show';
+    finalFeedback.innerHTML = '🏁 <b>활동 확인 완료!</b><br>모든 ROUND를 잘 작성했습니다. 이제 모둠별로 어떤 기준을 세웠는지 발표해 보세요.<br><br>발표 팁 : <b>“누구를 위해 어떤 기능을 먼저 샀는가?”</b>, <b>“누구를 놓쳐서 교환했는가?”</b>, <b>“우리의 공정성 기준은 무엇인가?”</b>를 중심으로 말하면 좋습니다.';
+  } else {
+    finalFeedback.className = 'feedback warn show';
+    finalFeedback.innerHTML = '🔍 아직 보완할 부분이 있어요.<br>' + messages.join('<br>');
+  }
+});
+
+
+
+document.getElementById('resetAllBtn').addEventListener('click', ()=>{
+  featureEls.forEach(el => el.querySelector('input').checked = false);
+  document.querySelectorAll('input, textarea').forEach(el=>{
+    if(el.type === 'radio' || el.type === 'checkbox') el.checked = false;
+    else el.value = '';
+  });
+  renderSelectedStyles();
+  updateBoard();
+  budgetFeedback.className = 'feedback';
+  budgetFeedback.innerHTML = '';
+  finalFeedback.className = 'feedback';
+  finalFeedback.innerHTML = '';
+  document.getElementById('thinkingHint').classList.remove('show');
+  pickRandomScenarios();
+  ['choiceReason','swapReason','criteriaReason'].forEach(updateCharCount);
+
+  updateSwapMode();
+  finalSelection=[];
+  missedChoice='';
+  nextChoice='';
+  priorityChoice='';
+  customPriorityText='';
+  const customInput = document.getElementById('customPriorityInput');
+  if(customInput) customInput.value='';
+  renderFinalAll();
+  document.getElementById('posterWrap').classList.remove('show');
+  document.getElementById('saveResultBtn').disabled = true;
+  updateResultPreview();
+});
+
+renderSelectedStyles();
+updateBoard();
+
+document.getElementById('rerollUsersBtn').addEventListener('click', ()=>{
+  pickRandomScenarios();
+  finalFeedback.className = 'feedback';
+  finalFeedback.innerHTML = '';
+});
+
+document.getElementById('sampleBtn').addEventListener('click', ()=>{
+  document.getElementById('thinkingHint').classList.toggle('show');
+});
+
+pickRandomScenarios();
+
+
+function prepareForPrint(){
+  // 현재 입력값을 HTML 속성에도 반영해 인쇄/PDF에서 값이 안정적으로 보이게 함
+  document.querySelectorAll('input[type="text"]').forEach(el=>{
+    el.setAttribute('value', el.value);
+  });
+
+  document.querySelectorAll('textarea').forEach(el=>{
+    el.textContent = el.value;
+  });
+
+  document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(el=>{
+    if(el.checked) el.setAttribute('checked','checked');
+    else el.removeAttribute('checked');
+  });
+}
+
+function printActivity(){
+  prepareForPrint();
+  window.print();
+}
+
+document.getElementById('printBtn').addEventListener('click', printActivity);
+document.getElementById('printBtnBottom').addEventListener('click', printActivity);
+window.addEventListener('beforeprint', prepareForPrint);
+
+
+function val(id, fallback=''){
+  const el = document.getElementById(id);
+  const v = (el?.value || '').trim();
+  return v || fallback;
+}
+
+function updateResultPreview(){
+  const list = document.getElementById('resultFunctionList');
+  const rows = finalSelection
+    .map(id=>finalFeatureMeta.find(f=>f.id===id))
+    .filter(Boolean);
+
+  list.innerHTML = '';
+  if(rows.length===0){
+    list.innerHTML = '<li>FINAL 기능을 선택하면 여기에 표시됩니다.</li>';
+  }else{
+    rows.forEach(f=>{
+      const li=document.createElement('li');
+      li.textContent=`${f.name} · ${f.cost}코인 · ${f.users}`;
+      list.appendChild(li);
+    });
+  }
+
+  document.getElementById('resultCriteria').textContent =
+    getPriorityLabel() || val('teamCriteria','아직 선택되지 않았어요.');
+
+  const next=finalFeatureMeta.find(f=>f.id===nextChoice);
+  document.getElementById('resultNext').textContent =
+    next?.name || '아직 선택되지 않았어요.';
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines=99){
+  const words = String(text || '').split(/\s+/);
+  let line = '';
+  let lines = 0;
+
+  for(let n=0; n<words.length; n++){
+    const test = line ? line + ' ' + words[n] : words[n];
+    if(ctx.measureText(test).width > maxWidth && line){
+      ctx.fillText(line, x, y);
+      y += lineHeight;
+      lines++;
+      if(lines >= maxLines) return y;
+      line = words[n];
+    }else{
+      line = test;
+    }
+  }
+  if(line && lines < maxLines){
+    ctx.fillText(line, x, y);
+    y += lineHeight;
+  }
+  return y;
+}
+
+function roundRect(ctx, x, y, w, h, r, fill, stroke){
+  ctx.beginPath();
+  ctx.roundRect(x,y,w,h,r);
+  if(fill){ ctx.fillStyle = fill; ctx.fill(); }
+  if(stroke){ ctx.strokeStyle = stroke; ctx.lineWidth = 3; ctx.stroke(); }
+}
+
+function drawSummaryPoster(){
+  updateResultPreview();
+
+  const canvas = document.getElementById('resultCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // 배경
+  const bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#f3f7ff');
+  bg.addColorStop(.5,'#fff8fb');
+  bg.addColorStop(1,'#f4fff6');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  // 헤더
+  roundRect(ctx, 55, 45, W-110, 145, 34, '#ffffff', '#dbe4fb');
+  ctx.fillStyle = '#263d8c';
+  ctx.font = '900 54px sans-serif';
+  ctx.fillText('AI 포용성 경매 · 우리 모둠 최종 결과', 95, 108);
+  ctx.fillStyle = '#6b7895';
+  ctx.font = '700 25px sans-serif';
+  ctx.fillText('기능 선택 → 사용자 고려 → 공정성 기준 → 다음 개선', 98, 153);
+
+  // 기능 박스
+  roundRect(ctx, 55, 220, 760, 395, 28, '#ffffff', '#dbe4fb');
+  ctx.fillStyle = '#2a4189';
+  ctx.font = '900 34px sans-serif';
+  ctx.fillText('① 최종 선택 기능', 90, 270);
+
+  const rows = finalSelection
+    .map(id=>finalFeatureMeta.find(f=>f.id===id))
+    .filter(Boolean)
+    .slice(0,3)
+    .map(f=>[f.name, String(f.cost), f.users]);
+
+  while(rows.length<3){
+    rows.push(['선택 없음','-','-']);
+  }
+
+  let y = 315;
+  rows.forEach((r,i)=>{
+    roundRect(ctx, 90, y, 690, 80, 18, i%2===0 ? '#f6f8ff' : '#fff9f3', null);
+    ctx.fillStyle = '#334a8d';
+    ctx.font = '900 28px sans-serif';
+    ctx.fillText(`${i+1}. ${r[0]}`, 115, y+33);
+    ctx.fillStyle = '#6b7895';
+    ctx.font = '700 20px sans-serif';
+    ctx.fillText(`${r[1]}코인 · ${r[2]}`, 115, y+62);
+    y += 98;
+  });
+
+  // 오른쪽 상단 공정성 기준
+  roundRect(ctx, 845, 220, 500, 190, 28, '#ffffff', '#dbe4fb');
+  ctx.fillStyle = '#2a4189';
+  ctx.font = '900 31px sans-serif';
+  ctx.fillText('② 우리의 공정성 기준', 880, 267);
+  ctx.fillStyle = '#4f5f7c';
+  ctx.font = '700 23px sans-serif';
+  wrapText(ctx, getPriorityLabel() || val('teamCriteria','아직 선택되지 않았어요.'), 880, 315, 430, 34, 3);
+
+  // 오른쪽 중간 교환 결정
+  roundRect(ctx, 845, 435, 500, 180, 28, '#ffffff', '#dbe4fb');
+  ctx.fillStyle = '#2a4189';
+  ctx.font = '900 31px sans-serif';
+  ctx.fillText('③ 교환 찬스', 880, 482);
+
+  const swapChoice = document.querySelector('input[name="swapChoice"]:checked')?.value || '';
+  let swapText = '아직 결정하지 않았어요.';
+  if(swapChoice === 'no') swapText = '현재 기능 구성을 유지했어요.';
+  if(swapChoice === 'yes'){
+    const d = val('dropFeature','기존 기능');
+    const n = val('newFeature','새 기능');
+    swapText = `${d} → ${n}`;
+  }
+  ctx.fillStyle = '#4f5f7c';
+  ctx.font = '700 23px sans-serif';
+  wrapText(ctx, swapText, 880, 530, 430, 34, 2);
+
+  // 하단 3칸
+  const boxY = 650, boxH = 190, gap = 22, boxW = (W-110-gap*2)/3;
+  const missedObj = finalFeatureMeta.find(f=>f.id===missedChoice);
+  const nextObj = finalFeatureMeta.find(f=>f.id===nextChoice);
+  const boxes = [
+    ['포기한 기능', missedObj?.name || '선택 안 함'],
+    ['다음에 추가할 기능', nextObj?.name || '선택 안 함'],
+    ['최종 우선순위', getPriorityLabel() || '선택 안 함']
+  ];
+  boxes.forEach((b,i)=>{
+    const x = 55 + i*(boxW+gap);
+    roundRect(ctx, x, boxY, boxW, boxH, 26, '#ffffff', '#dbe4fb');
+    ctx.fillStyle = '#2a4189';
+    ctx.font = '900 27px sans-serif';
+    ctx.fillText(b[0], x+28, boxY+45);
+    ctx.fillStyle = '#53627f';
+    ctx.font = '700 20px sans-serif';
+    wrapText(ctx, b[1], x+28, boxY+85, boxW-56, 30, 3);
+  });
+
+  document.getElementById('posterWrap').classList.add('show');
+  document.getElementById('saveResultBtn').disabled = false;
+  document.getElementById('posterWrap').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function saveSummaryPoster(){
+  const canvas = document.getElementById('resultCanvas');
+  const link = document.createElement('a');
+  link.download = '9차시_AI포용성경매_우리모둠_최종결과.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+document.getElementById('makeResultBtn').addEventListener('click', drawSummaryPoster);
+document.getElementById('saveResultBtn').addEventListener('click', saveSummaryPoster);
+
+['teamCriteria'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('input', updateResultPreview);
+});
+updateResultPreview();
+
+updateSwapMode();
+
+renderFinalAll();
+</script>
+</body>
+</html>

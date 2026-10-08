@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8. 책임 있는 AI 활용 — AI 활용 과제와 나의 기여</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --ink:#1c2230; --ink-2:#4b5563; --ink-3:#8a94a6;
+  --paper:#ffffff; --bg:#f3f5f9; --line:#d9dee8; --line-2:#eceff4;
+  --blue:#2457d6; --blue-soft:#e9effc; --blue-ink:#1a3f9e;
+  --ok:#1f8f5f; --ok-soft:#e5f5ec; --warn:#b45309; --warn-soft:#fff4e5; --red:#c62828;
+  --radius:10px;
+  --font:"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--font);color:var(--ink);background:var(--bg);font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+textarea,input,select{font-family:inherit;font-size:15px;color:var(--ink)}
+
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.rail{background:var(--paper);border-right:1px solid var(--line);padding:22px 18px;position:sticky;top:0;height:100vh;overflow:auto}
+.rail .unit{font-size:12.5px;color:var(--ink-3);margin-bottom:4px}
+.rail .title{font-size:17px;font-weight:700;line-height:1.35;margin:0 0 18px}
+.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:10px;align-items:flex-start;padding:9px 8px;border-radius:8px;color:var(--ink-3);font-size:14px;cursor:default}
+.steps li .n{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:12px;flex:none;background:var(--paper)}
+.steps li.done{color:var(--ink-2);cursor:pointer}
+.steps li.done .n{background:var(--ok);border-color:var(--ok);color:#fff}
+.steps li.current{color:var(--blue-ink);background:var(--blue-soft);font-weight:600}
+.steps li.current .n{border-color:var(--blue);color:var(--blue)}
+.steps li.done:hover{background:var(--line-2)}
+.rail .who{margin-top:22px;padding-top:16px;border-top:1px solid var(--line-2)}
+.rail .who label{display:block;font-size:12px;color:var(--ink-3);margin:8px 0 3px}
+.rail .who input{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:7px}
+.rail .tools{margin-top:22px;display:flex;flex-direction:column;gap:8px}
+.rail .save{font-size:12px;color:var(--ink-3);margin-top:10px;min-height:18px}
+
+.main{padding:34px 40px 80px;max-width:820px;width:100%}
+.stage{display:none}
+.stage.active{display:block}
+.stage h1{font-size:26px;line-height:1.3;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
+.stage h1 small{display:block;font-size:13px;color:var(--ink-3);font-weight:500;margin-bottom:6px;letter-spacing:0}
+.stage .lead{color:var(--ink-2);margin:0 0 22px}
+.stage h2{font-size:18px;margin:34px 0 10px;font-weight:700}
+.stage h3{font-size:15.5px;margin:22px 0 8px;font-weight:700}
+.stage p{margin:0 0 10px}
+.stage .note{font-size:13px;color:var(--ink-3)}
+.kq{border-left:4px solid var(--blue);background:var(--paper);padding:14px 18px;border-radius:0 var(--radius) var(--radius) 0;margin:10px 0 24px;font-weight:600;color:var(--blue-ink);line-height:1.55}
+.kq .tag{display:block;font-size:12px;font-weight:600;color:var(--blue);margin-bottom:4px}
+.box{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:12px 0}
+.box.tint{background:var(--blue-soft);border-color:transparent}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.concept{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:12px 0}
+.concept b.t{display:block;font-size:16px;margin-bottom:6px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;background:var(--paper);margin:8px 0 12px}
+.tbl th,.tbl td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+.tbl th{background:var(--line-2);font-weight:600;font-size:13px}
+
+/* SNS 게시물 */
+.post{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:12px 0}
+.post .u{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.post .u .av{width:36px;height:36px;border-radius:50%;background:#dfe4ee}
+.post .u b{display:block;font-size:14px}
+.post .u span{font-size:12px;color:var(--ink-3)}
+.post h3{margin:0 0 10px;font-size:20px;line-height:1.3}
+.post p{margin:0 0 8px;font-size:15px}
+.post .src{font-size:13px;color:var(--ink-3);border-top:1px solid var(--line-2);padding-top:8px;margin-top:10px}
+.post .react{display:flex;gap:26px;font-size:13px;color:var(--ink-2);margin-top:8px}
+.chat{display:flex;flex-direction:column;gap:6px;margin:10px 0 14px}
+.chat span{align-self:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:14px 14px 14px 3px;padding:7px 13px;font-size:14px}
+
+/* 검색 결과 */
+.serp{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:10px 0 14px}
+.serp .bar{background:var(--line-2);padding:10px 14px;font-size:13.5px;display:flex;gap:8px;align-items:center}
+.serp .bar span{background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:5px 14px;flex:1}
+.serp .r{display:grid;grid-template-columns:24px 1fr;gap:12px;padding:12px 16px;border-top:1px solid var(--line-2)}
+.serp .r .n{color:var(--ink-3);font-size:13px;padding-top:2px}
+.serp .r .site{font-size:12.5px;color:var(--ink-3)}
+.serp .r .t{color:var(--blue);font-weight:600;font-size:15px}
+.serp .r .d{font-size:13.5px;color:var(--ink-2)}
+.serp .r .cite{display:inline-block;margin-top:5px;font-size:12px;border:1px solid var(--line);border-radius:5px;padding:1px 8px;color:var(--ink-2)}
+.serp .r .cite b{font-weight:600;color:var(--ink-3);margin-right:4px}
+.serp .r.doc .t{color:#5b3fb5}
+
+/* 리빌/단서 */
+.clue{border:1.5px solid var(--line);border-radius:var(--radius);margin:14px 0;background:var(--paper);overflow:hidden}
+.clue .ch{display:flex;align-items:center;gap:12px;padding:14px 18px}
+.clue .ch b{font-size:15.5px}
+.clue .ch .st{font-size:12.5px;color:var(--ink-3)}
+.clue .ch button{margin-left:auto}
+.clue .cb{display:none;padding:0 18px 18px;border-top:1px solid var(--line-2)}
+.clue.open .cb{display:block}
+.clue.open{border-color:var(--blue)}
+.clue.open .ch .st{color:var(--ok)}
+.reveal{display:flex;gap:14px;align-items:center;background:var(--blue-soft);border-radius:var(--radius);padding:14px 18px;margin:18px 0}
+.reveal .rt{flex:1;font-size:14.5px;color:var(--blue-ink)}
+.echo{background:var(--line-2);border-radius:8px;padding:10px 14px;margin:8px 0 12px;font-size:14px}
+.echo div{display:flex;gap:10px}
+.echo b{flex:none;color:var(--blue)}
+.echo .empty{color:var(--ink-3)}
+
+/* 질문 */
+.q{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:14px 0}
+.q .ql{font-weight:700;margin-bottom:8px;display:flex;gap:8px;align-items:baseline}
+.q .ql .no{color:var(--blue);flex:none}
+.q .qh{font-size:13.5px;color:var(--ink-2);margin:-4px 0 10px}
+.q textarea{width:100%;min-height:78px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;resize:vertical;line-height:1.55;background:#fbfcfe}
+.q input[type=text]{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:#fbfcfe}
+.q select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fbfcfe;min-width:160px}
+.q textarea:focus,.q input:focus,.q select:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:var(--blue)}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opts.row{flex-direction:row;flex-wrap:wrap;gap:8px 16px}
+.opt{display:flex;gap:9px;align-items:flex-start;padding:8px 10px;border-radius:8px;border:1px solid transparent;cursor:pointer}
+.opt:hover{background:var(--line-2)}
+.opt input{margin-top:4px;accent-color:var(--blue)}
+.opt.sel{background:var(--blue-soft);border-color:#c7d5f7}
+.opt .etc{flex:1;padding:4px 8px;border:0;border-bottom:1px solid var(--line);background:transparent}
+.blank{line-height:2.3}
+.blank input{width:min(100%,340px);padding:4px 8px;border:0;border-bottom:1.5px solid var(--ink-3);background:transparent;border-radius:0;margin:0 4px}
+.blank input:focus{outline:0;border-bottom-color:var(--blue)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2 .lab{font-size:13px;font-weight:600;margin-bottom:4px;color:var(--ink-2)}
+.mtx{width:100%;border-collapse:collapse;font-size:14px}
+.mtx th,.mtx td{border:1px solid var(--line);padding:9px 10px;text-align:center}
+.mtx td:first-child,.mtx th:first-child{text-align:left}
+.mtx input{accent-color:var(--blue)}
+.mtx th{background:var(--line-2);font-weight:600;font-size:13px}
+.rows3 .row{display:grid;grid-template-columns:minmax(40px,170px) 1fr;gap:10px;align-items:start;margin-bottom:10px}
+.rows3 .row .lb{font-weight:600;color:var(--blue);padding-top:8px}
+.claimgrid{display:grid;grid-template-columns:80px 1fr 1fr 150px;gap:8px;align-items:start}
+.claimgrid .hd{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.claimgrid .lb{font-weight:600;color:var(--blue);padding-top:8px}
+.claimgrid textarea{min-height:64px}
+.claimgrid .opts{gap:2px}
+.claimgrid .opt{padding:4px 6px;font-size:13.5px}
+.judge{display:grid;grid-template-columns:80px 190px 1fr;gap:8px;align-items:start;margin-bottom:8px}
+.judge .lb{font-weight:600;color:var(--blue);padding-top:8px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.compare .col{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.compare .col .k{font-size:12.5px;color:var(--ink-3);margin-bottom:4px}
+.compare .col .v{font-weight:600}
+.compare .col .v.empty{color:var(--ink-3);font-weight:400}
+
+.stage.locked textarea,.stage.locked input,.stage.locked select{background:#f5f7fa;color:var(--ink-2)}
+.stage.locked .opt{cursor:default}
+.lockbar{display:flex;gap:10px;align-items:center;background:var(--ok-soft);color:#125c3c;border-radius:8px;padding:9px 14px;font-size:13.5px;margin:0 0 18px}
+.lockbar::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok)}
+
+.btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:9px 16px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600}
+.btn:hover{background:var(--line-2)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--blue-ink)}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn.ghost{border-color:transparent;color:var(--ink-3)}
+.btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:36px;padding-top:20px;border-top:1px solid var(--line)}
+.nav .hint{font-size:13px;color:var(--ink-3)}
+
+@media (max-width:820px){
+  .app{grid-template-columns:1fr}
+  .rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:14px 16px}
+  .rail .steps{display:flex;gap:4px;overflow:auto;padding-bottom:4px}
+  .rail .steps li{flex:none;padding:6px 10px;font-size:13px}
+  .rail .steps li .lbl{display:none}
+  .rail .steps li.current .lbl{display:inline}
+  .rail .who{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:0;margin-top:10px;padding-top:0}
+  .rail .tools{flex-direction:row;flex-wrap:wrap;margin-top:12px}
+  .main{padding:22px 16px 60px}
+  .two,.grid2,.compare{grid-template-columns:1fr}
+  .claimgrid{grid-template-columns:1fr}
+  .judge{grid-template-columns:1fr}
+  .stage h1{font-size:22px}
+}
+
+/* 장면 카드 */
+.scenes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}
+.scene{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.scene .sh{background:var(--line-2);padding:8px 14px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.scene .sb{padding:12px 14px;font-size:14px}
+.scene .bubble{display:inline-block;background:var(--blue-soft);color:var(--blue-ink);border-radius:12px 12px 12px 3px;padding:6px 11px;margin:4px 0;font-size:13.5px}
+.scene .bubble.me{background:#e5f5ec;color:#125c3c;border-radius:12px 12px 3px 12px}
+.scene .snsq{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px}
+.scene .snsq b{display:block;font-size:13.5px}
+.scene .snsq .r{color:var(--ink-3);font-size:12px;margin-top:4px}
+.quotes{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;margin:10px 0}
+.quotes p{margin:4px 0;font-size:14.5px}
+.quotes p::before{content:"“ ";color:var(--ink-3)}
+.vs{display:grid;grid-template-columns:1fr 40px 1fr;gap:8px;align-items:center;margin:12px 0}
+.vs .fr{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.vs .fr .fh{padding:8px 12px;font-size:12.5px;font-weight:600;background:var(--line-2)}
+.vs .fr .fb{padding:14px;font-size:14px;min-height:96px}
+.vs .fr.after .fh{background:#fdeaf1;color:#b81f56}
+.vs .mid{text-align:center;font-size:11px;color:var(--ink-3);font-weight:600}
+.spread{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+.spread .sp{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px}
+.spread .sp b{display:block;font-size:13px;margin-bottom:3px}
+.spectrum{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:10px 0 4px}
+.spectrum .sg{padding:10px 8px;border-radius:8px;font-size:12.5px;text-align:center;font-weight:600;line-height:1.35}
+.spectrum .sg.k{background:var(--blue-soft);color:var(--blue-ink)}
+.spectrum .sg.m{background:#fdeaf1;color:#b81f56}
+.spectrum-lab{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-3);margin-bottom:8px}
+.spectrum-lab span:last-child{color:#b81f56;font-weight:600}
+.persp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.persp .pc{border-radius:12px;padding:14px 16px;border:1.5px solid}
+.persp .pc.v{border-color:#e0457b;background:#fff7fa}
+.persp .pc.m{border-color:#2f6fed;background:#f5f8ff}
+.persp .pc b.t{display:block;font-size:15px;margin-bottom:8px}
+.persp .pc ol{margin:0 0 8px;padding-left:20px;font-size:14px}
+.persp .pc li{margin-bottom:4px}
+.persp .pc .qt{font-size:14px;font-style:italic;color:var(--ink-2)}
+@media (max-width:820px){.scenes,.spread,.persp{grid-template-columns:1fr}.vs{grid-template-columns:1fr}.vs .mid{display:none}.spectrum{grid-template-columns:repeat(3,1fr)}}
+
+/* 제출물 카드 */
+.subs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}
+.sub{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px}
+.sub.a{border-color:#2f6fed}.sub.b{border-color:#1f8f5f}.sub.c{border-color:#7c3aed}
+.sub .sh{font-weight:700;font-size:15px;margin-bottom:8px}
+.sub.a .sh{color:#2f6fed}.sub.b .sh{color:#1f8f5f}.sub.c .sh{color:#7c3aed}
+.sub .kv{font-size:13.5px;margin-bottom:4px}.sub .kv b{color:var(--ink-2);font-weight:600}
+.sub .qt{font-size:13.5px;color:var(--ink-2);border-left:3px solid var(--line);padding-left:10px;margin:8px 0}
+.sub .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.sub .tags span{font-size:11.5px;padding:2px 8px;border-radius:99px;background:var(--line-2);color:var(--ink-2)}
+.proc{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px;margin:10px 0}
+.proc th{padding:8px;text-align:center;font-size:15px;border-radius:8px 8px 0 0}
+.proc th.a{background:#e8f0ff;color:#2f6fed}.proc th.b{background:#e5f5ec;color:#1f8f5f}.proc th.c{background:#efe6ff;color:#7c3aed}
+.proc td{background:var(--paper);border:1px solid var(--line);padding:9px 11px;vertical-align:top}
+.proc td .st{display:block;font-weight:700;font-size:12.5px;color:var(--ink-3);margin-bottom:2px}
+.proc td.warn{background:#fff9f0}
+.gridq{width:100%;border-collapse:collapse;font-size:13.5px}
+.gridq th,.gridq td{border:1px solid var(--line);padding:8px 8px;vertical-align:top}
+.gridq th{background:var(--line-2);font-weight:600;font-size:13px;text-align:center}
+.gridq td:first-child{font-weight:600;width:24%;background:#fbfcfe}
+.gridq .opt{padding:3px 4px;font-size:13px}
+.gridq .opts{gap:1px}
+.task{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.task .tk{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px}
+.task .tk b.t{display:block;font-size:15px;margin-bottom:6px}
+.task .tk ul{margin:0 0 8px;padding-left:18px;font-size:14px}
+.task .tk .core{font-size:13.5px;font-weight:600;color:var(--blue-ink);background:var(--blue-soft);padding:6px 10px;border-radius:6px}
+.rubric{background:var(--paper);border:2px solid var(--ink);border-radius:12px;padding:20px 24px;margin:12px 0}
+.rubric h3.rt{text-align:center;font-size:20px;margin:0 0 16px}
+.rubric .q{margin:10px 0}
+@media (max-width:820px){.subs,.task{grid-template-columns:1fr}.proc{display:block;overflow-x:auto}.gridq{display:block;overflow-x:auto}}
+
+#printView{display:none}
+@media print{
+  @page{size:A4;margin:16mm 15mm}
+  body{background:#fff;font-size:11.5pt;color:#000}
+  .app{display:none!important}
+  #printView{display:block}
+  .pv h1{font-size:17pt;margin:0 0 2pt}
+  .pv .meta{font-size:10pt;color:#444;margin-bottom:10pt;display:flex;justify-content:space-between;border-bottom:1.5px solid #000;padding-bottom:6pt}
+  .pv .kq{border-left:3pt solid #2457d6;padding:5pt 9pt;margin:6pt 0 10pt;font-weight:600;background:none;border-radius:0;color:#000}
+  .pv h2{font-size:13pt;margin:14pt 0 5pt;padding-bottom:3pt;border-bottom:1px solid #999;break-after:avoid}
+  .pv h3{font-size:11.5pt;margin:9pt 0 4pt;break-after:avoid}
+  .pv .item{margin:0 0 7pt;break-inside:avoid}
+  .pv .item .l{font-weight:600;font-size:10.5pt;color:#333}
+  .pv .item .v{border:1px solid #bbb;padding:5pt 7pt;min-height:22pt;white-space:pre-wrap;margin-top:2pt;border-radius:3pt}
+  .pv .item .v.inline{border:0;padding:0;min-height:0;margin-top:0;white-space:normal;line-height:1.9}
+  .pv .blank{border-bottom:1px solid #000;padding:0 4pt;font-weight:600}
+  .pv .blank.empty{color:#999;font-weight:400}
+  .pv .empty{color:#999}
+  .pv .stamp{font-size:9pt;color:#666;margin-left:6pt;font-weight:400}
+  .pv table{width:100%;border-collapse:collapse;font-size:10.5pt;margin:4pt 0 8pt}
+  .pv th,.pv td{border:1px solid #999;padding:4pt 6pt;vertical-align:top;white-space:pre-wrap}
+  .pv th{background:#eee;text-align:left}
+  .pv .summary{border:1.5px solid #000;padding:8pt 10pt;margin:10pt 0 4pt;break-inside:avoid}
+  .pv .summary h2{border:0;margin:0 0 6pt;padding:0}
+  .pv .pb{break-before:page}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="rail">
+    <div class="unit" id="railUnit"></div>
+    <h1 class="title" id="railTitle"></h1>
+    <ul class="steps" id="steps"></ul>
+    <div class="who">
+      <label for="cls">학번</label><input id="cls" placeholder="예: 10315">
+      <label for="nm">이름</label><input id="nm" placeholder="이름">
+    </div>
+    <div class="tools">
+      <button class="btn" id="btnPrint">PDF로 저장</button>
+      <button class="btn ghost sm" id="btnReset">처음부터 다시 하기</button>
+      <div class="save" id="saveMsg"></div>
+    </div>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+<div id="printView"></div>
+
+<script>
+/* =====================================================================
+   모듈 정의 — 교재(학생용 V3, 8. 책임 있는 AI 활용)의 장 구조를 그대로 옮김
+   ===================================================================== */
+const MODULE = {
+  key:"ai-ethics-08-responsible-ai",
+  unit:"고등학교 AI 윤리 · 8차시",
+  railTitle:"AI 활용 과제와<br>나의 기여",
+  printTitle:"8. 책임 있는 AI 활용 — AI 활용 과제와 나의 기여",
+  keyQuestion:"AI가 도와준 과제를 내 성과로 인정하려면 어떤 조건이 필요할까?",
+  compare:null,
+  summary:[
+    ["1차 판단 — 같은 수준의 성과인가 (1단계 ①)","s1.judge"],
+    ["가장 판단하기 어려운 사례 (2단계 ②)","s2.hard"],
+    ["개념 적용 후 판단 (3단계 ③)","s3.after"],
+    ["사례별 판단 A / B / C (4단계 ①)",["s4.jA","s4.jB","s4.jC"]],
+    ["내가 가장 중요하게 볼 기준 (4단계 ④)","s4.crit"],
+    ["판단 변화 (6단계 ①)","s6.change"]
+  ]
+};
+
+const JUDGE=["인정 가능","조건이 필요함","추가 확인 필요","인정하기 어려움"];
+
+const STAGES = [
+/* ---------------- 1. 주제 만나기 ---------------- */
+{
+  id:"s1", short:"주제 만나기", title:"1. 주제 만나기", sub:"책임 있는 AI 활용",
+  blocks:[
+    {kind:"kq"},
+    {kind:"h2", text:"생각 열기 — 세 과제, 같은 성과라고 볼 수 있을까?"},
+    {kind:"html", html:`
+      <p>아래는 같은 수행평가에 제출된 익명 과제 세 편입니다. 세 학생 모두 생성형 AI를 사용했습니다. 지금은 완성된 결과물만 보고 먼저 판단해 보세요.</p>
+      <div class="box" style="margin-bottom:0"><b>익명 과제 블라인드 심사</b><div class="note">세 결과물은 비슷하고, 세 학생 모두 AI를 사용했습니다. 같은 수준의 학생 성과라고 볼 수 있을까요?</div></div>
+      <div class="subs">
+        <div class="sub a"><div class="sh">제출물 A</div><div class="kv"><b>주제:</b> 쉬는 공간 부족 문제</div><div class="kv"><b>핵심 제안:</b> 빈 교실 일부를 휴식 공간으로 시범 운영</div><div class="qt">빈 교실 일부를 점심시간 휴식 공간으로 시범 운영하고, 학생 의견을 반영해 확대 여부를 결정할 것을 제안한다.</div><div class="tags"><span>근거 제시: 있음</span><span>개선안 제시: 있음</span><span>AI 사용: 있음</span></div></div>
+        <div class="sub b"><div class="sh">제출물 B</div><div class="kv"><b>주제:</b> 쉬는 공간 부족 문제</div><div class="kv"><b>핵심 제안:</b> 유휴 공간을 휴식 공간으로 시범 운영</div><div class="qt">학교의 유휴 공간을 휴식 공간으로 활용하고, 시범 운영 결과를 확인한 뒤 확대 여부를 결정할 필요가 있다.</div><div class="tags"><span>근거 제시: 있음</span><span>개선안 제시: 있음</span><span>AI 사용: 있음</span></div></div>
+        <div class="sub c"><div class="sh">제출물 C</div><div class="kv"><b>주제:</b> 쉬는 공간 부족 문제</div><div class="kv"><b>핵심 제안:</b> 비어 있는 공간을 휴식 공간으로 시범 운영</div><div class="qt">비어 있는 공간을 학생 휴식 공간으로 운영하고, 이용 기준과 운영 결과를 바탕으로 확대 여부를 결정할 수 있다.</div><div class="tags"><span>근거 제시: 있음</span><span>개선안 제시: 있음</span><span>AI 사용: 있음</span></div></div>
+      </div>
+      <div class="box tint" style="text-align:center"><b>아직 확인할 수 없는 정보</b><br>🔒 AI 활용 과정은 아직 공개되지 않았습니다.</div>`},
+    {kind:"h2", text:"먼저 생각해 보기"},
+    {kind:"field", key:"s1.judge", no:"①", label:"지금 공개된 정보만으로 판단한다면?", help:"세 과제를 같은 수준의 학생 성과라고 볼 수 있을까요?", type:"radio", inline:true, required:true, options:["그렇다","그렇지 않다","아직 판단하기 어렵다"]},
+    {kind:"field", key:"s1.judgeWhy", label:"그렇게 생각한 가장 큰 이유", type:"text"},
+    {kind:"field", key:"s1.stuck", no:"②", label:"지금 가장 걸리는 점은 무엇인가요?", help:"세 제출물을 보면서 판단하기 어렵거나 궁금해진 점을 하나 적어 보세요.", type:"text"},
+    {kind:"h3", text:"③ 무엇을 더 알아야 할까요?"},
+    {kind:"html", html:`<p>세 과제를 더 정확하게 판단하려면 어떤 정보가 필요할까요? 가장 중요하다고 생각하는 것 두 가지만 적어 보세요.</p>`},
+    {kind:"rows", rows:[["①","s1.need1"],["②","s1.need2"]]}
+  ]
+},
+/* ---------------- 2. 근거 탐구하기 ---------------- */
+{
+  id:"s2", short:"근거 탐구하기", title:"2. 근거 탐구하기", sub:"결과는 비슷한데, 만든 과정도 비슷할까?",
+  lead:"앞에서는 세 과제의 완성된 결과물만 살펴보았습니다. 이제 공개되지 않았던 AI 활용 과정을 확인해 봅시다. 결과물의 문장이 얼마나 좋아 보이는지보다, 학생과 AI가 각각 무엇을 했는지에 주목하세요.",
+  blocks:[
+    {kind:"echo", items:[["나의 1차 판단","s1.judge"],["더 알아야 할 것","s1.need1"],["","s1.need2"]]},
+    {kind:"reveal", id:"p1", need:[], text:"자료 1. 세 학생의 과제 제작 과정을 공개합니다.", btn:"제작 과정 열기"},
+    {kind:"h2", gate:"p1", text:"자료 1. 세 학생의 과제 제작 과정"},
+    {kind:"html", gate:"p1", html:`<p>세 학생의 과정을 비교하며 학생과 AI가 각각 한 일을 확인해 보세요.</p>
+      <table class="proc"><tr><th class="a">제출물 A</th><th class="b">제출물 B</th><th class="c">제출물 C</th></tr>
+        <tr><td><span class="st">① 방향·근거</span>문제·주장·구조를 학생이 결정. 관련 자료를 직접 비교해 근거 선택</td><td><span class="st">① 방향·근거</span>과제 주제를 학생이 결정. 자료 정리·초안 작성을 AI에 요청</td><td><span class="st">① 방향·근거</span>자료를 학생이 직접 탐색. 핵심 주장과 메모를 학생이 작성</td></tr>
+        <tr><td><span class="st">② AI가 한 일</span>반론 아이디어, 문장 다듬기</td><td><span class="st">② AI가 한 일</span>자료 정리, 제안서 초안 대부분 작성</td><td><span class="st">② AI가 한 일</span>메모를 완성된 제안서로 작성</td></tr>
+        <tr><td><span class="st">③ 학생의 검토·수정</span>반론 선택·반영, 수정 문장 재확인</td><td><span class="st">③ 학생의 검토·수정</span>원자료 대조, 오류 수정, 근거·구조·결론 재구성</td><td class="warn"><span class="st">③ 학생의 검토·수정</span>표현 일부 수정. 자료 요약 일부는 원자료와 다시 확인하지 않음</td></tr>
+        <tr><td><span class="st">④ AI 활용 표시</span>사용 부분과 용도 표시</td><td><span class="st">④ AI 활용 표시</span>초안·자료 정리에 사용했다고 표시</td><td class="warn"><span class="st">④ AI 활용 표시</span>AI 사용 사실은 표시. 사용한 부분과 용도는 구체적으로 표시하지 않음</td></tr>
+      </table>`},
+    {kind:"h2", gate:"p1", text:"과정을 비교해 보자"},
+    {kind:"html", gate:"p1", html:`<p>각 사례의 과정을 보고 가장 가까운 판단에 표시하세요.</p>`},
+    {kind:"grid", gate:"p1", cols:["제출물 A","제출물 B","제출물 C"], rows:[
+      {label:"과제의 핵심 방향과 주장을 정하는 데 누가 더 큰 역할을 했는가?", options:["학생 중심","학생과 AI가 함께","AI 중심","판단하기 어려움"], keys:["s2.g1A","s2.g1B","s2.g1C"]},
+      {label:"학생이 근거를 직접 확인했는가?", options:["충분히 확인","일부 확인","확인 어려움"], keys:["s2.g2A","s2.g2B","s2.g2C"]},
+      {label:"AI 결과를 학생의 판단에 따라 수정·재구성했는가?", options:["적극적으로 함","일부 함","확인 어려움"], keys:["s2.g3A","s2.g3B","s2.g3C"]},
+      {label:"AI를 어디에 어떻게 사용했는지 알 수 있는가?", options:["명확함","일부 확인","확인 어려움"], keys:["s2.g4A","s2.g4B","s2.g4C"]}]},
+    {kind:"h2", gate:"p1", text:"결과만 볼 때와 무엇이 달라졌을까?"},
+    {kind:"field", gate:"p1", key:"s2.diff", no:"①", label:"제작 과정을 확인하고 새롭게 알게 된 차이는 무엇인가요?", help:"결과물만 볼 때는 알 수 없었지만 과정을 확인하고 중요하다고 느낀 차이 한 가지를 적어 보세요.", type:"text"},
+    {kind:"field", gate:"p1", key:"s2.hard", no:"②", label:"가장 판단하기 어려운 사례는?", help:"세 사례 가운데 학생이 실제로 어느 정도 기여했는지 판단하기 가장 까다롭다고 느낀 사례를 하나 고르세요.", type:"radio", inline:true, required:true, options:["제출물 A","제출물 B","제출물 C"]},
+    {kind:"field", gate:"p1", key:"s2.hardWhy", label:"그렇게 생각한 이유", type:"text"},
+    {kind:"html", gate:"p1", html:`<div class="box tint">과정은 달랐습니다. 그렇다면 무엇을 기준으로 ‘학생의 기여’를 판단해야 할까요?</div>`}
+  ]
+},
+/* ---------------- 3. 개념으로 다시 보기 ---------------- */
+{
+  id:"s3", short:"개념으로 다시 보기", title:"3. 개념으로 다시 보기", sub:"AI를 썼다는 사실만으로 판단할 수 있을까?",
+  lead:"앞에서 세 과제의 결과물은 비슷했지만, 학생과 AI가 한 일은 서로 달랐습니다. 학생의 성과를 판단하려면 무엇을 봐야 할까요? 두 가지 개념으로 다시 살펴봅시다.",
+  blocks:[
+    {kind:"html", html:`<div class="two">
+        <div class="concept"><b class="t">핵심 개념 1. 학문적 정직성</b><p>학문적 정직성은 과제나 탐구에서 내가 직접 한 일과 AI 등의 도움을 받은 부분을 사실대로 드러내고, 사용한 근거를 확인하며 결과에 책임을 지는 것입니다.</p>
+          <b>무엇을 확인할까?</b><ul style="margin:4px 0 10px;padding-left:18px;font-size:14px"><li>AI를 어디에 어떻게 사용했는가?</li><li>AI가 제시한 내용과 근거를 확인했는가?</li><li>AI의 도움을 받은 부분을 적절하게 밝혔는가?</li></ul>
+          <b>앞의 사례에서는</b><ul style="margin:4px 0 10px;padding-left:18px;font-size:14px"><li>A·B·C는 모두 AI를 사용했지만, 근거를 확인한 정도와 AI 활용을 표시한 방식은 달랐습니다.</li></ul>
+          <div class="note"><b>주의할 점</b> AI를 사용했다 = 부정행위라고 단순하게 판단하지 않습니다.</div></div>
+        <div class="concept"><b class="t">핵심 개념 2. 실질적 기여</b><p>실질적 기여는 과제에서 평가하려는 핵심 활동을 학생이 실제로 얼마나 수행했는지를 뜻합니다.</p>
+          <b>무엇을 확인할까?</b><ul style="margin:4px 0 10px;padding-left:18px;font-size:14px"><li>문제와 주장을 누가 정했는가?</li><li>근거를 누가 선택하고 검증했는가?</li><li>AI 결과를 학생이 자신의 판단으로 수정·재구성했는가?</li></ul>
+          <b>앞의 사례에서는</b><ul style="margin:4px 0 10px;padding-left:18px;font-size:14px"><li>B는 AI가 초안 대부분을 만들었지만 학생이 원자료를 다시 확인하고 구조와 결론을 재구성했습니다.</li><li>C는 학생이 처음 자료와 주장을 직접 준비했지만, 일부 AI 요약을 다시 확인하지 않았습니다.</li></ul>
+          <p style="font-size:14px;margin:0 0 6px">“AI가 얼마나 많이 썼는가?”와 “학생이 얼마나 실질적으로 기여했는가?”는 같은 질문이 아닙니다.</p>
+          <div class="note"><b>주의할 점</b> 학생의 기여를 단순히 AI가 만든 문장의 비율로 계산할 수 없습니다.</div></div>
+      </div>
+      <div class="box tint"><b>생성형 AI와 과제 평가</b><p style="margin:6px 0 0">생성형 AI는 요청에 따라 자료 요약, 개요, 문장, 초안 등을 빠르게 만들 수 있습니다. 그래서 완성된 결과물만 보면 학생이 직접 판단한 부분과 AI가 만든 부분을 구분하기 어려울 수 있습니다. AI 활용 과제에서는 결과물뿐 아니라 만들어진 과정도 함께 확인할 필요가 있습니다.</p></div>`},
+    {kind:"h2", text:"개념 적용하기"},
+    {kind:"echo", items:[["2단계에서 가장 판단하기 어렵다고 고른 사례","s2.hard"]]},
+    {kind:"field", key:"s3.case", label:"다시 살펴볼 사례", help:"앞에서 가장 판단하기 어려웠다고 고른 사례를 다시 살펴보세요.", type:"radio", inline:true, required:true, options:["제출물 A","제출물 B","제출물 C"]},
+    {kind:"field", key:"s3.honesty", no:"①", label:"학문적 정직성의 관점에서", help:"이 사례에서 특히 확인해야 할 점은 무엇인가요?", type:"text"},
+    {kind:"field", key:"s3.contrib", no:"②", label:"실질적 기여의 관점에서", help:"이 학생이 직접 했다고 볼 수 있는 핵심 활동은 무엇인가요?", type:"text"},
+    {kind:"field", key:"s3.after", no:"③", label:"두 개념으로 다시 보니 판단은 어떻게 되었나요?", type:"radio", inline:true, required:true, options:["더 분명해졌다","오히려 더 복잡해졌다","아직 추가 조건이 필요하다"]},
+    {kind:"field", key:"s3.afterWhy", label:"이유", type:"text"},
+    {kind:"html", html:`<div class="box tint">그렇다면 같은 AI 활용도 과제에서 무엇을 평가하느냐에 따라 다르게 판단해야 할까요?</div>`}
+  ]
+},
+/* ---------------- 4. 근거로 판단하기 ---------------- */
+{
+  id:"s4", short:"근거로 판단하기", title:"4. 근거로 판단하기", sub:"같은 AI 활용도 과제에 따라 판단이 달라질까?",
+  lead:"이제 각 과제를 학생의 성과로 어느 정도 인정할 수 있을지 판단해 봅시다.",
+  blocks:[
+    {kind:"h2", text:"① 지금까지 확인한 근거로 다시 판단해 보자"},
+    {kind:"html", html:`<p>지금까지 확인한 과정과 두 개념을 근거로 현재 판단을 표시하세요.</p>`},
+    {kind:"judge", rows:[["제출물 A","s4.jA","s4.jAwhy"],["제출물 B","s4.jB","s4.jBwhy"],["제출물 C","s4.jC","s4.jCwhy"]]},
+    {kind:"reveal", id:"t1", need:["s4.jA","s4.jB","s4.jC"], text:"세 사례를 판단했다면, 이번에는 과제의 조건을 바꿔 봅니다.", btn:"조건이 달라진 과제 보기"},
+    {kind:"h2", gate:"t1", text:"② 조건이 달라졌다면?"},
+    {kind:"html", gate:"t1", html:`<div class="task">
+        <div class="tk"><b class="t">📊 과제 X — 자료 분석·논증을 평가</b><div class="note">이 과제에서 교사가 확인하려는 것</div><ul><li>어떤 자료를 선택했는가?</li><li>근거가 맞는지 확인했는가?</li><li>자신의 판단을 어떻게 구성했는가?</li><li>근거를 바탕으로 주장과 결론을 만들었는가?</li></ul><div class="core">핵심 평가 대상: 자료 분석과 판단·논증</div></div>
+        <div class="tk"><b class="t">✍ 과제 Y — 학생 자신의 글쓰기를 평가</b><div class="note">이 과제에서 교사가 확인하려는 것</div><ul><li>문장을 학생이 직접 구성했는가?</li><li>표현을 선택하고 다듬었는가?</li><li>글의 구조를 직접 만들었는가?</li></ul><div class="core">핵심 평가 대상: 학생 자신의 글쓰기 과정</div></div>
+      </div>`},
+    {kind:"h2", gate:"t1", text:"③ 같은 사례, 다른 과제라면?"},
+    {kind:"html", gate:"t1", html:`<div class="box">B는 AI가 초안 대부분을 만들었지만, 학생이 원자료를 확인하고 오류를 수정하며 근거·구조·결론을 재구성했습니다.</div>`},
+    {kind:"field", gate:"t1", key:"s4.bx", label:"과제 X라면 B를 학생의 성과로 어느 정도 인정할 수 있을까요?", type:"radio", inline:true, required:true, options:JUDGE},
+    {kind:"field", gate:"t1", key:"s4.bxWhy", label:"가장 중요한 이유", type:"text", rows:2},
+    {kind:"field", gate:"t1", key:"s4.by", label:"과제 Y라면 B에 대한 판단도 같을까요?", type:"radio", inline:true, required:true, options:["같다","달라질 수 있다"]},
+    {kind:"field", gate:"t1", key:"s4.byWhy", label:"왜 그런가요?", type:"text", rows:2},
+    {kind:"html", gate:"t1", html:`<div class="box">C는 자료와 핵심 주장을 학생이 직접 준비했습니다. 이 정보는 C의 ‘실질적 기여’를 판단하는 데 어느 정도 충분한 근거가 될까요?</div>`},
+    {kind:"field", gate:"t1", key:"s4.c", label:"C에 대한 판단", type:"radio", required:true, options:["충분한 근거가 된다","일부 근거가 되지만 다른 정보도 필요하다","이것만으로는 판단하기 어렵다"]},
+    {kind:"field", gate:"t1", key:"s4.cMore", label:"함께 확인해야 할 점이 있다면 한 가지", type:"line"},
+    {kind:"h2", gate:"t1", text:"④ 그래서 내가 중요하게 보는 기준은?"},
+    {kind:"html", gate:"t1", html:`<p>A·B·C와 두 과제 조건을 모두 비교한 뒤 정리해 보세요.</p>`},
+    {kind:"field", gate:"t1", key:"s4.crit", type:"blank", tpl:"학생의 성과를 판단할 때 내가 가장 중요하게 볼 기준은 ___ 이다.\n그 이유는 ___ .\n다만 과제에서 ___ 을 평가한다면 이 기준의 적용 방식이 달라질 수 있다."}
+  ]
+},
+/* ---------------- 5. 산출물 완성하기 ---------------- */
+{
+  id:"s5", short:"산출물 완성하기", title:"5. 산출물 완성하기", sub:"학교 과제의 AI 활용 인정 기준표",
+  lead:"이제 다른 과제에도 사용할 수 있는 기준을 만들어 봅시다. 사례 비교 → 판단 기준 찾기(학문적 정직성·실질적 기여·과제의 평가 목표) → 학교 기준 만들기의 순서입니다.",
+  blocks:[
+    {kind:"echo", items:[["4단계에서 정한 나의 기준","s4.crit"]]},
+    {kind:"html", html:`<div class="rubric"><h3 class="rt">학교 과제의 AI 활용 인정 기준표</h3><div class="note" style="text-align:center;margin-top:-10px;margin-bottom:8px">아래 항목을 채우면 기준표가 완성됩니다.</div></div>`},
+    {kind:"field", key:"s5.core", no:"①", label:"먼저 확인할 것", help:"AI 활용을 판단하기 전에, 이 과제에서 무엇을 평가하려는지 먼저 확인합니다. 학생이 직접 보여 주어야 하는 핵심 능력:", type:"line"},
+    {kind:"h2", text:"② 과제의 AI 활용 인정 기준"},
+    {kind:"html", html:`<p>사례와 핵심 개념을 바탕으로 꼭 필요한 최소 기준 한 문장씩 정해 보세요.</p>`},
+    {kind:"field", key:"s5.k1", label:"① 핵심 학습 수행", type:"blank", tpl:"학생이 ___ 을 직접 수행한다."},
+    {kind:"field", key:"s5.k2", label:"② 근거 확인", type:"blank", tpl:"AI가 제시한 내용이나 근거를 ___"},
+    {kind:"field", key:"s5.k3", label:"③ 판단·수정·재구성", type:"blank", tpl:"AI 결과를 ___"},
+    {kind:"html", html:`<div class="q"><div class="ql"><span>④ AI 활용 기록·표시</span></div><div class="blank" style="color:var(--ink-2)">AI를 어디에 어떻게 사용했는지 알 수 있게 표시한다. <span class="note">(공통 기준)</span></div></div>`},
+    {kind:"field", key:"s5.goal", no:"③", label:"과제의 평가 목표가 달라진다면?", type:"blank", tpl:"과제에서 ___ 을 평가한다면,\n위 기준 가운데 ___ 을 더 중요하게 보아야 한다."}
+  ]
+},
+/* ---------------- 6. 돌아보기 ---------------- */
+{
+  id:"s6", short:"돌아보기", title:"6. 돌아보기", sub:"처음 생각에서 지금의 기준까지",
+  lead:"처음 판단(결과물만 보고) → 과정 확인(학생과 AI가 한 일 비교) → 개념으로 다시 보기(학문적 정직성·실질적 기여) → 조건 비교(과제 목표에 따라 판단이 달라질 수 있음) → 내 기준 만들기의 다섯 단계를 따라 스스로 생각을 정리해 봅시다.",
+  blocks:[
+    {kind:"trail", title:"판단의 흐름", items:[["1차 판단 (같은 성과인가)","s1.judge"],["개념 적용 후","s3.after"],["A 판단","s4.jA"],["B 판단","s4.jB"],["C 판단","s4.jC"]]},
+    {kind:"field", key:"s6.change", no:"①", label:"처음 판단과 지금 판단은?", type:"radio", inline:true, required:true, options:["처음 판단을 유지했다","처음 판단을 수정했다","판단에 새로운 조건이 추가되었다","아직 판단을 유보한다"]},
+    {kind:"field", key:"s6.changeWhy", label:"그렇게 된 가장 중요한 이유 한 가지", type:"text"},
+    {kind:"field", key:"s6.more", no:"②", label:"아직 더 확인해야 할 것이 있나요?", type:"radio", required:true, options:["없다",{etc:"있다 → 확인할 정보나 조건 한 가지"}]},
+    {kind:"h2", text:"스스로 확인하기 — 나는 이번 수업에서…"},
+    {kind:"matrix", key:"s6.self", cols:["충분히","대체로","보완 필요"], rows:[
+      "학생과 AI가 한 일을 비교해 학생의 기여를 판단했다.",
+      "학문적 정직성과 실질적 기여를 근거로 활용했다.",
+      "과제의 평가 목표에 따라 판단이 달라질 수 있음을 검토했다."]}
+  ]
+}
+];
+
+/* =====================================================================
+   엔진 — 상태
+   ===================================================================== */
+const KEY=MODULE.key;
+let S=load();
+function blank(){ return {answers:{},current:0,locked:[],clues:{},stamps:{},meta:{}}; }
+function load(){ try{ const j=JSON.parse(localStorage.getItem(KEY)); if(j&&j.answers) return Object.assign(blank(),j);}catch(e){} return blank(); }
+let saveT=null;
+function save(){ clearTimeout(saveT); saveT=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); const d=new Date(); msg(`자동 저장됨 ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`);}catch(e){ msg("저장 실패: 브라우저 저장 공간을 확인하세요."); } },250); }
+function msg(t){ document.getElementById("saveMsg").textContent=t; }
+const pad=n=>String(n).padStart(2,"0");
+const get=k=>S.answers[k];
+const set=(k,v)=>{ S.answers[k]=v; save(); };
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+
+/* 필드 색인 (인쇄·검증용) */
+const FIELDS={};
+function collectFields(){
+  STAGES.forEach(st=>st.blocks.forEach(b=>{
+    const add=f=>{ if(f&&f.key) FIELDS[f.key]=f; };
+    if(b.kind==="field") add(b);
+    if(b.kind==="pair"){ b.a.forEach(add); b.b.forEach(add); }
+    if(b.kind==="clue") b.fields.forEach(add);
+    if(b.kind==="rows") b.rows.forEach(r=>add({key:r[1],label:r[0],type:r[2]||"line"}));
+    if(b.kind==="claims") b.rows.forEach(r=>{ add({key:r.ok,label:r.lb+" 자료로 확인할 수 있는 것",type:"text"}); add({key:r.not,label:r.lb+" 아직 확정해서 말하기 어려운 것",type:"text"}); add({key:r.src,label:r.lb+" 근거 자료",type:"check",options:r.srcOpts}); });
+    if(b.kind==="grid") b.rows.forEach(r=>r.keys.forEach((k,ci)=>add({key:k,label:`${r.label} (${b.cols[ci]})`,type:"radio",options:r.options})));
+    if(b.kind==="judge") b.rows.forEach(r=>{ add({key:r[1],label:r[0]+" 판단",type:"select",options:JUDGE}); add({key:r[2],label:r[0]+" 가장 중요한 근거",type:"text"}); });
+  }));
+}
+collectFields();
+
+/* =====================================================================
+   렌더링
+   ===================================================================== */
+const main=document.getElementById("main");
+function isOpen(gate){ return !gate || !!S.clues[gate]; }
+function render(){
+  main.innerHTML="";
+  STAGES.forEach((st,i)=>{
+    const sec=document.createElement("section");
+    sec.className="stage"+(i===S.current?" active":"")+(S.locked.includes(i)?" locked":"");
+    sec.dataset.i=i;
+    let h=`<h1><small>${esc(st.sub||"")}</small>${esc(st.title)}</h1>`;
+    if(S.locked.includes(i)) h+=`<div class="lockbar">이 단계는 ${esc(S.stamps[st.id]||"")}에 제출되어 잠겼습니다. 답은 읽기만 할 수 있습니다.</div>`;
+    if(st.lead) h+=`<p class="lead">${esc(st.lead)}</p>`;
+    h+=st.blocks.map(b=>{ if(!isOpen(b.gate)) return ""; return renderBlock(b,st,i); }).join("");
+    h+=renderNav(i);
+    sec.innerHTML=h;
+    main.appendChild(sec);
+  });
+  bind(); renderSteps(); lockInputs();
+  if(MODULE.compare&&STAGES[S.current].blocks.some(b=>b.kind==="compare")) renderCompare();
+  window.scrollTo({top:0});
+}
+function renderBlock(b){
+  switch(b.kind){
+    case "kq": return `<div class="kq"><span class="tag">핵심 질문</span>${esc(MODULE.keyQuestion)}</div>`;
+    case "h2": return `<h2>${esc(b.text)}</h2>`;
+    case "h3": return `<h3>${esc(b.text)}</h3>`;
+    case "html": return `<div>${b.html}</div>`;
+    case "field": return `<div class="q">${fieldHead(b)}${fieldInput(b)}</div>`;
+    case "pair": return `<div class="q">${b.title?`<div class="ql">${esc(b.title)}</div>`:""}<div class="grid2">
+        <div><div class="lab">${esc(b.la||"A")}</div>${b.a.map(f=>`<div style="margin-bottom:10px">${f.label?`<div class="qh">${esc(f.label)}</div>`:""}${fieldInput(f)}</div>`).join("")}</div>
+        <div><div class="lab">${esc(b.lb||"B")}</div>${b.b.map(f=>`<div style="margin-bottom:10px">${f.label?`<div class="qh">${esc(f.label)}</div>`:""}${fieldInput(f)}</div>`).join("")}</div></div></div>`;
+    case "rows": return `<div class="q rows3">${b.title?`<div class="ql">${esc(b.title)}</div>`:""}${b.rows.map(r=>`<div class="row"><div class="lb">${esc(r[0])}</div>${fieldInput({key:r[1],type:r[2]||"line",rows:2})}</div>`).join("")}</div>`;
+    case "trail": return `<div class="q"><div class="ql">${esc(b.title)}</div><table class="mtx"><tr>${b.items.map(it=>`<th>${esc(it[0])}</th>`).join("")}</tr><tr>${b.items.map(it=>{const v=get(it[1]);const t=v&&v.value?v.value.split(" — ")[0]:(typeof v==="string"&&v?v:"—");return `<td style="text-align:center;font-weight:600">${esc(t)}</td>`;}).join("")}</tr></table></div>`;
+    case "echo": return `<div class="echo">${b.items.map(it=>{ const v=plain(it[1]); const has=v!=="—"; return `<div>${it[0]?`<b>${esc(it[0])}</b>`:"<b style='visibility:hidden'>·</b>"}<span class="${has?"":"empty"}">${esc(has?v:"(아직 입력하지 않음)")}</span></div>`; }).join("")}</div>`;
+    case "reveal": {
+      if(S.clues[b.id]) return "";
+      const ready=b.need.every(k=>!isEmpty(FIELDS[k]||{type:"line"},get(k)));
+      return `<div class="reveal"><div class="rt">${esc(b.text)}${ready?"":"<br><span class='note'>위 항목을 먼저 입력하세요.</span>"}</div><button class="btn primary" data-reveal="${b.id}" ${ready?"":"disabled"}>${esc(b.btn)}</button></div>`;
+    }
+    case "clue": {
+      const open=!!S.clues[b.id];
+      return `<div class="clue${open?" open":""}" data-clue="${b.id}"><div class="ch"><b>${esc(b.title)}</b><span class="st">${open?"확인함":"아직 열지 않음"}</span>${open?"":`<button class="btn sm primary" data-reveal="${b.id}">열기</button>`}</div>
+        <div class="cb">${b.html}${b.fields.map(f=>`<div class="q" style="margin-bottom:0">${fieldHead(f)}${fieldInput(f)}</div>`).join("")}</div></div>`;
+    }
+    case "claims": return `<div class="q"><div class="claimgrid"><div></div><div class="hd">자료로 확인할 수 있는 것</div><div class="hd">아직 확정해서 말하기 어려운 것</div><div class="hd">근거 자료</div>
+      ${b.rows.map(r=>`<div class="lb">${esc(r.lb)}</div><div>${fieldInput({key:r.ok,type:"text",rows:3})}</div><div>${fieldInput({key:r.not,type:"text",rows:3})}</div><div>${fieldInput({key:r.src,type:"check",options:r.srcOpts})}</div>`).join("")}</div></div>`;
+    case "grid": return `<div class="q" style="padding:10px"><table class="gridq"><tr><th>확인할 점</th>${b.cols.map(c=>`<th>${esc(c)}</th>`).join("")}</tr>${b.rows.map(r=>`<tr><td>${esc(r.label)}</td>${r.keys.map(k=>`<td>${fieldInput({key:k,type:"radio",options:r.options})}</td>`).join("")}</tr>`).join("")}</table></div>`;
+    case "judge": return `<div class="q"><div class="judge"><div></div><div class="hd" style="font-size:12.5px;font-weight:600;color:var(--ink-2)">개념 적용 후 판단</div><div class="hd" style="font-size:12.5px;font-weight:600;color:var(--ink-2)">가장 중요한 근거</div>
+      ${b.rows.map(r=>`<div class="lb">${esc(r[0])}</div><div>${fieldInput({key:r[1],type:"select",options:JUDGE})}</div><div>${fieldInput({key:r[2],type:"text",rows:2})}</div>`).join("")}</div></div>`;
+    case "matrix": return `<div class="q"><table class="mtx"><thead><tr><th>확인할 내용</th>${b.cols.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>
+      ${b.rows.map((r,ri)=>`<tr><td>${esc(r)}</td>${b.cols.map(c=>`<td><input type="radio" name="${b.key}.${ri}" data-key="${b.key}.${ri}" value="${esc(c)}" ${get(b.key+"."+ri)===c?"checked":""}></td>`).join("")}</tr>`).join("")}
+      </tbody></table></div>`;
+    case "compare": return `<div class="q"><div class="ql">처음 판단과 지금 판단</div><div class="compare" id="cmp"></div></div>`;
+  }
+  return "";
+}
+function fieldHead(b){ return `${b.label?`<div class="ql">${b.no?`<span class="no">${esc(b.no)}</span>`:""}<span>${esc(b.label)}</span></div>`:""}${b.help?`<div class="qh">${esc(b.help)}</div>`:""}`; }
+function fieldInput(b){
+  const v=get(b.key);
+  switch(b.type){
+    case "text": return `<textarea data-key="${b.key}" rows="${b.rows||3}" placeholder="${esc(b.placeholder||"")}">${esc(v||"")}</textarea>`;
+    case "line": return `<input type="text" data-key="${b.key}" value="${esc(v||"")}" placeholder="${esc(b.placeholder||"")}">`;
+    case "select": return `<select data-key="${b.key}" data-type="select"><option value="">선택</option>${b.options.map((o,i)=>`<option value="${esc(o)}" ${v===o?"selected":""}>${i+1}. ${esc(o)}</option>`).join("")}</select>`;
+    case "radio": { const cur=v||{};
+      return `<div class="opts${b.inline?" row":""}">${b.options.map(o=>{ const isEtc=typeof o==="object"; const val=isEtc?"__etc__":o; const sel=cur.value===val;
+        return `<label class="opt${sel?" sel":""}"><input type="radio" name="${b.key}" data-key="${b.key}" data-type="radio" value="${esc(val)}" ${sel?"checked":""}>${isEtc?`<span style="flex:none">${esc(o.etc)}:</span><input class="etc" type="text" data-etc="${b.key}" value="${esc(cur.etc||"")}" placeholder="직접 쓰기">`:`<span>${esc(o)}</span>`}</label>`;}).join("")}</div>`; }
+    case "check": { const cur=v||{values:[],etc:""};
+      return `<div class="opts">${b.options.map(o=>{ const isEtc=typeof o==="object"; const val=isEtc?"__etc__":o; const sel=cur.values.includes(val);
+        return `<label class="opt${sel?" sel":""}"><input type="checkbox" data-key="${b.key}" data-type="check" data-max="${b.max||0}" value="${esc(val)}" ${sel?"checked":""}>${isEtc?`<span style="flex:none">${esc(o.etc)}:</span><input class="etc" type="text" data-etc="${b.key}" value="${esc(cur.etc||"")}" placeholder="직접 쓰기">`:`<span>${esc(o)}</span>`}</label>`;}).join("")}</div>`; }
+    case "blank": { const parts=b.tpl.split("___"); const cur=Array.isArray(v)?v:[]; let out=`<div class="blank">`;
+      parts.forEach((p,pi)=>{ out+=esc(p).replace(/\n/g,"<br>"); if(pi<parts.length-1) out+=`<input type="text" data-key="${b.key}" data-type="blank" data-idx="${pi}" value="${esc(cur[pi]||"")}">`; });
+      return out+"</div>"; }
+  }
+  return "";
+}
+function renderNav(i){
+  const last=i===STAGES.length-1, locked=S.locked.includes(i);
+  return `<div class="nav"><div>${i>0?`<button class="btn" data-go="${i-1}">이전 단계 보기</button>`:""}</div>
+    <div class="hint">${locked?"":"제출하면 이 단계의 답은 고정됩니다."}</div>
+    <div>${locked?(last?`<button class="btn primary" data-print="1">PDF로 저장</button>`:`<button class="btn primary" data-go="${i+1}">다음 단계 보기</button>`):
+      (last?`<button class="btn primary" data-submit="${i}">제출하고 PDF 만들기</button>`:`<button class="btn primary" data-submit="${i}">제출하고 다음 단계로</button>`)}</div></div>`;
+}
+function renderSteps(){
+  const ul=document.getElementById("steps"); ul.innerHTML="";
+  STAGES.forEach((st,i)=>{ const li=document.createElement("li"); const done=S.locked.includes(i);
+    li.className=(done?"done":"")+(i===S.current?" current":"");
+    li.innerHTML=`<span class="n">${done?"✓":i+1}</span><span class="lbl">${esc(st.short)}</span>`;
+    li.addEventListener("click",()=>{ if(done||i===S.current){S.current=i;save();render();} });
+    ul.appendChild(li); });
+}
+function lockInputs(){ document.querySelectorAll(".stage.locked").forEach(sec=>sec.querySelectorAll("textarea,input,select,button[data-reveal]").forEach(el=>{ if(!el.closest(".nav")) el.disabled=true; })); }
+function renderCompare(){
+  const el=document.getElementById("cmp"); if(!el) return; const c=MODULE.compare;
+  const txt=r=>{ if(!r||!r.value) return `<span class="empty">(미입력)</span>`; return r.value==="__etc__"?esc(r.etc||"(다른 설명)"):esc(r.value); };
+  el.innerHTML=`<div class="col"><div class="k">${esc(c.firstLabel)} (${esc(S.stamps[c.firstStage]||"")})</div><div class="v">${txt(get(c.firstKey))}</div><div class="k" style="margin-top:8px">이유</div><div class="v ${get(c.firstWhy)?"":"empty"}">${esc(get(c.firstWhy)||"(미입력)")}</div></div>
+  <div class="col"><div class="k">${esc(c.lastLabel)} (${esc(S.stamps[c.lastStage]||"")})</div><div class="v">${txt(get(c.lastKey))}</div><div class="k" style="margin-top:8px">이유</div><div class="v ${get(c.lastWhy)?"":"empty"}">${esc(get(c.lastWhy)||"(미입력)")}</div></div>`;
+}
+
+/* =====================================================================
+   이벤트
+   ===================================================================== */
+function bind(){
+  main.querySelectorAll("textarea,input[type=text]").forEach(el=>{
+    if(el.dataset.etc){ el.addEventListener("input",()=>{ const k=el.dataset.etc; const cur=get(k)||{}; cur.etc=el.value; set(k,cur); }); return; }
+    if(el.dataset.type==="blank"){ el.addEventListener("input",()=>{ const k=el.dataset.key; const arr=Array.isArray(get(k))?get(k).slice():[]; arr[+el.dataset.idx]=el.value; set(k,arr); refreshReveals(); }); return; }
+    if(el.dataset.key) el.addEventListener("input",()=>{ set(el.dataset.key,el.value); refreshReveals(); });
+  });
+  main.querySelectorAll("select[data-key]").forEach(el=>el.addEventListener("change",()=>{ set(el.dataset.key,el.value); refreshReveals(); }));
+  main.querySelectorAll("input[type=radio]").forEach(el=>el.addEventListener("change",()=>{
+    const k=el.dataset.key; if(el.dataset.type==="radio"){ const cur=get(k)||{}; cur.value=el.value; set(k,cur); } else set(k,el.value);
+    el.closest(".opts")?.querySelectorAll(".opt").forEach(o=>o.classList.toggle("sel",o.querySelector("input").checked));
+    refreshReveals();
+  }));
+  main.querySelectorAll("input[type=checkbox]").forEach(el=>el.addEventListener("change",()=>{
+    const k=el.dataset.key; const cur=get(k)||{values:[],etc:""}; const max=+el.dataset.max;
+    if(el.checked){ if(max&&cur.values.length>=max){ el.checked=false; toast(`최대 ${max}개까지 선택할 수 있습니다.`); return; } cur.values.push(el.value); }
+    else cur.values=cur.values.filter(x=>x!==el.value);
+    set(k,cur); el.closest(".opt").classList.toggle("sel",el.checked);
+  }));
+  main.querySelectorAll("[data-reveal]").forEach(b=>b.addEventListener("click",()=>{ S.clues[b.dataset.reveal]=true; save(); const y=window.scrollY; render(); window.scrollTo({top:y}); }));
+  main.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{ S.current=+b.dataset.go; save(); render(); }));
+  main.querySelectorAll("[data-submit]").forEach(b=>b.addEventListener("click",()=>submit(+b.dataset.submit)));
+  main.querySelectorAll("[data-print]").forEach(b=>b.addEventListener("click",doPrint));
+}
+/* 입력에 따라 리빌 버튼 활성화만 갱신 (전체 재렌더 없이) */
+function refreshReveals(){
+  document.querySelectorAll("[data-reveal]").forEach(btn=>{
+    const st=STAGES[S.current]; const b=st.blocks.find(x=>x.kind==="reveal"&&x.id===btn.dataset.reveal); if(!b) return;
+    const ready=b.need.every(k=>!isEmpty(FIELDS[k]||{type:"line"},get(k)));
+    btn.disabled=!ready; const note=btn.parentElement.querySelector(".note"); if(note) note.style.display=ready?"none":"";
+  });
+}
+function toast(t){ msg(t); setTimeout(()=>msg(""),2500); }
+function submit(i){
+  const st=STAGES[i]; const missing=[], req=[];
+  const walk=f=>{ if(!f||!f.key) return; if(isEmpty(f,get(f.key))) (f.required?req:missing).push(f.label||f.key); };
+  st.blocks.forEach(b=>{
+    if(b.kind==="field") walk(b);
+    if(b.kind==="pair"){ b.a.forEach(f=>walk(Object.assign({label:b.la},f))); b.b.forEach(f=>walk(Object.assign({label:b.lb},f))); }
+    if(b.kind==="clue"){ b.fields.forEach(walk); if(!S.clues[b.id]) req.push(b.title); }
+    if(b.kind==="reveal"&&!S.clues[b.id]) req.push(`“${b.btn}” 열기`);
+    if(b.kind==="rows") b.rows.forEach(r=>walk(FIELDS[r[1]]));
+    if(b.kind==="claims") b.rows.forEach(r=>[r.ok,r.not,r.src].forEach(k=>walk(FIELDS[k])));
+    if(b.kind==="judge") b.rows.forEach(r=>{ walk(Object.assign({required:true},FIELDS[r[1]])); walk(FIELDS[r[2]]); });
+    if(b.kind==="grid") b.rows.forEach(r=>r.keys.forEach(k=>walk(FIELDS[k])));
+    if(b.kind==="matrix") b.rows.forEach((r,ri)=>{ if(!get(b.key+"."+ri)) missing.push("스스로 확인하기 "+(ri+1)); });
+  });
+  if(i===0&&!(S.meta.cls&&S.meta.name)) req.push("학번·이름 (왼쪽 입력란)");
+  if(req.length){ alert("다음 항목은 꼭 입력해야 제출할 수 있습니다:\n\n- "+req.join("\n- ")); return; }
+  const warn=missing.length?`아직 비어 있는 항목이 ${missing.length}개 있습니다:\n- ${missing.slice(0,6).join("\n- ")}${missing.length>6?"\n- …":""}\n\n`:"";
+  if(!confirm(warn+"제출하면 이 단계의 답은 더 이상 고칠 수 없습니다. 제출할까요?")) return;
+  const d=new Date(); S.stamps[st.id]=`${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if(!S.locked.includes(i)) S.locked.push(i);
+  if(i<STAGES.length-1) S.current=i+1;
+  save(); render();
+  if(i===STAGES.length-1) setTimeout(doPrint,300);
+}
+function isEmpty(f,v){
+  if(v==null) return true;
+  if(f.type==="radio") return !v.value||(v.value==="__etc__"&&!(v.etc||"").trim());
+  if(f.type==="check") return !v.values||!v.values.length;
+  if(f.type==="blank") return !Array.isArray(v)||v.every(x=>!(x||"").trim());
+  return !String(v).trim();
+}
+
+/* =====================================================================
+   인쇄(PDF) 뷰 — STAGES 정의에서 자동 생성
+   ===================================================================== */
+function ans(f){
+  const v=get(f.key);
+  if(f.type==="radio"){ if(!v||!v.value) return `<span class="empty">(미입력)</span>`; return v.value==="__etc__"?`다른: ${esc(v.etc||"")}`:esc(v.value); }
+  if(f.type==="check"){ if(!v||!v.values.length) return `<span class="empty">(미선택)</span>`; return v.values.map(x=>x==="__etc__"?`☑ 다른: ${esc(v.etc||"")}`:`☑ ${esc(x)}`).join("<br>"); }
+  if(f.type==="blank"){ const parts=f.tpl.split("___"); const cur=Array.isArray(v)?v:[]; let o=""; parts.forEach((p,pi)=>{ o+=esc(p).replace(/\n/g,"<br>"); if(pi<parts.length-1) o+=`<span class="blank${(cur[pi]||"").trim()?"":" empty"}">${esc((cur[pi]||"").trim()||"　　　　　　")}</span>`; }); return o; }
+  return v&&String(v).trim()?esc(v):`<span class="empty">(미입력)</span>`;
+}
+function item(f){ return `<div class="item">${f.label?`<div class="l">${f.no?esc(f.no)+" ":""}${esc(f.label)}</div>`:""}<div class="v${f.type==="blank"?" inline":""}">${ans(f)}</div></div>`; }
+function plain(k){ const f=FIELDS[k]; const v=get(k); if(!f||v==null) return "—";
+  if(f.type==="radio") return v.value?(v.value==="__etc__"?(v.etc||"다른"):v.value):"—";
+  if(f.type==="check") return v.values&&v.values.length?v.values.map(x=>x==="__etc__"?(v.etc||"다른"):x).join(" / "):"—";
+  if(f.type==="blank") return Array.isArray(v)?v.filter(x=>x&&x.trim()).join(" / ")||"—":"—";
+  return String(v).trim()||"—"; }
+function buildPrint(){
+  const pv=document.getElementById("printView");
+  const stamp=id=>S.stamps[id]?`<span class="stamp">제출 ${esc(S.stamps[id])}</span>`:`<span class="stamp">(미제출)</span>`;
+  let h=`<div class="pv"><h1>${esc(MODULE.printTitle)}</h1>
+    <div class="meta"><span>고등학교 AI 윤리 교육 · 학생 활동지</span><span>${esc(S.meta.cls||"")} ${esc(S.meta.name||"")}</span></div>
+    <div class="kq">핵심 질문 — ${esc(MODULE.keyQuestion)}</div>
+    <div class="summary"><h2>답변 요약</h2><table>${MODULE.summary.map(([l,k])=>`<tr><th style="width:36%">${esc(l)}</th><td>${Array.isArray(k)?k.map((kk)=>esc(plain(kk).split(" — ")[0])).join(" / "):esc(plain(k))}</td></tr>`).join("")}</table>
+      <div style="font-size:9pt;color:#555">제출 단계 ${S.locked.length}/${STAGES.length}</div></div>`;
+  STAGES.forEach((st,si)=>{
+    h+=`<h2${si===3?" class='pb'":""}>${esc(st.title)}${st.sub?" — "+esc(st.sub):""} ${stamp(st.id)}</h2>`;
+    st.blocks.forEach(b=>{
+      switch(b.kind){
+        case "h2": if(/^[①-⑩0-9]/.test(b.text)||/확인하기|적용|원칙|단계/.test(b.text)) h+=`<h3>${esc(b.text)}</h3>`; break;
+        case "field": h+=item(b); break;
+        case "rows": h+=`<table>${b.rows.map(r=>`<tr><th style="width:18%">${esc(r[0])}</th><td>${ans(FIELDS[r[1]])}</td></tr>`).join("")}</table>`; break;
+        case "pair": h+=`<table><tr><th style="width:50%">${esc(b.la||"A")}</th><th>${esc(b.lb||"B")}</th></tr><tr><td>${b.a.map(f=>`${f.label?"<b>"+esc(f.label)+"</b><br>":""}${ans(f)}`).join("<br>")}</td><td>${b.b.map(f=>`${f.label?"<b>"+esc(f.label)+"</b><br>":""}${ans(f)}`).join("<br>")}</td></tr></table>`; break;
+        case "clue": b.fields.forEach(f=>h+=item(f)); break;
+        case "claims": h+=`<table><tr><th style="width:12%"></th><th>자료로 확인할 수 있는 것</th><th>아직 확정해서 말하기 어려운 것</th><th style="width:16%">근거 자료</th></tr>${b.rows.map(r=>`<tr><th>${esc(r.lb)}</th><td>${ans(FIELDS[r.ok])}</td><td>${ans(FIELDS[r.not])}</td><td>${ans(FIELDS[r.src])}</td></tr>`).join("")}</table>`; break;
+        case "grid": h+=`<table><tr><th>확인할 점</th>${b.cols.map(c=>`<th style="width:18%">${esc(c)}</th>`).join("")}</tr>${b.rows.map(r=>`<tr><td>${esc(r.label)}</td>${r.keys.map(k=>`<td>${esc(plain(k))}</td>`).join("")}</tr>`).join("")}</table>`; break;
+        case "judge": h+=`<table><tr><th style="width:12%"></th><th style="width:22%">판단</th><th>가장 중요한 근거</th></tr>${b.rows.map(r=>`<tr><th>${esc(r[0])}</th><td>${esc(get(r[1])||"—")}</td><td>${ans(FIELDS[r[2]])}</td></tr>`).join("")}</table>`; break;
+        case "trail": h+=`<table><tr>${b.items.map(it=>`<th>${esc(it[0])}</th>`).join("")}</tr><tr>${b.items.map(it=>{const v=get(it[1]);return `<td>${esc(v&&v.value?v.value.split(" — ")[0]:(typeof v==="string"&&v?v:"—"))}</td>`;}).join("")}</tr></table>`; break;
+        case "matrix": h+=`<table><tr><th>확인할 내용</th><th style="width:22%">평가</th></tr>${b.rows.map((r,ri)=>`<tr><td>${esc(r)}</td><td>${esc(get(b.key+"."+ri)||"—")}</td></tr>`).join("")}</table>`; break;
+      }
+    });
+  });
+  pv.innerHTML=h+"</div>";
+}
+function doPrint(){
+  const left=STAGES.length-S.locked.length;
+  if(left>0&&!confirm(`아직 제출하지 않은 단계가 ${left}개 있습니다. 지금 상태로 PDF를 만들까요?`)) return;
+  buildPrint(); setTimeout(()=>window.print(),100);
+}
+window.addEventListener("beforeprint",buildPrint);
+
+/* =====================================================================
+   초기화
+   ===================================================================== */
+document.getElementById("railUnit").textContent=MODULE.unit;
+document.getElementById("railTitle").innerHTML=MODULE.railTitle;
+document.getElementById("btnPrint").addEventListener("click",doPrint);
+document.getElementById("btnReset").addEventListener("click",()=>{
+  if(!confirm("모든 답과 진행 상태가 지워집니다. 처음부터 다시 할까요?")) return;
+  if(!confirm("정말 지울까요? 되돌릴 수 없습니다.")) return;
+  localStorage.removeItem(KEY); S=blank(); document.getElementById("cls").value=""; document.getElementById("nm").value=""; render(); msg("초기화됨");
+});
+[["cls","cls"],["nm","name"]].forEach(([id,k])=>{ const el=document.getElementById(id); el.value=S.meta[k]||""; el.addEventListener("input",()=>{ S.meta[k]=el.value; save(); }); });
+render();
+</script>
+</body>
+</html>

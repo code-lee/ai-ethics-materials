@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI의 평가와 선발 기준 검토</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#f3f5f6;color:#182b3b;font:17px/1.7 "Malgun Gothic",sans-serif}main{max-width:1120px;margin:auto;padding:32px 28px 100px}header{border-top:7px solid #245c70;padding:26px 0}h1{font-size:32px;line-height:1.35}h2{font-size:25px;margin:0 0 14px}h3{font-size:20px}p{margin:10px 0}nav{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}nav a,button,.button{border:1px solid #7391a0;border-radius:5px;background:#fff;color:#1c5269;padding:9px 14px;font:inherit;text-decoration:none;cursor:pointer}button.primary{background:#225c70;color:#fff}section{background:white;border:1px solid #c8d5dc;padding:28px;margin:24px 0;scroll-margin-top:20px}details{background:#f6f9fa;border:1px solid #ccdbe2;padding:16px;margin:16px 0}summary{cursor:pointer;font-weight:bold}label{display:block;margin:14px 0 5px;font-weight:bold}textarea,input,select{width:100%;padding:10px;border:1px solid #8197a4;border-radius:3px;font:inherit;background:#fff;color:#162a37}textarea{min-height:105px;resize:vertical}input[type=file]{font-size:15px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid #c8d5dc;padding:18px;margin:14px 0;background:#fbfcfc}.hint{color:#3e5969;font-size:15px}.notice{border-left:4px solid #a47832;padding:12px 16px;background:#fff9e8}.tag{font-size:14px;color:#356074}table{width:100%;border-collapse:collapse;margin:18px 0}td,th{border:1px solid #bacbd4;padding:12px;vertical-align:top;text-align:left}th{background:#eef4f6}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;background:#eef3f6;padding:18px}img{max-width:100%;height:auto}.buttons{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}#status{padding:12px;min-height:48px}a{color:#145d83}a:focus,button:focus,input:focus,textarea:focus,select:focus,summary:focus{outline:3px solid #dc9934;outline-offset:2px}#report{background:#fff;padding:24px;overflow-wrap:anywhere}#report h3{border-bottom:1px solid #bbb;padding-bottom:8px}.answer{white-space:pre-wrap;overflow-wrap:anywhere;border-left:3px solid #93b1bc;padding:8px 14px;margin-bottom:18px}.attachment{max-height:850px}footer{font-size:14px;color:#486273} @media(max-width:700px){main{padding:16px}section{padding:18px}.grid{grid-template-columns:1fr}h1{font-size:27px}table{display:block;overflow:auto}button{padding:10px}}[hidden]{display:none!important}.scope-box{border:1px solid #b9cbd5;padding:16px 20px;margin:16px 0;background:#f4f8fa}.scope-note{font-size:15px;color:#425e70;border-left:3px solid #93adbc;padding-left:10px}#report h4{font-size:17px;margin:14px 0 6px}h4{line-height:1.6}@media print{body{background:white;font-size:11pt}main{padding:0;max-width:none}header,nav,section,.tools,footer{display:none!important}#report{display:block!important}#report img{max-height:230mm}h2,h3,label{break-after:avoid}.answer{break-inside:auto}.card{break-inside:avoid}}</style>
+</head>
+<body><main><header><span class="tag">고등학교 2학년 · AI 윤리 · 03</span><h1>AI의 평가와 선발 기준 검토</h1>
+<p><a href="%EC%97%90%EB%93%80%ED%85%8C%ED%81%AC_%EC%82%AC%EC%9A%A9%EC%95%88%EB%82%B4.html" target="_blank" rel="noopener">AI·Google Slides 사용 안내 자세히 보기</a></p>
+<p>교재의 활동 1부터 순서대로 진행하고, HTML을 열라는 안내가 나오면 같은 번호의 웹 활동으로 이동합니다. 웹에 입력 칸이 없는 도입·개념 문제는 교재에 답합니다. 웹에 작성한 답은 교재에 다시 옮기지 않습니다. 이 파일은 공동 편집 문서가 아니므로 모둠 기록 담당자 한 명의 기기에서 입력합니다. 개인 성찰은 모둠원마다 직접 작성하고, 각 답 앞에 제출 번호를 붙여 줄을 나눕니다. 모둠 기록과 개인 답을 구분하세요.</p>
+<details><summary>HTML 열기·작성·저장·제출 방법</summary><ol>
+<li>교사가 배부한 단원 HTML 파일을 내려받고 Chrome 또는 Edge로 엽니다. ZIP으로 받았다면 먼저 압축을 풉니다.</li>
+<li>활동 번호에 따라 자료를 읽고 답을 작성합니다. 외부 AI나 Slides는 링크로 새 창에서 열고, 작업 뒤 이 창으로 돌아옵니다.</li>
+<li>중간에 <b>이어쓰기 저장</b>을 눌러 JSON 파일을 받습니다. 다음 시간에는 이 HTML을 다시 열고 <b>이어쓰기 불러오기</b>에서 JSON을 선택합니다.</li>
+<li>끝나면 <b>결과물 미리보기</b>를 확인하고 <b>제출용 문서 저장</b>을 누릅니다. 저장된 HTML은 답안과 첨부 그림을 읽는 문서입니다.</li>
+<li>저장한 문서를 다시 열어 내용을 확인한 뒤 교사가 지정한 과제함에 제출합니다. PDF 제출은 <b>인쇄·PDF 저장</b>에서 PDF 대상을 선택합니다.</li>
+</ol>
+<p>입력은 자동 저장되지 않습니다. 창을 닫기 전에 저장하세요. AI 결과가 자동으로 들어오거나 교사에게 자동 제출되지는 않습니다.</p></details><p>교사가 안내한 활동 범위에 따라 작성합니다. 작성 누락 확인은 입력·첨부 여부를 점검하며, 답안이 옳은지를 자동으로 평가하지 않습니다.</p>
+<label for="record">모둠·제출 번호</label><input data-field id="record" maxlength="2000" value="" placeholder=""><nav><a href="#s2">활동 2 · AI의 이력서 평가 검토하기</a><a href="#s3">활동 3 · 개념으로 다시 보기</a><a href="#s4">활동 4 · 공정한 선발을 위한 개선안 만들기</a><a href="#s5">활동 5 · 돌아보기</a></nav><div class="scope-box">
+<label for="lessonScope">교사가 안내한 수업 범위</label><select id="lessonScope"><option value="full">학생용 교재의 전체 활동</option>
+<option value="basic">50분 축약 활동〔교사가 안내한 경우〕</option></select><p id="scopeHelp" class="hint" aria-live="polite"></p>
+</div></header><section id="s2"><span class="tag">교재 활동 2</span><h2>2. AI의 이력서 평가 검토하기</h2>
+<p class="notice">전체 활동은 평가 문장 2개를 분석합니다. 교사가 50분 축약 활동을 안내했다면 위에서 범위를 선택하고 평가 근거 검토 1을 작성하세요. 점수나 평가 거절도 실제 응답대로 기록합니다.</p>
+<div class="card">
+<h3>직무 설명 · 먼저 읽기</h3>
+<p>백엔드 개발자는 화면 뒤에서 데이터 저장과 처리를 담당합니다. 이 활동의 가상 업무는 결제 처리 오류의 원인을 찾아 고치고, 재발을 점검하며 팀과 변경 내용을 공유하는 일입니다. Java·Spring 등은 기술 이름, 자격증은 학습·자격의 단서입니다. 이름을 안다는 사실만으로 실제 업무 능력을 확정하지 않습니다. 코딩 지식보다 이력서에서 무엇을 확인할 수 있는지를 판단하세요.</p>
+</div>
+<p>같은 AI 도구의 새 대화에 A·B를 각각 입력하고 실제 응답을 비교합니다. 두 자료에는 여러 차이가 있으므로 점수 차이를 한 표현의 효과로 단정하지 않습니다.</p>
+<details><summary>Gemini 접속·입력·응답 기록 방법</summary><ol>
+<li>
+<a href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer">Gemini 열기</a>를 누르고 학교에서 허용한 Google 계정으로 로그인합니다. 오른쪽 위 계정 표시를 확인합니다.</li>
+<li>왼쪽 메뉴에서 <b>새 채팅</b>을 엽니다. 메뉴가 접혀 있으면 먼저 메뉴 버튼을 누릅니다.</li>
+<li>이 활동지의 요청문을 복사하여 Gemini 입력창에 붙여 넣습니다. 대괄호나 빈칸이 남아 있으면 활동에서 정한 내용으로 채웁니다.</li>
+<li>응답을 받은 뒤, 원문 자료와 대조합니다. AI가 제시한 말이라는 이유만으로 근거로 인정하지 않습니다.</li>
+<li>활동지로 돌아와 실제 응답과 도구명·사용 날짜를 남깁니다. 접속할 수 없으면 교사가 제공한 실제 응답을 사용하고 제공 자료임을 표시합니다.</li>
+</ol>
+<p>Google 계정이 있어도 학교 설정과 연령에 따라 기능이 다를 수 있습니다. 로그인·이용 제한은 교사에게 확인하며, 수업은 유료 결제 없이 진행합니다.</p>
+<a href="https://support.google.com/gemini/answer/13275745?hl=ko" target="_blank" rel="noopener noreferrer">Gemini 공식 사용 안내</a></details><div class="card">
+<h3>이력서 A</h3>
+<pre id="resumeA">다음은 결제 서비스의 백엔드 개발자 지원자에 대한 가상 이력서입니다. 업무는 결제 오류의 원인 분석·수정, 재발 점검, 팀과 변경 내용 공유입니다. 관련 내용을 근거로 적합도를 1~5점으로 평가하고 이유를 설명해 주세요. 이력서에 없는 사실은 추측하지 말고 추가 확인 사항을 구분해 주세요.
+
+· 지원 분야: 백엔드 개발자 
+· 학력: 한빛대학교 컴퓨터공학과 (2015~2019)
+· 경력: 
+ - 브릿지테크 백엔드 엔지니어(2019~2022) 
+ - 코어페이먼츠 백엔드 리드(2022~현재)
+· 보유 기술: Java, Spring, MySQL, Kafka, AWS
+· 자격증: 정보처리기사, AWS Solutions Architect
+· 활동: 교내 체스 동아리 ·회장(2017~2019), 오픈소스 결제 라이브러리 기여자
+· 자기소개서(일부): 장애 상황에서 신속하게 원인을 파악하고 시스템을 정상화하는 데 강점이 있습니다. 결제 처리 지연 문제의 근본 원인을 제거해 재발률을 0%로 만들었습니다.</pre>
+<button data-copy="resumeA">요청문과 이력서 A 복사</button>
+</div>
+<div class="card">
+<h3>이력서 B</h3>
+<pre id="resumeB">다음은 결제 서비스의 백엔드 개발자 지원자에 대한 가상 이력서입니다. 업무는 결제 오류의 원인 분석·수정, 재발 점검, 팀과 변경 내용 공유입니다. 관련 내용을 근거로 적합도를 1~5점으로 평가하고 이유를 설명해 주세요. 이력서에 없는 사실은 추측하지 말고 추가 확인 사항을 구분해 주세요.
+
+·지원 분야: 백엔드 개발자 (결제 서비스팀)
+·학력: 한빛여자대학교 컴퓨터공학과 (2015~2019)
+·경력: 
+  - 브릿지테크 백엔드 엔지니어(2019~2022)
+  - 코어페이먼츠 백엔드 리드(2022~현재)
+·보유 기술: Java, Spring, MySQL, Kafka, AWS
+·자격증: 정보처리기사, AWS Solutions Architect
+·활동: 
+ - 교내 여성 체스 동아리 회장(2017~2019)
+ - 오픈소스 결제 라이브러리 기여자
+·자기소개서(일부): 장애 상황에서 팀원들과 협력해 원인을 함께 파악하고 시스템을 정상화하는 데 강점이 있습니다. 결제 처리 지연 문제를 팀과 함께 개선해 재발률을 0%로 만들었습니다.</pre>
+<button data-copy="resumeB">요청문과 이력서 B 복사</button>
+</div>
+<label for="tool">사용 도구·모델명(표시된 경우)·날짜</label><input data-field id="tool" maxlength="2000" value="" placeholder=""><label for="origin">응답 수집 방법</label><select data-field id="origin"><option value="">선택하세요</option>
+<option>우리 모둠이 직접 실행</option>
+<option>교사가 수집한 실제 응답 사용</option></select><label for="responseA">이력서 A에 대한 실제 응답</label><textarea data-field id="responseA" maxlength="12000" placeholder="점수와 이유를 함께 붙여 넣으세요. 동점·평가 거절도 그대로 기록합니다."></textarea><label for="responseB">이력서 B에 대한 실제 응답</label><textarea data-field id="responseB" maxlength="12000" placeholder="점수와 이유를 함께 붙여 넣으세요. 동점·평가 거절도 그대로 기록합니다."></textarea><p>AI가 제시한 평가 이유 두 문장을 골라 원문과 대조하세요.</p>
+<div class="card">
+<h3>평가 근거 검토 1</h3>
+<label for="claim0">AI의 평가 문장</label><textarea data-field id="claim0" maxlength="12000" placeholder=""></textarea><label for="evidence0">관련된 이력서의 문장</label><textarea data-field id="evidence0" maxlength="12000" placeholder=""></textarea><label for="analysis0">확인되는 내용과 추측·추가 확인할 내용</label><textarea data-field id="analysis0" maxlength="12000" placeholder=""></textarea>
+</div>
+<div class="card" data-full-only="">
+<h3>평가 근거 검토 2</h3>
+<p class="scope-note" data-scope-note=""></p>
+<label for="claim1">AI의 평가 문장</label><textarea data-field id="claim1" maxlength="12000" placeholder=""></textarea><label for="evidence1">관련된 이력서의 문장</label><textarea data-field id="evidence1" maxlength="12000" placeholder=""></textarea><label for="analysis1">확인되는 내용과 추측·추가 확인할 내용</label><textarea data-field id="analysis1" maxlength="12000" placeholder=""></textarea>
+</div></section><section id="s3"><span class="tag">교재 활동 3</span><h2>3. 개념으로 다시 보기</h2>
+<p>교재의 대표성·대리변수·공정성과 비차별·투명성과 설명가능성·책무성을 확인한 뒤, 방금 받은 응답에 적용할 개념 하나를 설명하세요.</p>
+<label for="concept">개념과 실제 응답의 연결</label><textarea data-field id="concept" maxlength="12000" placeholder=""></textarea></section><section id="s4"><span class="tag">교재 활동 4</span><h2>4. 공정한 선발을 위한 개선안 만들기</h2>
+<p class="notice">전체 활동은 공통 기준 3개, 50분 축약 활동은 기준 1·2를 작성하여 A·B에 같은 기준으로 적용합니다. 정보가 부족하면 추가 확인으로 남기세요.</p>
+<p>업무 수행 능력을 무엇으로 확인할지 먼저 정한 뒤 같은 기준을 A·B에 적용합니다.</p>
+<div class="card">
+<h3>학교명</h3>
+<label for="use0">정보 사용 여부</label><select data-field id="use0"><option value="">선택하세요</option>
+<option>평가에 사용</option>
+<option>평가에서 제외</option>
+<option>추가 확인 필요</option></select><label for="why0">그렇게 판단한 이유</label><textarea data-field id="why0" maxlength="12000" placeholder=""></textarea>
+</div>
+<div class="card">
+<h3>담당 업무와 경력</h3>
+<label for="use1">정보 사용 여부</label><select data-field id="use1"><option value="">선택하세요</option>
+<option>평가에 사용</option>
+<option>평가에서 제외</option>
+<option>추가 확인 필요</option></select><label for="why1">그렇게 판단한 이유</label><textarea data-field id="why1" maxlength="12000" placeholder=""></textarea>
+</div>
+<div class="card">
+<h3>보유 기술과 자격증</h3>
+<label for="use2">정보 사용 여부</label><select data-field id="use2"><option value="">선택하세요</option>
+<option>평가에 사용</option>
+<option>평가에서 제외</option>
+<option>추가 확인 필요</option></select><label for="why2">그렇게 판단한 이유</label><textarea data-field id="why2" maxlength="12000" placeholder=""></textarea>
+</div>
+<div class="card">
+<h3>동아리 활동과 역할</h3>
+<label for="use3">정보 사용 여부</label><select data-field id="use3"><option value="">선택하세요</option>
+<option>평가에 사용</option>
+<option>평가에서 제외</option>
+<option>추가 확인 필요</option></select><label for="why3">그렇게 판단한 이유</label><textarea data-field id="why3" maxlength="12000" placeholder=""></textarea>
+</div>
+<div class="card">
+<h3>성과와 협업 경험</h3>
+<label for="use4">정보 사용 여부</label><select data-field id="use4"><option value="">선택하세요</option>
+<option>평가에 사용</option>
+<option>평가에서 제외</option>
+<option>추가 확인 필요</option></select><label for="why4">그렇게 판단한 이유</label><textarea data-field id="why4" maxlength="12000" placeholder=""></textarea>
+</div>
+<p>공통 선발 기준 세 가지를 작성합니다. 아래 기준은 최종 제출에도 그대로 포함됩니다.</p>
+<div class="card">
+<h3>공통 기준 1</h3>
+<label for="criterion0">평가 항목과 판단 기준</label><textarea data-field id="criterion0" maxlength="12000" placeholder="예: 문제 해결 과정에서 지원자가 직접 수행한 조치가 구체적인가?"></textarea><label for="proof0">근거로 사용할 자료와 제외할 정보</label><textarea data-field id="proof0" maxlength="12000" placeholder=""></textarea><label for="applyA0">이력서 A의 근거와 판단</label><textarea data-field id="applyA0" maxlength="12000" placeholder=""></textarea><label for="applyB0">이력서 B의 근거와 판단</label><textarea data-field id="applyB0" maxlength="12000" placeholder=""></textarea><label for="more0">추가로 확인할 자료</label><textarea data-field id="more0" maxlength="12000" placeholder=""></textarea>
+</div>
+<div class="card">
+<h3>공통 기준 2</h3>
+<label for="criterion1">평가 항목과 판단 기준</label><textarea data-field id="criterion1" maxlength="12000" placeholder="예: 문제 해결 과정에서 지원자가 직접 수행한 조치가 구체적인가?"></textarea><label for="proof1">근거로 사용할 자료와 제외할 정보</label><textarea data-field id="proof1" maxlength="12000" placeholder=""></textarea><label for="applyA1">이력서 A의 근거와 판단</label><textarea data-field id="applyA1" maxlength="12000" placeholder=""></textarea><label for="applyB1">이력서 B의 근거와 판단</label><textarea data-field id="applyB1" maxlength="12000" placeholder=""></textarea><label for="more1">추가로 확인할 자료</label><textarea data-field id="more1" maxlength="12000" placeholder=""></textarea>
+</div>
+<div class="card" data-full-only="">
+<h3>공통 기준 3</h3>
+<p class="scope-note" data-scope-note=""></p>
+<label for="criterion2">평가 항목과 판단 기준</label><textarea data-field id="criterion2" maxlength="12000" placeholder="예: 문제 해결 과정에서 지원자가 직접 수행한 조치가 구체적인가?"></textarea><label for="proof2">근거로 사용할 자료와 제외할 정보</label><textarea data-field id="proof2" maxlength="12000" placeholder=""></textarea><label for="applyA2">이력서 A의 근거와 판단</label><textarea data-field id="applyA2" maxlength="12000" placeholder=""></textarea><label for="applyB2">이력서 B의 근거와 판단</label><textarea data-field id="applyB2" maxlength="12000" placeholder=""></textarea><label for="more2">추가로 확인할 자료</label><textarea data-field id="more2" maxlength="12000" placeholder=""></textarea>
+</div>
+<label for="peer">다른 모둠의 질문</label><textarea data-field id="peer" maxlength="12000" placeholder=""></textarea><label for="revision">최종 기준에서 보완한 내용과 이유 또는 유지한 근거</label><textarea data-field id="revision" maxlength="12000" placeholder=""></textarea><p>검토 후에는 위의 기준과 적용 결과 입력란 자체를 고치세요. 수정 이유만 적고 기준을 그대로 두지 않도록 확인합니다.</p></section><section id="s5"><span class="tag">교재 활동 5</span><h2>5. 돌아보기</h2>
+<label for="individual">개인 제출 번호</label><input data-field id="individual" maxlength="2000" value="" placeholder=""><label for="explain">AI의 평가에서 받아들일 수 있는 판단과 다시 확인해야 할 판단을 실제 응답과 이력서에 근거해 설명하세요.</label><textarea data-field id="explain" maxlength="12000" placeholder=""></textarea><label for="limit">우리 기준으로도 판단하기 어려운 부분과 필요한 추가 자료는 무엇인가요? 이번 두 이력서 비교의 한계도 설명하세요.</label><textarea data-field id="limit" maxlength="12000" placeholder=""></textarea><label for="human">AI를 선발에 활용할 때 사람이 검토하고 책임질 단계는 무엇인가요?</label><textarea data-field id="human" maxlength="12000" placeholder=""></textarea></section><section class="tools"><h2>작성 확인과 제출</h2>
+<p>이 버튼은 작성 여부를 확인합니다. 답의 정확성이나 윤리적 판단을 자동 채점하지 않습니다.</p>
+<div class="buttons">
+<button id="check">작성 누락 확인</button><button id="preview">결과물 미리보기</button><button id="save">이어쓰기 저장</button><button id="export" class="primary">제출용 문서 저장</button><button id="print">인쇄·PDF 저장</button>
+</div>
+<label for="load">이어쓰기 불러오기</label><input id="load" type="file" accept=".json"><p id="status" role="status" aria-live="polite"></p></section><article id="report" hidden></article><footer>외부 서비스에 자동 전송하지 않습니다. 공식 자료·AI·Slides 링크를 직접 열면 해당 서비스로 이동합니다.</footer><script>const CONFIG={"unit": "03", "title": "AI의 평가와 선발 기준 검토", "fields": [{"id": "tool", "label": "사용 도구·모델명(표시된 경우)·날짜", "required": true, "kind": "line"}, {"id": "origin", "label": "응답 수집 방법", "required": true, "kind": "text"}, {"id": "responseA", "label": "이력서 A에 대한 실제 응답", "required": true, "kind": "text"}, {"id": "responseB", "label": "이력서 B에 대한 실제 응답", "required": true, "kind": "text"}, {"id": "claim0", "label": "AI의 평가 문장", "required": true, "kind": "text", "context": "평가 근거 검토 1"}, {"id": "evidence0", "label": "관련된 이력서의 문장", "required": true, "kind": "text", "context": "평가 근거 검토 1"}, {"id": "analysis0", "label": "확인되는 내용과 추측·추가 확인할 내용", "required": true, "kind": "text", "context": "평가 근거 검토 1"}, {"id": "claim1", "label": "AI의 평가 문장", "required": true, "kind": "text", "context": "평가 근거 검토 2"}, {"id": "evidence1", "label": "관련된 이력서의 문장", "required": true, "kind": "text", "context": "평가 근거 검토 2"}, {"id": "analysis1", "label": "확인되는 내용과 추측·추가 확인할 내용", "required": true, "kind": "text", "context": "평가 근거 검토 2"}, {"id": "concept", "label": "개념과 실제 응답의 연결", "required": false, "kind": "text"}, {"id": "use0", "label": "정보 사용 여부", "required": true, "kind": "text", "context": "학교명"}, {"id": "why0", "label": "그렇게 판단한 이유", "required": true, "kind": "text", "context": "학교명"}, {"id": "use1", "label": "정보 사용 여부", "required": true, "kind": "text", "context": "담당 업무와 경력"}, {"id": "why1", "label": "그렇게 판단한 이유", "required": true, "kind": "text", "context": "담당 업무와 경력"}, {"id": "use2", "label": "정보 사용 여부", "required": true, "kind": "text", "context": "보유 기술과 자격증"}, {"id": "why2", "label": "그렇게 판단한 이유", "required": true, "kind": "text", "context": "보유 기술과 자격증"}, {"id": "use3", "label": "정보 사용 여부", "required": true, "kind": "text", "context": "동아리 활동과 역할"}, {"id": "why3", "label": "그렇게 판단한 이유", "required": true, "kind": "text", "context": "동아리 활동과 역할"}, {"id": "use4", "label": "정보 사용 여부", "required": true, "kind": "text", "context": "성과와 협업 경험"}, {"id": "why4", "label": "그렇게 판단한 이유", "required": true, "kind": "text", "context": "성과와 협업 경험"}, {"id": "criterion0", "label": "평가 항목과 판단 기준", "required": true, "kind": "text", "context": "공통 기준 1"}, {"id": "proof0", "label": "근거로 사용할 자료와 제외할 정보", "required": true, "kind": "text", "context": "공통 기준 1"}, {"id": "applyA0", "label": "이력서 A의 근거와 판단", "required": true, "kind": "text", "context": "공통 기준 1"}, {"id": "applyB0", "label": "이력서 B의 근거와 판단", "required": true, "kind": "text", "context": "공통 기준 1"}, {"id": "more0", "label": "추가로 확인할 자료", "required": true, "kind": "text", "context": "공통 기준 1"}, {"id": "criterion1", "label": "평가 항목과 판단 기준", "required": true, "kind": "text", "context": "공통 기준 2"}, {"id": "proof1", "label": "근거로 사용할 자료와 제외할 정보", "required": true, "kind": "text", "context": "공통 기준 2"}, {"id": "applyA1", "label": "이력서 A의 근거와 판단", "required": true, "kind": "text", "context": "공통 기준 2"}, {"id": "applyB1", "label": "이력서 B의 근거와 판단", "required": true, "kind": "text", "context": "공통 기준 2"}, {"id": "more1", "label": "추가로 확인할 자료", "required": true, "kind": "text", "context": "공통 기준 2"}, {"id": "criterion2", "label": "평가 항목과 판단 기준", "required": true, "kind": "text", "context": "공통 기준 3"}, {"id": "proof2", "label": "근거로 사용할 자료와 제외할 정보", "required": true, "kind": "text", "context": "공통 기준 3"}, {"id": "applyA2", "label": "이력서 A의 근거와 판단", "required": true, "kind": "text", "context": "공통 기준 3"}, {"id": "applyB2", "label": "이력서 B의 근거와 판단", "required": true, "kind": "text", "context": "공통 기준 3"}, {"id": "more2", "label": "추가로 확인할 자료", "required": true, "kind": "text", "context": "공통 기준 3"}, {"id": "peer", "label": "다른 모둠의 질문", "required": false, "kind": "text"}, {"id": "revision", "label": "최종 기준에서 보완한 내용과 이유 또는 유지한 근거", "required": false, "kind": "text"}, {"id": "individual", "label": "개인 제출 번호", "required": false, "kind": "line"}, {"id": "explain", "label": "AI의 평가에서 받아들일 수 있는 판단과 다시 확인해야 할 판단을 실제 응답과 이력서에 근거해 설명하세요.", "required": true, "kind": "text"}, {"id": "limit", "label": "우리 기준으로도 판단하기 어려운 부분과 필요한 추가 자료는 무엇인가요? 이번 두 이력서 비교의 한계도 설명하세요.", "required": true, "kind": "text"}, {"id": "human", "label": "AI를 선발에 활용할 때 사람이 검토하고 책임질 단계는 무엇인가요?", "required": true, "kind": "text"}, {"id": "record", "label": "모둠·제출 번호", "required": false, "kind": "line"}], "version": 9};</script><script>'use strict';
+const $=id=>document.getElementById(id),images={},MAX=20000000;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const value=id=>$(id)?.value.trim()||'';
+const ROUTES=['AI 없이 사람에게 상담받기','음성 외의 방식으로 전달하기','기록 수정·재검토 요청하기','이용 중 담당자에게 연결되기'];
+const lessonScope=()=>value('lessonScope')||'full';
+const selectedRoute=()=>value('selectedRoute')||'0';
+const scopeLabel=()=>lessonScope()==='basic'?'50분 축약 활동':'학생용 교재의 전체 활동';
+function message(s){$('status').textContent=s;}
+function fieldTitle(f){return (f.context?f.context+' — ':'')+f.label;}
+function isFieldRequired(f){
+ if(!f.required)return false;
+ if(CONFIG.unit==='06'&&f.id==='prompt'&&value('implementation')==='제공 양식')return false;
+ if(lessonScope()==='basic'){
+  if(CONFIG.unit==='03'&&['claim1','evidence1','analysis1','criterion2','proof2','applyA2','applyB2','more2'].includes(f.id))return false;
+  if(CONFIG.unit==='09'&&/^proposal[0-3]$/.test(f.id))return f.id==='proposal'+selectedRoute();
+ }
+ return true;
+}
+function updateLessonScope(){
+ if($('selectedRouteWrap'))$('selectedRouteWrap').hidden=lessonScope()!=='basic';
+ if($('scopeHelp')){
+  const full={
+   '02':'필요한 점검 질문을 작성합니다. 최대 7개를 모두 채우는 것 자체가 목표는 아닙니다.',
+   '03':'AI 평가 문장 2개를 분석하고 공통 기준 3개를 A·B에 적용합니다.',
+   '09':'네 지원 경로의 개선안을 모두 작성하여 포스터 한 장으로 정리합니다.'
+  };
+  const basic={
+   '02':'교사용의 50분 운영에 따라 핵심 점검 질문 3개를 작성합니다. 더 필요한 질문은 추가할 수 있습니다.',
+   '03':'교사용의 50분 운영에 따라 평가 근거 검토 1과 공통 기준 1·2를 작성합니다. 두 이력서와 응답은 모두 확인합니다. 검토 2와 기준 3은 추가 작성입니다.',
+   '09':'교사용의 50분 운영에 따라 선택한 한 경로의 개선안으로 포스터를 만듭니다. 조사·개념·판단은 교사의 안내에 따라 진행하고, 동료가 실제로 요청 방법을 찾는지 검토합니다.'
+  };
+  $('scopeHelp').textContent=(lessonScope()==='basic'?basic:full)[CONFIG.unit]||'';
+ }
+ for(const n of document.querySelectorAll('[data-full-only]')){
+  const hint=n.querySelector('[data-scope-note]');
+  if(hint)hint.textContent=lessonScope()==='basic'?'50분 축약 활동에서는 추가 작성입니다. 이미 쓴 내용은 저장됩니다.':'전체 활동에서 작성할 항목입니다.';
+ }
+ if(CONFIG.unit==='09')for(let i=0;i<4;i++){
+  const n=$('proposalNote'+i);if(n)n.textContent=lessonScope()==='basic'?(String(i)===selectedRoute()?'선택한 경로: 이 개선안을 요청문에 반영합니다.':'추가 작성: 이번 축약 요청문에는 포함하지 않습니다. 기록은 저장됩니다.'):'전체 활동: 이 개선안을 요청문에 반영합니다.';
+ }
+ for(const f of CONFIG.fields){const el=$(f.id);if(el)el.setAttribute('aria-required',isFieldRequired(f)?'true':'false');}
+}
+function getState(){return {version:9,unit:CONFIG.unit,lessonScope:lessonScope(),selectedRoute:selectedRoute(),values:Object.fromEntries(CONFIG.fields.map(f=>[f.id,$(f.id).value])),images:{...images}};}
+function checkState(raw){
+ if(!raw||![7,8,9].includes(raw.version)||raw.unit!==CONFIG.unit||!raw.values||typeof raw.values!=='object'||Array.isArray(raw.values)||!raw.images||typeof raw.images!=='object'||Array.isArray(raw.images))throw Error('이 단원의 이어쓰기 파일이 아닙니다.');
+ if(raw.lessonScope!==undefined&&!['full','basic'].includes(raw.lessonScope))throw Error('수업 범위를 확인하세요.');
+ if(raw.selectedRoute!==undefined&&!['0','1','2','3'].includes(raw.selectedRoute))throw Error('선택 경로를 확인하세요.');
+ const allowed=new Set(CONFIG.fields.map(x=>x.id));
+ for(const [id,v] of Object.entries(raw.values)){
+  if(!allowed.has(id)||typeof v!=='string'||v.length>12000)throw Error('값 형식이 맞지 않습니다.');
+  const el=$(id);if(el.tagName==='SELECT'&&!Array.from(el.options).some(o=>o.value===v))throw Error('선택값이 맞지 않습니다.');
+ }
+ for(const [id,v] of Object.entries(raw.images)){
+  if(!/^[a-zA-Z0-9_-]+$/.test(id)||!document.querySelector(`input[data-image][id="${id}"]`)||typeof v!=='string'||v.length>8500000||!/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(v))throw Error('그림 형식이 맞지 않습니다.');
+ }
+ return raw;
+}
+function showImages(){for(const el of document.querySelectorAll('[data-image]')){$('preview_'+el.id).replaceChildren();if(images[el.id]){const im=document.createElement('img');im.src=images[el.id];im.alt=el.labels[0].textContent;im.className='attachment';$('preview_'+el.id).append(im);}}}
+function applyState(raw){
+ checkState(raw);
+ for(const f of CONFIG.fields)$(f.id).value=raw.values[f.id]??'';
+ if($('lessonScope'))$('lessonScope').value=raw.lessonScope??'full';
+ if($('selectedRoute'))$('selectedRoute').value=raw.selectedRoute??'0';
+ for(const k of Object.keys(images))delete images[k];Object.assign(images,raw.images);
+ showImages();updateLessonScope();$('report').hidden=true;
+}
+function reportHTML(){
+ let out=`<h1>${esc(CONFIG.title)}</h1><p>모둠·제출 번호: ${esc(value('record'))}</p>`;
+ if($('lessonScope'))out+=`<p>수업 범위: ${esc(scopeLabel())}</p>`;
+ if(CONFIG.unit==='09'&&lessonScope()==='basic')out+=`<p>선택 경로: ${esc(ROUTES[Number(selectedRoute())])}</p>`;
+ for(const section of document.querySelectorAll('section[id]')){
+  let entries='',lastContext='';
+  for(const el of section.querySelectorAll('[data-field]')){
+   const f=CONFIG.fields.find(x=>x.id===el.id);if(!f||!el.value.trim())continue;
+   const context=f.context||'';
+   if(context&&context!==lastContext)entries+=`<h3>${esc(context)}</h3>`;
+   lastContext=context;
+   entries+=`<h4>${esc(f.label)}</h4><div class="answer">${esc(el.value)}</div>`;
+  }
+  for(const el of section.querySelectorAll('[data-image]'))if(images[el.id])entries+=`<h3>${esc(el.labels[0].textContent)}</h3><img class="attachment" src="${images[el.id]}" alt="${esc(el.labels[0].textContent)}">`;
+  if(entries)out+=`<h2>${esc(section.querySelector('h2').textContent)}</h2>${entries}`;
+ }
+ return out+`<p>수업용 작성 기록 · ${esc(new Date().toLocaleString('ko-KR'))}</p>`;
+}
+function preview(){const r=$('report');r.innerHTML=reportHTML();r.hidden=false;return r.innerHTML;}
+function download(text,mime,name){const url=URL.createObjectURL(new Blob([text],{type:mime}));const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
+async function copyText(id){const el=$(id);const t=el.value??el.textContent;if(!t.trim()){message('먼저 내용을 작성하세요.');return;}try{await navigator.clipboard.writeText(t);message('복사했습니다. 해당 도구의 입력창에 붙여 넣으세요.');}catch(e){if(el.select){el.focus();el.select();}else{const range=document.createRange();range.selectNodeContents(el);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);}message('텍스트를 선택했습니다. Ctrl+C로 복사하세요.');}}
+function makePrompt(){
+ if(CONFIG.unit==='06'){
+  const ids=['rule0','rule1','rule2','situation','aiRole','humanRole','reason'];if(ids.some(i=>!value(i))){message('활동 3의 세 기준, 적용할 상황, AI·사람의 역할과 이유를 먼저 작성하세요.');return;}
+  const rules=['스스로 풀기 전에 AI 풀이부터 읽는 상황','교과서와 다른 답을 같은 AI에 다시 물어 확인하는 상황','학교 안내와 자신의 관심을 살피기 전에 AI 추천 과목을 선택하는 상황'].map((title,i)=>`${i+1}. ${title}\n우리 기준: ${value('rule'+i)}`).join('\n');
+  $('prompt').value=`고등학교 AI 윤리 수업에서 사용할 단일 HTML 웹 도구를 만들어 주세요. 제목은 ‘AI 활용 판단 기준표’입니다.\n\n[모둠이 직접 정한 기준]\n${rules}\n\n[적용할 상황] ${value('situation')}\nAI 역할: ${value('aiRole')}\n사람 역할: ${value('humanRole')}\n구분 이유: ${value('reason')}\n\n[화면과 기능]\n위 기준과 상황을 뜻을 바꾸지 않고 표시해 주세요. 사용자가 ① AI의 도움을 받으려는 일 ② AI에 맡길 일 ③ 사람이 직접 해야 할 일 ④ 역할을 이렇게 구분한 이유 ⑤ 추가로 확인할 근거 ⑥ 확인 후 내린 결정을 직접 입력하고 수정할 수 있게 해 주세요. 기준과 답을 한눈에 보는 결과 화면, 작성 화면으로 돌아가기, 입력 결과 HTML 저장, 인쇄/PDF 기능을 넣어 주세요. 저장 결과에는 각 질문과 사용자의 답을 함께 넣어 주세요. 입력은 자동 저장되지 않는다고 안내해 주세요.\n\n[구현 조건]\nHTML·CSS·JavaScript를 한 파일에 포함하고 외부 스크립트·서비스·AI API·로그인을 사용하지 마세요. 사용자 입력을 외부에 전송하지 마세요. AI가 답을 대신 쓰거나 사용자의 판단에 점수·등급을 붙이지 않게 하세요. 입력값은 실행 코드가 아닌 텍스트로 안전하게 표시하고 저장해 주세요. 저장한 결과 문서는 인터넷 없이 열어도 글을 읽을 수 있어야 합니다. 전체 코드와 UTF-8 HTML 파일로 저장하는 방법을 알려 주세요.`;
+ }else if(CONFIG.unit==='09'){
+  const indexes=lessonScope()==='basic'?[Number(selectedRoute())]:[0,1,2,3];
+  const ids=['sourceMode','source','facts',...indexes.map(i=>'proposal'+i)];
+  if(ids.some(i=>!value(i))){message(lessonScope()==='basic'?'활동 2의 자료·확인한 사실과 선택한 경로의 개선안을 먼저 작성하세요.':'활동 2의 자료·확인한 사실과 네 경로의 개선안을 먼저 작성하세요.');return;}
+  const proposals=indexes.map(i=>`${i+1}. ${ROUTES[i]}\n${value('proposal'+i)}`).join('\n');
+  const layout=indexes.length===1?'한 장에 제목과 선택한 지원 경로 한 구역을 배치해 주세요.':'한 장에 제목과 네 지원 경로 구역을 배치해 주세요.';
+  $('prompt').value=`고등학생을 위한 학교 지원 경로 개선안 포스터의 문구와 배치를 제안해 주세요. ${layout} 각 경로는 두 문장 이내로 작성해 주세요.\n\n[자료의 성격] ${value('sourceMode')}\n[출처] ${value('source')}\n[확인한 안내] ${value('facts')}\n[확인한 신청 절차] ${value('procedure')||'별도 확인 필요'}\n[아직 확인하지 못한 것] ${value('missing')||'제공한 자료 범위에서만 작성'}\n\n[포스터에 담을 개선안]\n${proposals}\n\n제목에는 ‘학생 개선 제안’을 반드시 넣어 주세요. 가상 자료라면 ‘솔빛고 가상 사례·학생 개선 제안’이라고 표시해 주세요. 현재 안내된 사실과 아직 시행되지 않은 학생 제안을 명확히 구분해 주세요. 제공되지 않은 담당자·연락처·제도·운영시간은 만들지 말고 필요한 부분은 ‘확인 필요’로 표시해 주세요. 이용자를 탓하는 표현은 피하고, 각 구역에서 누구에게 어떤 방법으로 요청하고 이후 안내를 받는지 드러나게 해 주세요. 선택하지 않은 경로를 임의로 추가하지 마세요. 이미지 생성 대신 Google Slides에 옮길 수 있는 문구와 배치 설명을 주세요.`;
+ }
+ message('작성한 내용을 반영했습니다. 요청문을 검토한 뒤 복사하세요. 기준·개선안·수업 범위를 바꾸면 다시 만들어야 합니다.');
+}
+function collectMissing(){
+ const missing=CONFIG.fields.filter(f=>isFieldRequired(f)&&!value(f.id)).map(fieldTitle);
+ if(CONFIG.unit==='02'){
+  const count=Array.from({length:7},(_,i)=>value('q'+i)).filter(Boolean).length,min=lessonScope()==='basic'?3:1;
+  if(count<min)missing.push(lessonScope()==='basic'?'핵심 점검 질문 3개':'점검 질문');
+  for(let i=0;i<7;i++)if(['q','d','e'].some(k=>value(k+i))&&['q','d','e'].some(k=>!value(k+i)))missing.push(`점검 질문 ${i+1}의 질문·판단·근거`);
+ }
+ if(CONFIG.unit==='03'){
+  for(let i=0;i<5;i++)if(['use','why'].some(k=>value(k+i))&&['use','why'].some(k=>!value(k+i)))missing.push(fieldTitle(CONFIG.fields.find(f=>f.id==='use'+i))+'와 그 이유');
+  if(lessonScope()==='basic')for(const ids of [['claim1','evidence1','analysis1'],['criterion2','proof2','applyA2','applyB2','more2']])if(ids.some(value)&&ids.some(id=>!value(id)))missing.push('추가로 작성한 '+fieldTitle(CONFIG.fields.find(f=>f.id===ids[0]))+'의 나머지 칸');
+ }
+ if(CONFIG.unit==='09')for(let i=0;i<3;i++)if(['feedback','accept','why'].some(k=>value(k+i))&&['feedback','accept','why'].some(k=>!value(k+i)))missing.push(`검토 의견 ${i+1}의 내용·반영 여부·이유`);
+ for(const el of document.querySelectorAll('[data-image]'))if(!images[el.id])missing.push(el.labels[0].textContent);
+ return missing;
+}
+document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>copyText(b.dataset.copy)));
+if($('makePrompt'))$('makePrompt').addEventListener('click',makePrompt);
+for(const id of ['lessonScope','selectedRoute'])if($(id))$(id).addEventListener('change',()=>{updateLessonScope();message('수업 범위를 반영했습니다. 기존 답은 유지됩니다. 이미 만든 요청문은 다시 생성하여 확인하세요.');});
+if($('implementation'))$('implementation').addEventListener('change',updateLessonScope);
+if($('refreshCriteria'))$('refreshCriteria').addEventListener('click',()=>{
+ const ids=['rule0','rule1','rule2','situation','aiRole','humanRole','reason'];
+ $('criteriaReference').textContent=ids.map(id=>`${fieldTitle(CONFIG.fields.find(f=>f.id===id))}: ${value(id)||'(활동 3에서 작성 필요)'}`).join('\n\n');
+ $('criteriaReference').style.whiteSpace='pre-wrap';message('활동 3의 현재 기준과 적용 상황을 표시했습니다. 기준을 고쳤다면 다시 눌러 확인하세요.');
+});
+$('save').addEventListener('click',()=>{download(JSON.stringify(getState(),null,2),'application/json',CONFIG.unit+'_이어쓰기.json');message('이어쓰기 파일 다운로드를 요청했습니다. 다운로드 목록에서 확인하세요.');});
+$('preview').addEventListener('click',()=>{preview();$('report').scrollIntoView({behavior:'smooth'});message('미리보기에서 활동·문항 제목과 답안, 첨부 그림을 함께 확인하세요.');});
+$('export').addEventListener('click',()=>{
+ const content=preview(),css=document.querySelector('style').textContent.replace(/@media print[\s\S]*/,'');
+ download(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(CONFIG.title)} · 제출</title><style>${css}body{background:white}main{max-width:1000px}h2{margin-top:36px}h3{margin-top:24px}h4{font-size:17px;margin:14px 0 6px}@media print{main{padding:0}img{max-height:230mm}h2,h3,h4{break-after:avoid}}</style></head><body><main>${content}</main></body></html>`,'text/html',CONFIG.unit+'_제출용문서.html');message('제출용 문서 다운로드를 요청했습니다. 저장 파일에서 질문과 답안이 함께 보이는지 확인하세요.');
+});
+$('print').addEventListener('click',()=>{preview();window.print();});
+$('check').addEventListener('click',()=>{const missing=collectMissing();message(missing.length?'선택한 수업 범위에서 작성·첨부 확인이 필요한 항목: '+missing.join(' / '):'선택한 수업 범위의 필수 입력·첨부 항목을 작성했습니다. 답안의 타당성은 자료와 검토 의견을 근거로 확인하세요.');});
+$('load').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>MAX)throw Error('파일이 너무 큽니다.');const state=JSON.parse(await file.text());checkState(state);if((CONFIG.fields.some(f=>value(f.id))||Object.keys(images).length)&&!confirm('현재 입력을 저장했나요? 불러온 내용으로 바뀝니다.'))return;applyState(state);message('답안과 첨부 그림을 불러왔습니다. 수업 범위와 비어 있는 확인 항목을 살펴보세요.');}catch(err){message('불러오지 못했습니다. 같은 단원의 이어쓰기 JSON 파일인지 확인하세요. 기존 입력은 유지됩니다.');}finally{e.target.value='';}});
+for(const el of document.querySelectorAll('[data-image]'))el.addEventListener('change',async()=>{const file=el.files[0];if(!file)return;try{if(!['image/png','image/jpeg'].includes(file.type)||file.size>6000000)throw Error('PNG·JPG 6MB 이하 파일을 선택하세요.');const bytes=new Uint8Array(await file.slice(0,8).arrayBuffer());const isPNG=bytes[0]===137&&bytes[1]===80&&bytes[2]===78&&bytes[3]===71;const isJPG=bytes[0]===255&&bytes[1]===216;if(!(isPNG||isJPG))throw Error('이미지 파일을 확인하세요.');const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file);});images[el.id]=data;showImages();message('그림을 첨부했습니다. 이어쓰기 또는 제출용 문서로 저장하세요.');}catch(err){message(err.message||'그림을 읽지 못했습니다.');}finally{el.value='';}});
+for(const b of document.querySelectorAll('[data-remove]'))b.addEventListener('click',()=>{delete images[b.dataset.remove];showImages();message('첨부 그림을 지웠습니다.');});
+window.addEventListener('beforeprint',preview);
+updateLessonScope();
+window.lesson={getState,checkState,applyState,reportHTML,makePrompt,collectMissing,updateLessonScope,images};
+</script></main></body>
+</html>

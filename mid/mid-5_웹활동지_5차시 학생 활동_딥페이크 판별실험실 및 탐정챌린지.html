@@ -1,0 +1,1836 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5차시 통합 활동 - 딥페이크 판별 실험실 & 딥페이크 탐정 챌린지</title>
+<style>
+:root{
+  --bg:#f4f8ff;
+  --paper:#ffffff;
+  --navy:#123d75;
+  --blue:#2f73d9;
+  --sky:#e9f3ff;
+  --line:#cbdcf2;
+  --text:#1f2b3d;
+  --muted:#64738b;
+  --green:#43a96f;
+  --amber:#e8ad2e;
+  --red:#e75b67;
+  --shadow:0 16px 42px rgba(32,66,120,.12);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 10% 8%, rgba(47,115,217,.10), transparent 18%),
+    radial-gradient(circle at 92% 12%, rgba(67,169,111,.08), transparent 16%),
+    linear-gradient(180deg,#f8fbff,#eef5ff);
+}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 60px}
+.hero{
+  background:linear-gradient(135deg,#fff,#f7fbff);
+  border:1px solid #d7e5f5;
+  box-shadow:var(--shadow);
+  border-radius:30px;
+  padding:24px;
+  position:relative;
+  overflow:hidden;
+}
+.hero:after{
+  content:"?";
+  position:absolute;
+  right:28px;top:18px;
+  font-size:120px;
+  line-height:1;
+  font-weight:1000;
+  color:rgba(47,115,217,.07);
+}
+.kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 13px;
+  border-radius:999px;
+  background:#eaf3ff;
+  color:#245a9e;
+  font-weight:1000;
+  font-size:13px;
+}
+h1{
+  margin:12px 0 8px;
+  color:var(--navy);
+  font-size:clamp(34px,5vw,55px);
+  letter-spacing:-1.8px;
+}
+.hero p{margin:0;color:var(--muted);line-height:1.75;max-width:820px}
+.rule{
+  margin-top:16px;
+  padding:13px 15px;
+  border-radius:16px;
+  background:#f1f6fd;
+  border:1px dashed #bcd2ee;
+  color:#36577f;
+  font-weight:900;
+}
+.video-card{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:14px;
+}
+.video-box,.intro-box{
+  background:#fff;
+  border:1px solid #dce7f5;
+  border-radius:22px;
+  padding:18px;
+}
+.video-screen{
+  min-height:240px;
+  border-radius:18px;
+  background:
+    linear-gradient(135deg,rgba(12,45,90,.95),rgba(34,86,150,.92)),
+    #123;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  position:relative;
+  overflow:hidden;
+}
+.video-screen:before{
+  content:"";
+  position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 25% 25%,rgba(255,255,255,.09),transparent 20%),
+    radial-gradient(circle at 75% 65%,rgba(255,255,255,.06),transparent 18%);
+}
+.play{
+  width:90px;height:90px;border-radius:50%;
+  display:grid;place-items:center;
+  background:#fff;color:#2f73d9;
+  font-size:38px;font-weight:1000;
+  z-index:1;
+  box-shadow:0 12px 30px rgba(0,0,0,.22);
+}
+.video-label{
+  position:absolute;left:16px;top:16px;
+  z-index:1;
+  padding:7px 11px;border-radius:999px;
+  background:rgba(255,255,255,.9);
+  color:#245a9e;font-weight:1000;font-size:12px;
+}
+.video-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.btn,a.btn{
+  border:none;border-radius:14px;padding:12px 15px;
+  font:inherit;font-weight:1000;cursor:pointer;text-decoration:none;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+}
+.btn.primary{background:linear-gradient(90deg,#2f73d9,#3b8ce9);color:#fff}
+.btn.light{background:#eef5ff;color:#345a89;border:1px solid #d9e6f6}
+.btn.green{background:linear-gradient(90deg,#43a96f,#5cbc85);color:#fff}
+.btn.gold{background:linear-gradient(90deg,#f3c04f,#eba737);color:#5a3a00}
+.intro-box h3{margin:0 0 10px;color:#234d83;font-size:22px}
+.intro-box ul{margin:0;padding-left:20px;color:#5a6880;line-height:1.8}
+.first-judge{
+  margin-top:14px;
+  padding:13px;
+  border-radius:16px;
+  background:#f9fbfe;
+  border:1px solid #e0e9f5;
+}
+.choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px}
+.choice{
+  border:2px solid #e0e8f3;
+  background:#fff;
+  border-radius:15px;
+  padding:13px 10px;
+  cursor:pointer;
+  font-weight:1000;
+  color:#52617a;
+}
+.choice.on.actual{background:#edf8f1;border-color:#43a96f;color:#247248}
+.choice.on.more{background:#fff8e7;border-color:#e8ad2e;color:#8a6412}
+.choice.on.ai{background:#fff0f2;border-color:#e75b67;color:#9a3442}
+
+.lab{
+  margin-top:18px;
+  background:#fff;
+  border:1px solid #d7e5f5;
+  box-shadow:var(--shadow);
+  border-radius:28px;
+  padding:20px;
+}
+.lab-title{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.step{
+  width:38px;height:38px;border-radius:50%;
+  background:linear-gradient(135deg,#2f73d9,#57a0ef);
+  color:#fff;display:grid;place-items:center;font-weight:1000;
+}
+.lab h2{margin:0;color:#183f73;font-size:25px}
+.help{margin:6px 0 16px;color:#6b7890;line-height:1.65;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{
+  border:1px solid #dce7f5;
+  border-radius:20px;
+  padding:16px;
+  background:#fbfdff;
+}
+.card h3{margin:0 0 12px;color:#2d5c96;font-size:19px}
+label{display:block;margin:10px 0 6px;font-size:13px;font-weight:1000;color:#455777}
+input,textarea{
+  width:100%;
+  border:1px solid #d7e3f2;
+  border-radius:12px;
+  padding:11px 12px;
+  font:inherit;
+  background:#fff;
+}
+textarea{min-height:76px;resize:vertical}
+.clue-table{
+  display:grid;
+  grid-template-columns:1fr 1.25fr;
+  border:1px solid #d8e5f4;
+  border-radius:16px;
+  overflow:hidden;
+}
+.clue-table>div{padding:10px;border-bottom:1px solid #e4ebf5}
+.clue-table>div:nth-last-child(-n+2){border-bottom:none}
+.head{background:#edf5ff;color:#31558e;font-weight:1000;text-align:center}
+.name{background:#f9fbfe;color:#4f5e78;font-weight:900}
+.checks{display:grid;gap:8px}
+.check{
+  display:flex;gap:9px;align-items:center;
+  padding:11px 12px;
+  background:#fff;border:1px solid #e0e8f3;border-radius:13px;
+  font-weight:900;color:#56647d;
+}
+.check input{width:auto}
+.info{
+  margin-top:10px;padding:12px;border-radius:14px;
+  background:#eef5ff;border:1px solid #d9e6f8;
+  color:#556887;font-size:13px;line-height:1.6;
+}
+
+.final{
+  margin-top:18px;
+  background:#fff;
+  border:1px solid #d7e5f5;
+  box-shadow:var(--shadow);
+  border-radius:28px;
+  padding:20px;
+}
+.verdicts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.verdict{
+  border:2px solid #e2e9f3;border-radius:17px;
+  padding:16px 10px;background:#fff;text-align:center;
+  font-weight:1000;cursor:pointer;color:#4f5d75;
+}
+.verdict.actual.on{background:#edf8f1;border-color:#43a96f;color:#247248}
+.verdict.more.on{background:#fff8e7;border-color:#e8ad2e;color:#8a6412}
+.verdict.ai.on{background:#fff0f2;border-color:#e75b67;color:#9a3442}
+.stars{display:flex;gap:4px;margin:8px 0}
+.star{border:none;background:transparent;font-size:30px;color:#c7d1df;cursor:pointer;padding:3px}
+.star.on{color:#ffb628}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.guide{margin-top:10px;padding:11px 12px;border-radius:13px;background:#f1f6ff;color:#4d6180;border:1px solid #dbe6f5}
+.guide.warn{background:#fff1f2;color:#964150;border-color:#efc0c6}
+.guide.ok{background:#eef9f2;color:#2f7549;border-color:#b7dfc6}
+
+.result{
+  display:none;
+  margin-top:16px;
+  border-radius:20px;
+  padding:18px;
+  background:linear-gradient(135deg,#eef6ff,#fbfdff);
+  border:1px solid #d7e6f7;
+}
+.result.show{display:block}
+.result-top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.pill{padding:7px 11px;border-radius:999px;background:#fff;border:1px solid #dbe6f5;color:#31558e;font-weight:1000;font-size:12px}
+.result h3{margin:12px 0 8px;color:#153e74;font-size:24px}
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.rbox{background:#fff;border:1px solid #dfe8f3;border-radius:14px;padding:12px}
+.rbox b{display:block;color:#31558e;margin-bottom:4px}
+.rbox span{color:#5c6980;font-size:13px;line-height:1.55}
+.answer{
+  display:none;
+  margin-top:14px;
+  border-radius:20px;
+  padding:18px;
+  background:linear-gradient(135deg,#fff8ea,#fffdf6);
+  border:1px solid #efd89c;
+}
+.answer.show{display:block}
+.answer h3{margin:0 0 8px;color:#7a5810}
+.answer p{margin:6px 0;color:#665a43;line-height:1.7}
+.teacher{
+  margin-top:16px;
+  border:1px solid #dde7f3;
+  border-radius:16px;
+  background:#fff;
+  overflow:hidden;
+}
+.teacher summary{cursor:pointer;padding:13px 15px;color:#3a5d8c;font-weight:1000}
+.teacher div{padding:0 15px 15px;color:#5d6b82;line-height:1.7;font-size:13px}
+.foot{margin-top:18px;text-align:center;color:#76849b;font-size:12px}
+@media(max-width:900px){
+  .video-card,.grid{grid-template-columns:1fr}
+  .choice-grid,.verdicts,.result-grid{grid-template-columns:1fr}
+}
+
+/* 통합 활동 연결 영역 */
+.bridge{
+  margin-top:22px;
+  background:linear-gradient(135deg,#fff,#f6fbff);
+  border:1px solid #d7e5f5;
+  box-shadow:var(--shadow);
+  border-radius:28px;
+  padding:22px;
+}
+.bridge-top{
+  display:flex;
+  gap:14px;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.bridge h2{
+  margin:0 0 8px;
+  color:#173f74;
+  font-size:28px;
+}
+.bridge p{
+  margin:0;
+  color:#65748d;
+  line-height:1.7;
+}
+.bridge-note{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:15px;
+  background:#eef6ff;
+  border:1px dashed #bfd4ee;
+  color:#395780;
+  font-weight:900;
+}
+.bridge-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:16px;
+}
+.challenge-wrap{
+  display:none;
+  margin-top:16px;
+  border:1px solid #d9e6f5;
+  border-radius:24px;
+  overflow:hidden;
+  background:#fff;
+}
+.challenge-wrap.show{display:block}
+.challenge-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  padding:14px 16px;
+  background:linear-gradient(90deg,#214a99,#4f84ff,#30c6c5);
+  color:#fff;
+  flex-wrap:wrap;
+}
+.challenge-head b{
+  font-size:18px;
+}
+.challenge-head span{
+  font-size:13px;
+  opacity:.96;
+}
+.challenge-frame{
+  width:100%;
+  min-height:1600px;
+  border:0;
+  display:block;
+  background:#fff;
+}
+@media(max-width:900px){
+  .challenge-frame{min-height:1800px}
+}
+
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <section class="hero" id="firstActivity">
+    <div class="kicker">🔬 함께 탐구하기</div>
+    <h1>딥페이크 판별 실험실</h1>
+    <p>한 가지 단서만으로 ‘실제 영상’ 또는 ‘AI 생성·변형 영상’이라고 단정하지 않습니다. 영상을 보고, 출처와 맥락을 확인하고, 여러 단서를 종합해 판단해 봅니다.</p>
+    <div class="rule">🎯 영상을 처음 봤을 때의 직감과, 출처·맥락·제작 정보를 확인한 뒤의 최종 판단이 어떻게 달라지는지 비교해 보세요.</div>
+
+    <div class="video-card">
+      <div class="video-box">
+        <div class="video-screen">
+          <div class="video-label">판별 자료 01 · 먼저 영상만 보고 판단해 보세요</div>
+          <div class="play">▶</div>
+        </div>
+        <div class="video-actions">
+          <a class="btn primary" href="https://www.youtube.com/watch?v=5Ncuote9ADo" target="_blank" rel="noopener">▶ 영상 보기</a>
+          <button class="btn light" type="button" id="firstJumpBtn">첫 판단하기 ↓</button>
+        </div>
+      </div>
+
+      <div class="intro-box">
+        <h3>📌 관찰 전 약속</h3>
+        <ul>
+          <li>영상 제목만 보고 정답을 예상하지 않습니다.</li>
+          <li>처음에는 ‘느낌’으로 판단해도 괜찮습니다.</li>
+          <li>이후에는 반드시 <b>근거</b>를 찾아 판단을 수정합니다.</li>
+          <li>‘추가 확인 필요’도 중요한 정보 판단 태도입니다.</li>
+        </ul>
+
+        <div class="first-judge" id="firstJudgeBox">
+          <b>1차 직감 판단</b>
+          <div class="choice-grid">
+            <button class="choice actual" data-first="실제 영상 같음">실제 영상 같음</button>
+            <button class="choice more" data-first="추가 확인 필요">추가 확인 필요</button>
+            <button class="choice ai" data-first="AI 생성·변형 같음">AI 생성·변형 같음</button>
+          </div>
+          <div class="guide" id="firstGuide">아직 정답은 공개하지 않습니다.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lab" id="sourceSection">
+    <div class="lab-title"><span class="step">1</span><h2>출처 확인</h2></div>
+    <p class="help">누가 올렸는지, 원본 출처가 있는지, 최초 게시물을 찾을 수 있는지 확인합니다.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>🔎 게시자 확인</h3>
+        <label for="source1">누가 게시했나요?</label>
+        <input id="source1" placeholder="예: 공식 채널, 개인 채널, 재업로드 계정">
+        <label for="source2">공식 계정 또는 원본 출처가 있나요?</label>
+        <input id="source2" placeholder="확인한 출처를 적어 보세요.">
+        <label for="source3">최초 게시물을 찾을 수 있나요?</label>
+        <input id="source3" placeholder="찾았다면 어디인지 적어 보세요.">
+      </div>
+      <div class="card">
+        <h3>🧭 출처 판단 메모</h3>
+        <textarea id="sourceMemo" placeholder="이 출처를 얼마나 믿을 수 있다고 생각하나요? 그 이유도 적어 보세요."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="lab">
+    <div class="lab-title"><span class="step">2</span><h2>영상 단서 확인</h2></div>
+    <p class="help">화면을 다시 보며 아래 단서를 하나씩 확인해 보세요. 이상한 부분이 없다고 느껴져도 그대로 적으면 됩니다.</p>
+    <div class="clue-table">
+      <div class="head">확인할 부분</div><div class="head">발견한 내용</div>
+      <div class="name">입 모양과 음성</div><div><input id="clue1" placeholder="일치하는가?"></div>
+      <div class="name">얼굴 경계와 머리카락</div><div><input id="clue2" placeholder="경계가 자연스러운가?"></div>
+      <div class="name">안경·귀걸이·치아 등 세부 표현</div><div><input id="clue3" placeholder="형태가 유지되는가?"></div>
+      <div class="name">빛과 그림자</div><div><input id="clue4" placeholder="광원과 그림자가 자연스러운가?"></div>
+      <div class="name">얼굴을 돌릴 때의 변화</div><div><input id="clue5" placeholder="윤곽이 바뀌거나 깨지지 않는가?"></div>
+      <div class="name">장면 사이의 일관성</div><div><input id="clue6" placeholder="인물·배경·물체가 유지되는가?"></div>
+    </div>
+  </section>
+
+  <section class="lab">
+    <div class="lab-title"><span class="step">3</span><h2>맥락 확인</h2></div>
+    <p class="help">영상 자체뿐 아니라 날짜, 장소, 자막, 다른 자료와의 일치 여부를 확인합니다.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>📅 날짜와 장소</h3>
+        <textarea id="context1" placeholder="영상의 날짜와 장소가 상황과 맞나요?"></textarea>
+      </div>
+      <div class="card">
+        <h3>💬 자막과 실제 발언</h3>
+        <textarea id="context2" placeholder="자막과 실제 말의 의미가 일치하나요?"></textarea>
+      </div>
+      <div class="card">
+        <h3>📰 교차 확인</h3>
+        <textarea id="context3" placeholder="같은 상황을 다룬 다른 영상이나 기사를 찾았나요?"></textarea>
+      </div>
+      <div class="card">
+        <h3>🔗 확인한 자료</h3>
+        <textarea id="context4" placeholder="확인한 기사, 공식 계정, 다른 자료를 적어 보세요."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="lab">
+    <div class="lab-title"><span class="step">4</span><h2>제작 이력 확인</h2></div>
+    <p class="help">영상의 설명, 공식 채널, 기사 등에서 AI 생성·편집 여부가 표시되어 있는지 확인합니다.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>🧾 제작 정보 체크</h3>
+        <div class="checks">
+          <label class="check"><input type="checkbox" id="history1"> 콘텐츠 제작 정보가 있음</label>
+          <label class="check"><input type="checkbox" id="history2"> AI 생성·편집 표시가 있음</label>
+          <label class="check"><input type="checkbox" id="history3"> 확인할 수 없음</label>
+        </div>
+      </div>
+      <div class="card">
+        <h3>ℹ️ 기억하기</h3>
+        <div class="info">제작 정보나 Content Credentials는 콘텐츠가 어떻게 만들어지고 수정되었는지 확인하는 데 도움을 줄 수 있습니다. 그러나 이 정보 하나만으로 모든 진위를 단정할 수는 없습니다.</div>
+        <label for="historyMemo">제작 이력 메모</label>
+        <textarea id="historyMemo" placeholder="제작 정보에서 확인한 내용을 적어 보세요."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="lab-title"><span class="step">5</span><h2>나의 최종 판정</h2></div>
+    <p class="help">처음 판단과 비교해 보세요. 판단이 바뀌어도 괜찮습니다.</p>
+
+    <div class="verdicts">
+      <button class="verdict actual" data-verdict="실제 영상일 가능성이 높다">✅ 실제 영상일 가능성이 높다</button>
+      <button class="verdict more" data-verdict="추가 확인이 필요하다">🔎 추가 확인이 필요하다</button>
+      <button class="verdict ai" data-verdict="AI 생성·변형 가능성이 높다">🤖 AI 생성·변형 가능성이 높다</button>
+    </div>
+
+    <label style="margin-top:14px;">확신 정도</label>
+    <div class="stars">
+      <button class="star" data-score="1">★</button>
+      <button class="star" data-score="2">★</button>
+      <button class="star" data-score="3">★</button>
+      <button class="star" data-score="4">★</button>
+      <button class="star" data-score="5">★</button>
+    </div>
+
+    <label for="evidence">가장 중요한 근거</label>
+    <textarea id="evidence" placeholder="내가 최종 판단을 내리는 데 가장 중요했던 근거를 적어 보세요."></textarea>
+
+    <div class="actions">
+      <button class="btn green" type="button" id="makeBtn">🧪 실험 결과 만들기</button>
+      <button class="btn gold" type="button" id="revealBtn">🔐 정답 공개</button>
+      <button class="btn light" type="button" id="resetBtn">다시 하기</button>
+    </div>
+    <div class="guide" id="guide">💡 정답을 보기 전에 먼저 자신의 판단과 근거를 완성하세요.</div>
+
+    <div class="result" id="result">
+      <div class="result-top">
+        <span class="pill">🔬 딥페이크 판별 실험 기록</span>
+        <span class="pill">자료 01</span>
+      </div>
+      <h3 id="resultVerdict">최종 판정</h3>
+      <div class="result-grid">
+        <div class="rbox"><b>처음 판단</b><span id="rFirst">-</span></div>
+        <div class="rbox"><b>최종 판단</b><span id="rFinal">-</span></div>
+        <div class="rbox"><b>확신 정도</b><span id="rConfidence">-</span></div>
+      </div>
+      <div class="rbox" style="margin-top:10px;"><b>가장 중요한 근거</b><span id="rEvidence">-</span></div>
+    </div>
+
+    <div class="answer" id="answer">
+      <h3>✅ 정답 및 해설</h3>
+      <p><b>정답:</b> 이 영상은 생성형 AI를 활용해 제작된 공식 홍보 뮤직비디오입니다.</p>
+      <p>처음에는 K-POP 스타일의 일반 뮤직비디오처럼 보일 수 있지만, 제작사 측은 게임 캐릭터와 기존 디자인 자산을 바탕으로 생성형 AI를 활용해 움직임과 장면을 구현했다고 설명했습니다.</p>
+      <p>따라서 이 활동에서는 화면의 어색함만 찾기보다 <b>공식 출처, 제작 설명, 다른 기사와의 교차 확인</b>이 최종 판단에 얼마나 중요한지 살펴보는 것이 핵심입니다.</p>
+    </div>
+
+    <details class="teacher">
+      <summary>👩‍🏫 교사용 참고 자료</summary>
+      <div>
+        활용 영상: 「Wanna be in LOVE」 feat. EVIE – Stellar Blade: BLOODRAIN 홍보 뮤직비디오.<br>
+        영상 링크: https://www.youtube.com/watch?v=5Ncuote9ADo<br><br>
+        수업에서는 영상 제목이나 AI 관련 설명을 먼저 보여 주지 않고 영상만 보게 한 뒤, 학생의 1차 판단을 기록하게 하는 것이 좋습니다. 이후 공식 제작 설명과 관련 보도를 확인하면서 판단을 수정하도록 진행하세요.<br><br>
+        제작사 설명에 따르면 캐릭터 Evie 자체는 아티스트와 모델러가 제작했으며, 영상에서는 생성형 AI가 캐릭터의 움직임과 표현을 렌더링하는 데 활용되었습니다.
+      </div>
+    </details>
+  </section>
+
+  
+  <section class="bridge" id="challengeBridge">
+    <div class="bridge-top">
+      <div>
+        <div class="kicker">🧩 다음 활동</div>
+        <h2>딥페이크 탐정 챌린지</h2>
+        <p>판별 실험실 활동을 마쳤다면, 이제 여러 영상을 직접 비교하며 판단해 보는 <b>딥페이크 탐정 챌린지</b>로 이어집니다.</p>
+      </div>
+    </div>
+
+    <div class="bridge-note">먼저 위 활동에서 나의 판단 기준을 정리한 뒤, 아래 버튼을 눌러 다음 활동으로 이동하세요.</div>
+
+    <div class="bridge-actions">
+      <button class="btn primary" type="button" id="openChallengeBtn">🕵️ 딥페이크 탐정 챌린지 시작하기</button>
+      <button class="btn light" type="button" id="jumpTopBtn">맨 위로 올라가기</button>
+    </div>
+
+    <div class="challenge-wrap" id="challengeWrap">
+      <div class="challenge-head">
+        <div>
+          <b>딥페이크 탐정 챌린지</b><br>
+          <span>아래에서 이어서 활동할 수 있습니다.</span>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn light" type="button" id="focusChallengeBtn">활동 영역으로 이동</button>
+          <button class="btn light" type="button" id="backToFirstBtn">↑ 첫 번째 활동으로 돌아가기</button>
+        </div>
+      </div>
+      <iframe
+        id="challengeFrame"
+        class="challenge-frame"
+        title="딥페이크 탐정 챌린지"
+        loading="lazy"
+        srcdoc="&lt;!doctype html&gt;
+&lt;html lang=&quot;ko&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;title&gt;5차시 활동 - 딥페이크 탐정 챌린지&lt;/title&gt;
+&lt;style&gt;
+:root{
+  --bg1:#eef8ff;
+  --bg2:#f7f1ff;
+  --line:#d7e6f6;
+  --text:#1f2840;
+  --muted:#63708c;
+  --blue:#4f84ff;
+  --navy:#244b9c;
+  --teal:#30c6c5;
+  --purple:#8b65ff;
+  --pink:#ff7db4;
+  --yellow:#ffcb57;
+  --orange:#ff9f50;
+  --green:#49b97a;
+  --red:#f16068;
+  --glass:rgba(255,255,255,.72);
+  --shadow:0 14px 34px rgba(73,95,145,.12);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:var(--text);
+  font-family:&quot;Pretendard&quot;,&quot;Noto Sans KR&quot;,&quot;Apple SD Gothic Neo&quot;,system-ui,sans-serif;
+  background:
+    radial-gradient(circle at 8% 14%, rgba(48,198,197,.18) 0 12%, transparent 13%),
+    radial-gradient(circle at 92% 16%, rgba(139,101,255,.16) 0 12%, transparent 13%),
+    radial-gradient(circle at 20% 84%, rgba(255,125,180,.14) 0 12%, transparent 13%),
+    linear-gradient(135deg, #eef8ff 0%, #f5f6ff 45%, #faf0ff 100%);
+  min-height:100vh;
+}
+body:before{
+  content:&quot;&quot;;
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(79,132,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,132,255,.05) 1px, transparent 1px);
+  background-size:34px 34px;
+  pointer-events:none;
+  mask-image:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.18));
+}
+.wrap{max-width:1280px; margin:0 auto; padding:22px 16px 70px}
+.hero{
+  position:relative; overflow:hidden;
+  border-radius:32px; padding:28px;
+  background:linear-gradient(135deg, rgba(255,255,255,.88), rgba(255,255,255,.72));
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.7);
+  box-shadow:var(--shadow);
+}
+.hero:after{
+  content:&quot;&quot;;
+  position:absolute; right:-50px; top:-60px; width:250px; height:250px; border-radius:50%;
+  background:radial-gradient(circle, rgba(139,101,255,.18), transparent 68%);
+}
+.kicker{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 12px; border-radius:999px;
+  background:linear-gradient(90deg, rgba(79,132,255,.12), rgba(48,198,197,.12));
+  border:1px solid rgba(94,137,236,.18);
+  color:#30519a; font-size:13px; font-weight:1000;
+}
+h1{
+  margin:12px 0 10px;
+  font-size:clamp(34px,5vw,58px);
+  line-height:1.1; letter-spacing:-2px;
+}
+.gradient{
+  background:linear-gradient(90deg, #2a53aa, #4f84ff, #30c6c5, #8b65ff);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero p{
+  margin:0; max-width:900px;
+  color:var(--muted); font-size:16px; line-height:1.8;
+}
+.mission{
+  margin-top:18px; padding:16px 18px; border-radius:20px;
+  background:linear-gradient(90deg, rgba(79,132,255,.08), rgba(48,198,197,.08), rgba(255,203,87,.10));
+  border:1px dashed rgba(93,132,235,.32);
+  font-weight:900; line-height:1.68;
+}
+.hero-row{display:grid; grid-template-columns:1.15fr .85fr; gap:14px; margin-top:18px}
+.hero-card{
+  border-radius:20px; padding:16px;
+  background:rgba(255,255,255,.62);
+  border:1px solid rgba(255,255,255,.75);
+}
+.hero-card b{display:block; margin-bottom:8px; font-size:17px}
+.mini-list{display:grid; gap:8px}
+.mini-item{
+  border-radius:14px; padding:11px 12px;
+  background:rgba(255,255,255,.72);
+  border:1px solid #e8eef9; color:#54627e; line-height:1.55; font-size:14px;
+}
+.panel{
+  margin-top:18px; padding:22px; border-radius:28px;
+  background:var(--glass); backdrop-filter:blur(9px);
+  border:1px solid rgba(255,255,255,.72);
+  box-shadow:var(--shadow);
+}
+.panel h2{
+  margin:0; display:flex; align-items:center; gap:10px;
+  font-size:27px; letter-spacing:-.7px;
+}
+.num{
+  width:38px; height:38px; flex:0 0 38px; border-radius:50%;
+  display:grid; place-items:center; color:#fff; font-weight:1000;
+  background:linear-gradient(135deg, var(--blue), var(--purple));
+  box-shadow:0 8px 18px rgba(95,120,255,.20);
+}
+.help{margin:8px 0 16px; color:var(--muted); line-height:1.68; font-size:14px}
+.resource-grid{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:12px;
+}
+.resource{
+  border-radius:20px; padding:15px; background:rgba(255,255,255,.82); border:1px solid #e7eef9;
+  display:flex; flex-direction:column; gap:9px;
+}
+.resource .tag{
+  align-self:flex-start; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:1000;
+  background:linear-gradient(90deg, rgba(79,132,255,.14), rgba(48,198,197,.14)); color:#3053a2;
+}
+.resource b{font-size:16px; line-height:1.45}
+.resource p{margin:0; color:var(--muted); font-size:13px; line-height:1.6}
+.resource a{
+  margin-top:auto; text-decoration:none; font-weight:1000; color:#2a53aa;
+  display:inline-flex; align-items:center; gap:6px;
+}
+.warning{
+  margin-top:12px; padding:12px 14px; border-radius:14px;
+  background:rgba(255,249,236,.94); border:1px solid #f3dfb1; color:#7a643a; line-height:1.65; font-size:13px; font-weight:900;
+}
+.clip-grid{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:14px;
+}
+.clip{
+  position:relative; overflow:hidden;
+  border-radius:24px; padding:16px;
+  background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.74));
+  border:1px solid #e5edf8;
+}
+.clip-head{display:flex; justify-content:space-between; gap:10px; align-items:center}
+.clip-badge{
+  width:42px; height:42px; border-radius:14px; display:grid; place-items:center;
+  font-size:20px; font-weight:1000; color:#fff;
+}
+.clip:nth-child(1) .clip-badge{background:linear-gradient(135deg,#4f84ff,#30c6c5)}
+.clip:nth-child(2) .clip-badge{background:linear-gradient(135deg,#8b65ff,#4f84ff)}
+.clip:nth-child(3) .clip-badge{background:linear-gradient(135deg,#ff9f50,#ffcb57)}
+.clip:nth-child(4) .clip-badge{background:linear-gradient(135deg,#30c6c5,#49b97a)}
+.clip:nth-child(5) .clip-badge{background:linear-gradient(135deg,#ff7db4,#8b65ff)}
+.clip:nth-child(6) .clip-badge{background:linear-gradient(135deg,#f16068,#ff9f50)}
+.clip-title{font-size:18px; font-weight:1000}
+
+
+
+.preview-player{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/9;
+  border-radius:18px;
+  overflow:hidden;
+  background:#111827;
+  border:1px solid #dfe8f7;
+}
+.preview-player iframe{
+  width:100%;
+  height:100%;
+  border:0;
+  display:block;
+}
+.player-mask-top{
+  position:absolute;
+  left:0; right:0; top:0;
+  height:42px;
+  z-index:4;
+  background:linear-gradient(180deg, rgba(17,24,39,.96), rgba(17,24,39,.78), transparent);
+  pointer-events:none;
+}
+.player-mask-bottom{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height:48px;
+  z-index:4;
+  background:linear-gradient(0deg, rgba(17,24,39,.96), rgba(17,24,39,.75), transparent);
+  pointer-events:none;
+}
+.clip-id-overlay{
+  position:absolute;
+  top:10px; left:12px; z-index:6;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.94);
+  color:#284b8a;
+  font-size:12px;
+  font-weight:1000;
+  box-shadow:0 4px 10px rgba(0,0,0,.12);
+}
+.preview-controls{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.preview-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  border:none;
+  border-radius:12px;
+  padding:10px 12px;
+  background:linear-gradient(90deg,#4f84ff,#30c6c5);
+  color:#fff;
+  font:inherit;
+  font-size:12px;
+  font-weight:1000;
+  cursor:pointer;
+}
+.preview-btn.stop{
+  background:#eef3fb;
+  color:#586781;
+  border:1px solid #dfe7f4;
+}
+.preview-timer{
+  margin-left:auto;
+  min-width:64px;
+  text-align:center;
+  padding:8px 10px;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid #e2eaf6;
+  color:#42536f;
+  font-size:12px;
+  font-weight:1000;
+}
+
+.embed-wrap{
+  position:relative; width:100%; aspect-ratio:16/9; border-radius:16px; overflow:hidden;
+  background:#000; border:1px solid #dfe8f7;
+}
+.embed-wrap iframe{width:100%; height:100%; border:0; display:block;}
+.ten-badge{
+  position:absolute; left:10px; top:10px; z-index:2;
+  padding:6px 10px; border-radius:999px;
+  background:rgba(0,0,0,.72); color:#fff; font-size:11px; font-weight:1000;
+}
+.link-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.link-btn{
+  display:inline-flex; align-items:center; gap:6px; text-decoration:none;
+  padding:8px 10px; border-radius:12px; font-size:12px; font-weight:1000;
+  background:#f4f8ff; border:1px solid #dfe7f6; color:#355494;
+}
+.video-thumb{
+  margin-top:12px; border-radius:18px; overflow:hidden; background:#fff; border:1px solid #dfe9f7;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);
+}
+.thumb-screen{
+  position:relative; min-height:150px; padding:14px;
+  background:linear-gradient(145deg,#d9e8ff,#eef7ff 50%, #fffefb);
+}
+.thumb-theme-A{background:linear-gradient(145deg,#dfeeff,#eef8ff 55%, #fffdf7)}
+.thumb-theme-B{background:linear-gradient(145deg,#e9f0ff,#f6f9ff 55%, #ffffff)}
+.thumb-theme-C{background:linear-gradient(145deg,#ffe0ec,#fff1f5 55%, #fffefc)}
+.thumb-theme-D{background:linear-gradient(145deg,#efe6ff,#f6f1ff 55%, #fffefe)}
+.thumb-theme-E{background:linear-gradient(145deg,#e4fff3,#f0fff8 55%, #fffefd)}
+.thumb-theme-F{background:linear-gradient(145deg,#fff0db,#fff7ea 55%, #fffefe)}
+.thumb-label{
+  position:absolute; top:12px; left:12px; padding:6px 10px; border-radius:999px;
+  background:rgba(255,255,255,.84); color:#5370a7; font-size:11px; font-weight:1000; border:1px solid rgba(130,159,216,.28)
+}
+.thumb-play{
+  position:absolute; right:12px; top:12px; width:36px; height:36px; border-radius:50%;
+  display:grid; place-items:center; background:rgba(255,255,255,.9); color:#3053a2; font-size:16px; border:1px solid #dce7f7;
+}
+.thumb-figure{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-top:28px;
+}
+.face{
+  width:74px; height:74px; border-radius:50%;
+  display:grid; place-items:center; font-size:36px; background:rgba(255,255,255,.82); border:2px solid rgba(255,255,255,.9);
+  box-shadow:0 8px 14px rgba(84,104,152,.10);
+}
+.wave{
+  flex:1; height:66px; border-radius:16px; background:rgba(255,255,255,.72); border:1px solid #dde8f7; padding:10px 12px;
+  display:flex; align-items:flex-end; gap:5px;
+}
+.wave span{width:10px; border-radius:6px 6px 0 0; background:linear-gradient(180deg,#5d89ff,#30c6c5)}
+.frame-row{
+  margin-top:10px; display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+}
+.frame{
+  height:42px; border-radius:12px; background:rgba(255,255,255,.78); border:1px solid #dfe8f7;
+  display:grid; place-items:center; font-size:18px; color:#58719f;
+}
+.thumb-caption{
+  margin-top:10px; padding:10px 11px; border-radius:14px; background:rgba(255,255,255,.78); border:1px solid #e4ecf8;
+  color:#61708a; line-height:1.55; font-size:13px;
+}
+.fake-screen{
+  margin-top:12px; border-radius:18px; padding:16px;
+  min-height:122px;
+  background:linear-gradient(145deg, #eef5ff, #fbfdff);
+  border:1px solid #dfe9f7;
+}
+.fake-top{display:flex; justify-content:space-between; font-size:12px; font-weight:1000; color:#6880b8; margin-bottom:10px}
+.fake-main{font-size:15px; font-weight:900; line-height:1.65}
+.fake-sub{margin-top:8px; font-size:13px; color:#6b7893; line-height:1.6}
+.choice-row{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px}
+.choice{
+  border:none; border-radius:14px; padding:11px 8px; font:inherit; font-weight:1000; cursor:pointer;
+  background:#fff; border:1px solid #dbe6f4; color:#41506f; transition:.15s;
+}
+.choice:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 6px 12px rgba(76,97,156,.08)}
+.choice.selected.real{background:#eaf6ee; border-color:#9cd5b4; color:#257348}
+.choice.selected.sus{background:#fff6e7; border-color:#f0d089; color:#8d6612}
+.choice.selected.ai{background:#fff0f2; border-color:#efb0bc; color:#a93a4d}
+.choice:disabled{cursor:default}
+.status-pill{
+  margin-top:10px; display:inline-flex; align-items:center; gap:6px;
+  padding:7px 10px; border-radius:999px; font-size:12px; font-weight:1000;
+  background:rgba(255,255,255,.72); border:1px solid #e5ecf8; color:#57647e;
+}
+.actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:15px}
+button.main, button.sub, button.gold, button.dark{
+  border:none; border-radius:14px; padding:12px 15px; font:inherit; font-weight:1000; cursor:pointer; transition:.16s;
+}
+button.main{background:linear-gradient(90deg,#4f84ff,#30c6c5); color:#fff}
+button.gold{background:linear-gradient(90deg,#ffcb57,#ff9f50); color:#613e12}
+button.dark{background:linear-gradient(90deg,#8b65ff,#4f84ff); color:#fff}
+button.sub{background:#f4f8fc; color:#5d6a84; border:1px solid #dfe7f4}
+button:hover{transform:translateY(-1px)}
+.round-layout{display:grid; grid-template-columns:1.1fr .9fr; gap:14px}
+.card{
+  border-radius:22px; padding:17px; background:rgba(255,255,255,.78); border:1px solid #e5edf8;
+}
+.criteria-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px}
+.criteria{
+  border-radius:18px; padding:16px; background:#fff; border:1px solid #e4ecf8;
+}
+.criteria .c-top{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+.c-icon{
+  width:46px; height:46px; border-radius:16px; display:grid; place-items:center; font-size:24px;
+  background:linear-gradient(135deg, rgba(79,132,255,.14), rgba(48,198,197,.14));
+}
+.criteria h3{margin:0; font-size:18px}
+.criteria ul{margin:8px 0 0 20px; padding:0; color:#5f6e8b; line-height:1.65}
+.bet-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.coin-board{display:flex; flex-wrap:wrap; gap:10px}
+.coin{
+  width:58px; height:58px; border-radius:50%; display:grid; place-items:center;
+  background:radial-gradient(circle at 30% 30%, #ffe48a, #ffc93f 60%, #e39d19 100%);
+  color:#7d5113; font-size:20px; font-weight:1000; box-shadow:0 8px 14px rgba(221,155,21,.18);
+  border:4px solid #fff4c9;
+}
+.bet-row{display:grid; gap:10px}
+select, input, textarea{
+  width:100%; border:1px solid #d9e4f4; border-radius:14px; padding:12px 13px; font:inherit; color:var(--text); background:#fff; outline:none;
+}
+textarea{min-height:94px; resize:vertical}
+input:focus, textarea:focus, select:focus{border-color:#87aaf9; box-shadow:0 0 0 3px rgba(79,132,255,.12)}
+label{display:block; margin:10px 0 6px; font-size:13px; font-weight:1000}
+.guide{
+  margin-top:10px; padding:12px 13px; border-radius:14px;
+  background:#f4f8ff; border:1px solid #dfe9f7; color:#5d6b86; line-height:1.6; font-size:13px;
+}
+.guide.ok{background:#edf9f2; border-color:#a5d8b7; color:#2d6d45; font-weight:900}
+.guide.warn{background:#fff3f3; border-color:#efbcc0; color:#9b4251; font-weight:900}
+.answer-board{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+}
+.answer-box{
+  border-radius:16px; padding:14px; background:#fff; border:1px solid #e4ecf8; line-height:1.65;
+}
+.answer-box b{display:block; margin-bottom:6px; font-size:16px}
+.scorebar{
+  margin-top:12px; border-radius:18px; padding:14px;
+  background:linear-gradient(90deg, rgba(79,132,255,.08), rgba(139,101,255,.08), rgba(48,198,197,.08));
+  border:1px dashed rgba(87,117,227,.22);
+  font-weight:1000; line-height:1.7;
+}
+.report-layout{display:grid; grid-template-columns:1.05fr .95fr; gap:14px}
+.checklist{display:grid; gap:8px; margin-top:10px}
+.ck{
+  display:flex; gap:10px; align-items:flex-start; border-radius:14px;
+  padding:11px 12px; background:#fff; border:1px solid #e3ebf7; cursor:pointer;
+}
+.ck input{width:auto; margin-top:3px}
+.report-result{display:none; margin-top:14px}
+.poster{
+  position:relative; overflow:hidden;
+  border-radius:26px; padding:20px;
+  background:
+    radial-gradient(circle at 92% 10%, rgba(139,101,255,.14) 0 11%, transparent 12%),
+    radial-gradient(circle at 10% 88%, rgba(48,198,197,.14) 0 11%, transparent 12%),
+    linear-gradient(155deg,#ffffff,#f6f7ff 55%, #f4fbff);
+  border:2px solid #dbe7f7; box-shadow:var(--shadow);
+}
+.poster:before{
+  content:&quot;FINAL REPORT&quot;;
+  position:absolute; top:16px; right:-34px; transform:rotate(14deg);
+  background:#8b65ff; color:#fff; font-size:12px; font-weight:1000;
+  padding:8px 30px;
+}
+.poster-head{text-align:center; padding-bottom:12px; border-bottom:2px dashed #dce7f6}
+.poster-title{font-size:40px; font-weight:1000; letter-spacing:-1.5px; background:linear-gradient(90deg,#2a53aa,#4f84ff,#30c6c5,#8b65ff); -webkit-background-clip:text; background-clip:text; color:transparent}
+.poster-sub{margin-top:8px; color:#66738f; line-height:1.6}
+.badge-row{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px}
+.badge-card{
+  border-radius:18px; padding:14px; text-align:center; background:#fff; border:1px solid #e4ecf8;
+}
+.b-icon{font-size:34px}
+.b-name{margin-top:6px; font-weight:1000}
+.b-cap{margin-top:4px; font-size:12px; color:#6a7690}
+.poster-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px}
+.pbox{
+  border-radius:18px; padding:15px; background:#fff; border:1px solid #e4ecf8;
+}
+.pbox h4{margin:0 0 8px; font-size:17px}
+.pbox p{margin:0; color:#5f6b85; line-height:1.75}
+.big-judgment{
+  margin-top:14px; border-radius:20px; padding:18px; text-align:center;
+  background:linear-gradient(90deg, rgba(79,132,255,.10), rgba(255,125,180,.10), rgba(255,203,87,.12));
+  border:1px dashed rgba(94,125,230,.24);
+}
+.big-judgment .j-top{font-size:13px; color:#617191; font-weight:1000}
+.big-judgment .j-main{margin-top:8px; font-size:32px; font-weight:1000; color:#244b9c}
+.big-judgment .j-sub{margin-top:6px; line-height:1.7; color:#5d6985}
+.teacher{
+  margin-top:14px; border-radius:18px; overflow:hidden; background:#fff; border:1px solid #e3ebf7;
+}
+.teacher summary{cursor:pointer; padding:14px 16px; font-weight:1000; color:#39528c}
+.teacher-body{padding:0 16px 16px; color:#5a6782; line-height:1.72; font-size:13px}
+.teacher-body .box{margin-top:9px; padding:12px; border-radius:14px; background:#f8fbff; border:1px solid #e3edf9}
+.foot{margin-top:22px; text-align:center; color:#78839d; font-size:12px; line-height:1.65}
+@media(max-width:980px){
+  .hero-row,.round-layout,.bet-grid,.report-layout{grid-template-columns:1fr}
+  .resource-grid,.clip-grid,.criteria-grid,.answer-board,.badge-row,.poster-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:760px){
+  .resource-grid,.clip-grid,.criteria-grid,.answer-board,.badge-row,.poster-grid{grid-template-columns:1fr}
+}
+@media print{
+  body{background:#fff}
+  body:before,.no-print{display:none!important}
+  .hero,.panel,.card,.clip,.resource,.criteria,.poster,.answer-box,.badge-card,.pbox{box-shadow:none; backdrop-filter:none}
+  .wrap{max-width:none; padding:0}
+}
+
+.return-first-bar{
+  position:sticky;
+  top:0;
+  z-index:9999;
+  display:flex;
+  justify-content:flex-start;
+  padding:10px 16px;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid #dce7f6;
+  box-shadow:0 6px 18px rgba(62,84,132,.08);
+}
+.return-first-btn{
+  border:none;
+  border-radius:14px;
+  padding:11px 15px;
+  font:inherit;
+  font-weight:1000;
+  cursor:pointer;
+  background:linear-gradient(90deg,#244b9c,#4f84ff);
+  color:#fff;
+  box-shadow:0 7px 16px rgba(79,132,255,.18);
+}
+.return-first-btn:hover{transform:translateY(-1px)}
+@media print{.return-first-bar{display:none!important}}
+
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;return-first-bar no-print&quot;&gt;
+  &lt;button type=&quot;button&quot; class=&quot;return-first-btn&quot; id=&quot;returnToFirstInside&quot;&gt;
+    ← 딥페이크 판별 실험실로 돌아가기
+  &lt;/button&gt;
+&lt;/div&gt;
+
+&lt;main class=&quot;wrap&quot;&gt;
+  &lt;section class=&quot;hero&quot;&gt;
+    &lt;div class=&quot;kicker&quot;&gt;🧪 5차시 활동&lt;/div&gt;
+    &lt;h1&gt;&lt;span class=&quot;gradient&quot;&gt;딥페이크 탐정 챌린지&lt;/span&gt; – AI가 손댄 영상을 찾아라!&lt;/h1&gt;
+    &lt;p&gt;실제 영상과 AI 생성·변형 영상의 특징을 비교하며, &lt;b&gt;얼굴&lt;/b&gt;, &lt;b&gt;소리&lt;/b&gt;, &lt;b&gt;장면&lt;/b&gt;, &lt;b&gt;출처&lt;/b&gt; 단서를 바탕으로 영상의 진위와 AI 생성·변형 여부를 판단하는 활동입니다.&lt;/p&gt;
+    &lt;div class=&quot;mission&quot;&gt;🎯 &lt;b&gt;오늘의 미션:&lt;/b&gt; 6개의 연습 영상 카드 중에서 어떤 영상이 &lt;u&gt;실제 영상 같음&lt;/u&gt;, &lt;u&gt;추가 확인 필요&lt;/u&gt;, &lt;u&gt;AI 생성·변형 같음&lt;/u&gt;인지 판단해 보세요. 그다음 실제 사례 영상도 살펴보며, 왜 섣불리 믿거나 공유하면 안 되는지 탐정 보고서로 정리합니다.&lt;/div&gt;
+    &lt;div class=&quot;hero-row&quot;&gt;
+      &lt;div class=&quot;hero-card&quot;&gt;
+        &lt;b&gt;🔎 활동 핵심&lt;/b&gt;
+        &lt;div class=&quot;mini-list&quot;&gt;
+          &lt;div class=&quot;mini-item&quot;&gt;① 6개 영상 카드를 보고 &lt;b&gt;직감 판단&lt;/b&gt;하기&lt;/div&gt;
+          &lt;div class=&quot;mini-item&quot;&gt;② 얼굴·소리·장면·출처 단서로 &lt;b&gt;근거 찾기&lt;/b&gt;&lt;/div&gt;
+          &lt;div class=&quot;mini-item&quot;&gt;③ 최종 판단과 공유 여부를 &lt;b&gt;탐정 보고서&lt;/b&gt;로 정리하기&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;hero-card&quot;&gt;
+        &lt;b&gt;⏱️ 권장 시간&lt;/b&gt;
+        &lt;div class=&quot;mini-list&quot;&gt;
+          &lt;div class=&quot;mini-item&quot;&gt;&lt;b&gt;ROUND 1&lt;/b&gt; 6~8분 · 직감으로 먼저 판별&lt;/div&gt;
+          &lt;div class=&quot;mini-item&quot;&gt;&lt;b&gt;ROUND 2~4&lt;/b&gt; 8~10분 · 단서 확인 및 정답 비교&lt;/div&gt;
+          &lt;div class=&quot;mini-item&quot;&gt;&lt;b&gt;ROUND 5&lt;/b&gt; 5분 · 보고서와 최종 결과물 작성&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  
+&lt;section class=&quot;panel&quot;&gt;
+    &lt;h2&gt;&lt;span class=&quot;num&quot;&gt;★&lt;/span&gt; 활동 안내&lt;/h2&gt;
+    &lt;p class=&quot;help&quot;&gt;ROUND 1에는 &lt;b&gt;실제 영상 3개&lt;/b&gt;와 &lt;b&gt;AI 생성·변형 영상 3개&lt;/b&gt;가 순서를 섞어 들어 있습니다. 일부 영상은 처음 보면 실제인지 AI인지 고민하도록 골랐습니다. 각 카드의 &lt;b&gt;「영상 열기」&lt;/b&gt; 버튼을 누르면 약 30초만 재생되고 자동으로 멈춥니다. 학생은 짧게 본 뒤 먼저 직감으로 판단하고, 두 번째 관찰에서 근거를 찾습니다.&lt;/p&gt;
+    &lt;div class=&quot;warning&quot;&gt;※ 동물 영상 대신, 학생들이 비교적 재미있게 볼 수 있는 &lt;b&gt;한국 코미디·댄스·밈형 영상&lt;/b&gt; 중심으로 바꾸었습니다. 인터넷이 연결된 환경에서 유튜브 영상이 재생됩니다.&lt;/div&gt;
+  &lt;/section&gt;
+
+
+  &lt;section class=&quot;panel&quot;&gt;
+    &lt;h2&gt;&lt;span class=&quot;num&quot;&gt;1&lt;/span&gt; ROUND 1 · 10초 직감 판단&lt;/h2&gt;
+    &lt;p class=&quot;help&quot;&gt;먼저 직감으로 판단해 보세요. 아래 카드에는 &lt;b&gt;실제 유튜브 영상&lt;/b&gt;이 들어 있습니다. 각 카드에서 영상을 열어 본 뒤 &lt;b&gt;실제 영상 같음 / 추가 확인 필요 / AI 생성·변형 같음&lt;/b&gt; 중 하나를 선택해 보세요. &lt;b&gt;‘추가 확인 필요’는 1차 판단 보류 선택지&lt;/b&gt;일 뿐, 최종 정답은 반드시 실제 영상 또는 AI 생성·변형 영상 중 하나입니다. 지금은 정답을 공개하지 않습니다.&lt;/p&gt;
+    &lt;div class=&quot;clip-grid&quot; id=&quot;clipGrid&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;actions no-print&quot;&gt;
+      &lt;button class=&quot;main&quot; id=&quot;countBtn&quot;&gt;📊 현재 선택 수 확인&lt;/button&gt;
+      &lt;button class=&quot;sub&quot; id=&quot;roundResetBtn&quot;&gt;다시 선택하기&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;guide no-print&quot; id=&quot;roundGuide&quot;&gt;💡 아직 학생에게 정답을 보여주지 말고, 먼저 전체 영상을 직감으로 판단하도록 해 보세요. ‘추가 확인 필요’는 1차 판단 보류용 선택지이며 정답은 아닙니다.&lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;panel&quot;&gt;
+    &lt;h2&gt;&lt;span class=&quot;num&quot;&gt;2&lt;/span&gt; ROUND 2 · 탐정 모드&lt;/h2&gt;
+    &lt;p class=&quot;help&quot;&gt;이제 탐정 모드입니다. 아래 네 가지 단서를 바탕으로 무엇이 이상한지 근거를 찾아보세요.&lt;/p&gt;
+    &lt;div class=&quot;round-layout&quot;&gt;
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;div class=&quot;criteria-grid&quot;&gt;
+          &lt;div class=&quot;criteria&quot;&gt;
+            &lt;div class=&quot;c-top&quot;&gt;&lt;div class=&quot;c-icon&quot;&gt;🙂&lt;/div&gt;&lt;h3&gt;얼굴 탐정&lt;/h3&gt;&lt;/div&gt;
+            &lt;ul&gt;
+              &lt;li&gt;얼굴 경계가 어색한가?&lt;/li&gt;
+              &lt;li&gt;입모양과 발음이 잘 맞는가?&lt;/li&gt;
+              &lt;li&gt;머리카락·치아·귀의 디테일이 자연스러운가?&lt;/li&gt;
+              &lt;li&gt;표정 변화가 부드러운가?&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;criteria&quot;&gt;
+            &lt;div class=&quot;c-top&quot;&gt;&lt;div class=&quot;c-icon&quot;&gt;🎧&lt;/div&gt;&lt;h3&gt;소리 탐정&lt;/h3&gt;&lt;/div&gt;
+            &lt;ul&gt;
+              &lt;li&gt;목소리가 지나치게 일정하거나 기계적인가?&lt;/li&gt;
+              &lt;li&gt;배경음과 목소리 크기 변화가 자연스러운가?&lt;/li&gt;
+              &lt;li&gt;입모양과 소리가 동시에 맞아 떨어지는가?&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;criteria&quot;&gt;
+            &lt;div class=&quot;c-top&quot;&gt;&lt;div class=&quot;c-icon&quot;&gt;🖼️&lt;/div&gt;&lt;h3&gt;장면 탐정&lt;/h3&gt;&lt;/div&gt;
+            &lt;ul&gt;
+              &lt;li&gt;프레임 사이 사람 위치가 갑자기 변하는가?&lt;/li&gt;
+              &lt;li&gt;빛과 그림자가 상황에 맞게 유지되는가?&lt;/li&gt;
+              &lt;li&gt;배경 글자나 물체 모양이 흔들리진 않는가?&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;criteria&quot;&gt;
+            &lt;div class=&quot;c-top&quot;&gt;&lt;div class=&quot;c-icon&quot;&gt;📰&lt;/div&gt;&lt;h3&gt;출처 탐정&lt;/h3&gt;&lt;/div&gt;
+            &lt;ul&gt;
+              &lt;li&gt;최초 게시자가 누구인가?&lt;/li&gt;
+              &lt;li&gt;원본 영상이나 공식 계정이 있는가?&lt;/li&gt;
+              &lt;li&gt;설명란에 AI 생성·편집 표시가 있는가?&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;b&gt;🧠 탐정 메모&lt;/b&gt;
+        &lt;label for=&quot;memo1&quot;&gt;가장 먼저 이상하다고 느낀 단서&lt;/label&gt;
+        &lt;textarea id=&quot;memo1&quot; placeholder=&quot;예: 입모양과 소리가 잘 맞지 않았다.&quot;&gt;&lt;/textarea&gt;
+        &lt;label for=&quot;memo2&quot;&gt;추가로 확인해 보고 싶은 점&lt;/label&gt;
+        &lt;textarea id=&quot;memo2&quot; placeholder=&quot;예: 원본 영상이 공식 계정에 있는지 검색해 보고 싶다.&quot;&gt;&lt;/textarea&gt;
+        &lt;div class=&quot;actions no-print&quot;&gt;
+          &lt;button class=&quot;gold&quot; id=&quot;memoExampleBtn&quot;&gt;예시 문장 넣기&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;panel&quot;&gt;
+    &lt;h2&gt;&lt;span class=&quot;num&quot;&gt;3&lt;/span&gt; ROUND 3 · 베팅하기&lt;/h2&gt;
+    &lt;p class=&quot;help&quot;&gt;어떤 영상이 가장 AI 생성·변형 가능성이 높다고 느껴지는지 골라 보고, 근거가 어느 정도 강한지 코인으로 표현해 보세요. &lt;b&gt;정답만큼 근거가 좋으면 추가 점수&lt;/b&gt;를 받을 수 있게 설계했습니다.&lt;/p&gt;
+    &lt;div class=&quot;bet-grid&quot;&gt;
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;b&gt;🪙 탐정 코인&lt;/b&gt;
+        &lt;div class=&quot;coin-board&quot;&gt;
+          &lt;div class=&quot;coin&quot;&gt;★&lt;/div&gt;&lt;div class=&quot;coin&quot;&gt;★&lt;/div&gt;&lt;div class=&quot;coin&quot;&gt;★&lt;/div&gt;&lt;div class=&quot;coin&quot;&gt;★&lt;/div&gt;&lt;div class=&quot;coin&quot;&gt;★&lt;/div&gt;
+          &lt;div class=&quot;coin&quot;&gt;★&lt;/div&gt;&lt;div class=&quot;coin&quot;&gt;★&lt;/div&gt;&lt;div class=&quot;coin&quot;&gt;★&lt;/div&gt;&lt;div class=&quot;coin&quot;&gt;★&lt;/div&gt;&lt;div class=&quot;coin&quot;&gt;★&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;guide&quot;&gt;확신 낮음 → &lt;b&gt;1코인&lt;/b&gt; / 어느 정도 확신 → &lt;b&gt;3코인&lt;/b&gt; / 근거가 매우 충분함 → &lt;b&gt;5코인&lt;/b&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;div class=&quot;bet-row&quot;&gt;
+          &lt;label for=&quot;betClip&quot;&gt;가장 AI 생성·변형 가능성이 높다고 느낀 영상&lt;/label&gt;
+          &lt;select id=&quot;betClip&quot;&gt;
+            &lt;option value=&quot;&quot;&gt;선택하세요&lt;/option&gt;
+            &lt;option&gt;A&lt;/option&gt;&lt;option&gt;B&lt;/option&gt;&lt;option&gt;C&lt;/option&gt;&lt;option&gt;D&lt;/option&gt;&lt;option&gt;E&lt;/option&gt;&lt;option&gt;F&lt;/option&gt;
+          &lt;/select&gt;
+          &lt;label for=&quot;betCoin&quot;&gt;베팅 코인 수&lt;/label&gt;
+          &lt;select id=&quot;betCoin&quot;&gt;
+            &lt;option value=&quot;&quot;&gt;선택하세요&lt;/option&gt;
+            &lt;option value=&quot;1&quot;&gt;1코인&lt;/option&gt;
+            &lt;option value=&quot;3&quot;&gt;3코인&lt;/option&gt;
+            &lt;option value=&quot;5&quot;&gt;5코인&lt;/option&gt;
+          &lt;/select&gt;
+          &lt;label for=&quot;betReason&quot;&gt;베팅 이유&lt;/label&gt;
+          &lt;textarea id=&quot;betReason&quot; placeholder=&quot;예: 영상 E는 제목에 Sora로 만들었다고 적혀 있어 AI 생성·변형 영상이라고 판단했다.&quot;&gt;&lt;/textarea&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;panel&quot;&gt;
+    &lt;h2&gt;&lt;span class=&quot;num&quot;&gt;4&lt;/span&gt; ROUND 4 · 정답 공개&lt;/h2&gt;
+    &lt;p class=&quot;help&quot;&gt;학생 선택이 끝나면 정답을 공개하세요. 어떤 단서가 결정적이었는지도 함께 비교할 수 있습니다.&lt;/p&gt;
+    &lt;div class=&quot;actions no-print&quot;&gt;
+      &lt;button class=&quot;dark&quot; id=&quot;revealBtn&quot;&gt;🎬 정답 공개하기&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;guide no-print&quot; id=&quot;answerGuide&quot;&gt;💡 먼저 ROUND 1 선택을 마친 뒤 정답 공개를 눌러 주세요.&lt;/div&gt;
+    &lt;div class=&quot;answer-board&quot; id=&quot;answerBoard&quot; style=&quot;display:none;&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;scorebar&quot; id=&quot;scoreBar&quot; style=&quot;display:none;&quot;&gt;&lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;panel&quot;&gt;
+    &lt;h2&gt;&lt;span class=&quot;num&quot;&gt;5&lt;/span&gt; ROUND 5 · 탐정 보고서&lt;/h2&gt;
+    &lt;p class=&quot;help&quot;&gt;최종 판단과 공유 여부를 정리하고, 마지막에는 시각적인 결과물로 완성해 보세요.&lt;/p&gt;
+    &lt;div class=&quot;report-layout&quot;&gt;
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;label for=&quot;finalClip&quot;&gt;최종 분석할 영상 번호&lt;/label&gt;
+        &lt;select id=&quot;finalClip&quot;&gt;
+          &lt;option value=&quot;&quot;&gt;선택하세요&lt;/option&gt;
+          &lt;option&gt;A&lt;/option&gt;&lt;option&gt;B&lt;/option&gt;&lt;option&gt;C&lt;/option&gt;&lt;option&gt;D&lt;/option&gt;&lt;option&gt;E&lt;/option&gt;&lt;option&gt;F&lt;/option&gt;
+        &lt;/select&gt;
+
+        &lt;label for=&quot;finalJudgment&quot;&gt;우리 모둠의 최종 판단&lt;/label&gt;
+        &lt;select id=&quot;finalJudgment&quot;&gt;
+          &lt;option value=&quot;&quot;&gt;선택하세요&lt;/option&gt;
+          &lt;option&gt;실제 영상&lt;/option&gt;
+          &lt;option&gt;AI 생성·변형 영상&lt;/option&gt;
+        &lt;/select&gt;
+
+        &lt;label for=&quot;top3&quot;&gt;결정적 단서 TOP 3&lt;/label&gt;
+        &lt;textarea id=&quot;top3&quot; placeholder=&quot;예: 1) 입모양-소리 불일치  2) 배경 글자 흔들림  3) 공식 원본 없음&quot;&gt;&lt;/textarea&gt;
+
+        &lt;label for=&quot;finalReason&quot;&gt;최종 판단 이유&lt;/label&gt;
+        &lt;textarea id=&quot;finalReason&quot; placeholder=&quot;왜 그렇게 판단했는지 근거를 종합해 적어 보세요.&quot;&gt;&lt;/textarea&gt;
+
+        &lt;label for=&quot;shareAction&quot;&gt;이 영상을 SNS에서 발견했다면?&lt;/label&gt;
+        &lt;div class=&quot;checklist&quot;&gt;
+          &lt;label class=&quot;ck&quot;&gt;&lt;input type=&quot;radio&quot; name=&quot;shareAction&quot; value=&quot;공유한다&quot;&gt; 공유한다&lt;/label&gt;
+          &lt;label class=&quot;ck&quot;&gt;&lt;input type=&quot;radio&quot; name=&quot;shareAction&quot; value=&quot;원본을 더 확인한다&quot;&gt; 원본을 더 확인한다&lt;/label&gt;
+          &lt;label class=&quot;ck&quot;&gt;&lt;input type=&quot;radio&quot; name=&quot;shareAction&quot; value=&quot;공유하지 않는다&quot;&gt; 공유하지 않는다&lt;/label&gt;
+          &lt;label class=&quot;ck&quot;&gt;&lt;input type=&quot;radio&quot; name=&quot;shareAction&quot; value=&quot;신고 또는 피해 지원을 요청한다&quot;&gt; 신고 또는 피해 지원을 요청한다&lt;/label&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;actions no-print&quot;&gt;
+          &lt;button class=&quot;gold&quot; id=&quot;autoReportBtn&quot;&gt;📝 예시 답안 넣기&lt;/button&gt;
+          &lt;button class=&quot;main&quot; id=&quot;makeReportBtn&quot;&gt;🏆 탐정 보고서 만들기&lt;/button&gt;
+          &lt;button class=&quot;sub&quot; id=&quot;resetAllBtn&quot;&gt;처음부터 다시&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;guide no-print&quot; id=&quot;reportGuide&quot;&gt;💡 최종 판단을 다 적으면 아래에 작품 같은 결과물이 만들어집니다.&lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;b&gt;🎖️ 탐정 배지 기준&lt;/b&gt;
+        &lt;div class=&quot;answer-board&quot; style=&quot;margin-top:12px;&quot;&gt;
+          &lt;div class=&quot;answer-box&quot;&gt;&lt;b&gt;LEVEL 1&lt;/b&gt; 눈썰미 탐정&lt;br&gt;이상한 부분을 발견&lt;/div&gt;
+          &lt;div class=&quot;answer-box&quot;&gt;&lt;b&gt;LEVEL 2&lt;/b&gt; 출처 탐정&lt;br&gt;원본과 최초 게시자 확인&lt;/div&gt;
+          &lt;div class=&quot;answer-box&quot;&gt;&lt;b&gt;LEVEL 3&lt;/b&gt; 팩트체크 탐정&lt;br&gt;여러 자료를 교차 확인&lt;/div&gt;
+          &lt;div class=&quot;answer-box&quot;&gt;&lt;b&gt;LEVEL 4&lt;/b&gt; 미디어 수사대장&lt;br&gt;근거를 종합해 신중하게 판단&lt;/div&gt;
+          &lt;div class=&quot;answer-box&quot;&gt;&lt;b&gt;지도 포인트&lt;/b&gt;&lt;br&gt;정답보다 근거 설명이 중요!&lt;/div&gt;
+          &lt;div class=&quot;answer-box&quot;&gt;&lt;b&gt;실제 사례 활용&lt;/b&gt;&lt;br&gt;위 추천 영상과 연결해 토론 확장&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;report-result&quot; id=&quot;reportResult&quot;&gt;
+      &lt;div class=&quot;poster&quot;&gt;
+        &lt;div class=&quot;poster-head&quot;&gt;
+          &lt;div class=&quot;poster-title&quot;&gt;딥페이크 탐정 보고서&lt;/div&gt;
+          &lt;div class=&quot;poster-sub&quot;&gt;6개 연습 영상과 실제 사례 참고 영상을 바탕으로 우리 모둠이 정리한 최종 결과물입니다.&lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;badge-row&quot;&gt;
+          &lt;div class=&quot;badge-card&quot;&gt;&lt;div class=&quot;b-icon&quot;&gt;🔎&lt;/div&gt;&lt;div class=&quot;b-name&quot;&gt;분석한 영상&lt;/div&gt;&lt;div class=&quot;b-cap&quot; id=&quot;posterClip&quot;&gt;-&lt;/div&gt;&lt;/div&gt;
+          &lt;div class=&quot;badge-card&quot;&gt;&lt;div class=&quot;b-icon&quot;&gt;🧠&lt;/div&gt;&lt;div class=&quot;b-name&quot;&gt;탐정 점수&lt;/div&gt;&lt;div class=&quot;b-cap&quot; id=&quot;posterScore&quot;&gt;-&lt;/div&gt;&lt;/div&gt;
+          &lt;div class=&quot;badge-card&quot;&gt;&lt;div class=&quot;b-icon&quot;&gt;🪙&lt;/div&gt;&lt;div class=&quot;b-name&quot;&gt;베팅 코인&lt;/div&gt;&lt;div class=&quot;b-cap&quot; id=&quot;posterCoin&quot;&gt;-&lt;/div&gt;&lt;/div&gt;
+          &lt;div class=&quot;badge-card&quot;&gt;&lt;div class=&quot;b-icon&quot;&gt;🏅&lt;/div&gt;&lt;div class=&quot;b-name&quot;&gt;획득 배지&lt;/div&gt;&lt;div class=&quot;b-cap&quot; id=&quot;posterBadge&quot;&gt;-&lt;/div&gt;&lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;poster-grid&quot;&gt;
+          &lt;div class=&quot;pbox&quot;&gt;
+            &lt;h4&gt;📌 최종 판단&lt;/h4&gt;
+            &lt;p id=&quot;posterJudgment&quot;&gt;-&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;pbox&quot;&gt;
+            &lt;h4&gt;📣 SNS에서 발견했다면?&lt;/h4&gt;
+            &lt;p id=&quot;posterAction&quot;&gt;-&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;pbox&quot;&gt;
+            &lt;h4&gt;🔍 결정적 단서 TOP 3&lt;/h4&gt;
+            &lt;p id=&quot;posterTop3&quot;&gt;-&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;pbox&quot;&gt;
+            &lt;h4&gt;🧾 최종 판단 이유&lt;/h4&gt;
+            &lt;p id=&quot;posterReason&quot;&gt;-&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;big-judgment&quot;&gt;
+          &lt;div class=&quot;j-top&quot;&gt;핵심 한마디&lt;/div&gt;
+          &lt;div class=&quot;j-main&quot; id=&quot;posterQuote&quot;&gt;멈추고 확인하면 더 안전하다!&lt;/div&gt;
+          &lt;div class=&quot;j-sub&quot;&gt;딥페이크 판단은 한 가지 느낌이 아니라, 여러 단서를 차분히 종합하는 과정입니다.&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;details class=&quot;teacher no-print&quot;&gt;
+      &lt;summary&gt;🔐 선생님 검토용 · 권장 정답 예시 보기&lt;/summary&gt;
+      &lt;div class=&quot;teacher-body&quot;&gt;
+        &lt;div class=&quot;box&quot;&gt;&lt;b&gt;정답:&lt;/b&gt; A=AI 생성·변형 영상 / B=실제 영상 / C=실제 영상 / D=AI 생성·변형 영상 / E=실제 영상 / F=AI 생성·변형 영상&lt;/div&gt;
+        &lt;div class=&quot;box&quot;&gt;&lt;b&gt;순서 구성:&lt;/b&gt; AI와 실제 영상을 번갈아 섞어 두어 앞쪽 3개가 전부 실제, 뒤쪽 3개가 전부 AI처럼 패턴이 보이지 않도록 바꿨습니다.&lt;/div&gt;
+        &lt;div class=&quot;box&quot;&gt;&lt;b&gt;D·F 영상:&lt;/b&gt; D는 실제 배우가 연기하는 것처럼 보이는 사람 중심 AI 생성·변형 영상이고, F는 2026년 공개된 송가인 공식 뮤직비디오 형식의 AI 생성·변형 영상입니다. 특히 F는 공식 뮤직비디오라 학생들이 더 고민하기 좋습니다.&lt;/div&gt;
+        &lt;div class=&quot;box&quot;&gt;&lt;b&gt;‘추가 확인 필요’의 역할:&lt;/b&gt; 정답이 아니라 1차 판단 보류용입니다. 학생이 처음에는 판단을 보류할 수 있지만, 출처·설명·추가 단서를 확인한 뒤 최종적으로 실제 영상 또는 AI 생성·변형 영상 중 하나를 선택합니다.&lt;/div&gt;
+        &lt;div class=&quot;box&quot;&gt;&lt;b&gt;수업 포인트:&lt;/b&gt; A와 D는 실제 촬영처럼 보이는 사람 중심 AI 생성·변형 영상이고, F는 &lt;b&gt;공식 K-POP 뮤직비디오 형식이라 더 헷갈리기 쉬운 AI 생성·변형 영상&lt;/b&gt;입니다. 반대로 B와 E는 편집 때문에 AI처럼 느낄 수도 있는 실제 영상입니다. 따라서 단순히 ‘어색한 부분 찾기’보다 &lt;b&gt;출처 확인 → 근거 비교 → 최종 판단&lt;/b&gt; 과정을 강조하기 좋습니다.&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/details&gt;
+  &lt;/section&gt;
+
+  &lt;div class=&quot;foot&quot;&gt;실제 사례 영상은 교사가 먼저 검토한 뒤 학생 수준에 맞게 선택하여 활용해 주세요.&lt;/div&gt;
+&lt;/main&gt;
+
+&lt;script&gt;
+
+let ytPlayers = {};
+
+function updatePosterCards(){
+  clips.forEach(clip =&gt; {
+    const holder = document.getElementById(`yt-${clip.id}`);
+    if(!holder) return;
+    holder.innerHTML = `
+      &lt;div class=&quot;preview-poster&quot;&gt;
+        &lt;div class=&quot;preview-circle&quot;&gt;${clip.icon}&lt;/div&gt;
+        &lt;div class=&quot;preview-text&quot;&gt;CLIP ${clip.id}&lt;br&gt;${clip.displayTitle}&lt;/div&gt;
+        &lt;div class=&quot;preview-sub&quot;&gt;버튼을 눌러 영상을 열어 보세요.&lt;/div&gt;
+      &lt;/div&gt;
+    `;
+  });
+}
+
+const clips = [
+
+  {
+    id:&quot;A&quot;, icon:&quot;🎭&quot;,
+    displayTitle:&quot;두 사람이 대화하는 광고 장면&quot;,
+    desc:&quot;두 사람이 자연스럽게 대화하는 것처럼 보이는 한국어 홍보 영상&quot;,
+    sub:&quot;처음 보면 실제 촬영 광고처럼 보이도록 만든 사람 중심 영상입니다.&quot;,
+    answer:&quot;AI 생성·변형 영상&quot;,
+    reason:&quot;제작자가 ‘100% AI로 만든 영상’이라고 밝힌 한국어 AI 생성 쇼츠입니다. 사람의 표정과 대화가 자연스러워 보여도 출처 확인이 중요합니다.&quot;,
+    youtube:&quot;chxA7f7_slo&quot;,
+    full:&quot;https://www.youtube.com/shorts/chxA7f7_slo&quot;,
+    start:0, end:30
+  },
+  {
+    id:&quot;B&quot;, icon:&quot;🕺&quot;,
+    displayTitle:&quot;댄스 챌린지 도전&quot;,
+    desc:&quot;유행하는 춤을 따라 하며 주변 반응까지 담은 한국 댄스 쇼츠&quot;,
+    sub:&quot;빠른 편집과 화면 효과 때문에 AI처럼 느껴질 수도 있는 영상입니다.&quot;,
+    answer:&quot;실제 영상&quot;,
+    reason:&quot;한국 크리에이터가 실제로 촬영한 댄스 챌린지 쇼츠입니다. 효과와 편집 때문에 처음에는 헷갈릴 수 있지만 실제 촬영 영상입니다.&quot;,
+    youtube:&quot;z5NdqVOPc24&quot;,
+    full:&quot;https://www.youtube.com/shorts/z5NdqVOPc24&quot;,
+    start:0, end:30
+  },
+  {
+    id:&quot;C&quot;, icon:&quot;😂&quot;,
+    displayTitle:&quot;스몰토크 파괴자&quot;,
+    desc:&quot;대화가 자꾸 어긋나는 상황을 코믹하게 보여 주는 한국 스케치 코미디 쇼츠&quot;,
+    sub:&quot;짧은 상황극이라 AI 대화 영상처럼 느껴질 수도 있습니다.&quot;,
+    answer:&quot;실제 영상&quot;,
+    reason:&quot;실제 사람이 연기하고 촬영한 한국 스케치 코미디 쇼츠입니다. 표정과 대화 흐름이 자연스럽고 실제 촬영 맥락을 확인할 수 있습니다.&quot;,
+    youtube:&quot;r3exufy9Hu4&quot;,
+    full:&quot;https://www.youtube.com/shorts/r3exufy9Hu4&quot;,
+    start:0, end:30
+  },
+  {
+    id:&quot;D&quot;, icon:&quot;🎬&quot;,
+    displayTitle:&quot;연기까지 자연스러운 사람 영상&quot;,
+    desc:&quot;실제 배우가 연기하는 것처럼 보이는 짧은 사람 중심 영상&quot;,
+    sub:&quot;표정과 동작이 자연스러워 실제 촬영인지 고민하게 만드는 영상입니다.&quot;,
+    answer:&quot;AI 생성·변형 영상&quot;,
+    reason:&quot;원 영상 제목에서 ‘이게 AI로 만든 영상이라고? 연기까지 잘 하는 AI’라고 밝힌 AI 생성 영상입니다. 겉보기만으로는 실제 촬영처럼 느껴질 수 있어 판별 활동에 적합합니다.&quot;,
+    youtube:&quot;-kx0X1XzTB0&quot;,
+    full:&quot;https://www.youtube.com/shorts/-kx0X1XzTB0&quot;,
+    start:0, end:30
+  },
+  {
+    id:&quot;E&quot;, icon:&quot;🏠&quot;,
+    displayTitle:&quot;부동산 공감 상황극&quot;,
+    desc:&quot;일상에서 한 번쯤 공감할 만한 상황을 짧게 비튼 한국 코미디 쇼츠&quot;,
+    sub:&quot;장면과 대사가 짧아 AI로 만든 상황극처럼 느껴질 수도 있습니다.&quot;,
+    answer:&quot;실제 영상&quot;,
+    reason:&quot;실제 사람이 연기하는 한국 스케치 코미디 촬영 영상입니다. 출처와 원본 맥락을 확인하면 실제 촬영임을 판단할 수 있습니다.&quot;,
+    youtube:&quot;qTkpwD1le4Q&quot;,
+    full:&quot;https://www.youtube.com/shorts/qTkpwD1le4Q&quot;,
+    start:0, end:30
+  },
+  {
+    id:&quot;F&quot;, icon:&quot;🎤&quot;,
+    displayTitle:&quot;가수의 공식 뮤직비디오&quot;,
+    desc:&quot;가수의 신곡 공식 뮤직비디오처럼 자연스럽게 보이는 한국 영상&quot;,
+    sub:&quot;실제 촬영과 AI 제작의 경계가 헷갈리도록 만든 영상입니다.&quot;,
+    answer:&quot;AI 생성·변형 영상&quot;,
+    reason:&quot;송가인의 2026년 신곡 ‘꽃이 아니면 어떤가(질경이)’ 공식 뮤직비디오로, 실제 송가인 대신 AI가 만든 페르소나와 가상 세계를 중심으로 제작된 100% AI 기반 영상으로 소개되었습니다.&quot;,
+    youtube:&quot;UtnRGODFyVo&quot;,
+    full:&quot;https://www.youtube.com/watch?v=UtnRGODFyVo&quot;,
+    start:0, end:30
+  }
+];
+const answerToClass = {&quot;실제 영상&quot;:&quot;real&quot;, &quot;추가 확인 필요&quot;:&quot;sus&quot;, &quot;AI 생성·변형 영상&quot;:&quot;ai&quot;};
+const selectionDisplay = {&quot;실제 영상&quot;:&quot;실제 영상 같음&quot;, &quot;추가 확인 필요&quot;:&quot;추가 확인 필요&quot;, &quot;AI 생성·변형 영상&quot;:&quot;AI 생성·변형 같음&quot;};
+const clipGrid = document.getElementById(&quot;clipGrid&quot;);
+const roundGuide = document.getElementById(&quot;roundGuide&quot;);
+const answerGuide = document.getElementById(&quot;answerGuide&quot;);
+const reportGuide = document.getElementById(&quot;reportGuide&quot;);
+let selections = {};
+let revealDone = false;
+let score = 0;
+
+function esc(s){
+  return String(s ?? &quot;&quot;).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g, ch =&gt; ({&#x27;&amp;&#x27;:&#x27;&amp;amp;&#x27;,&#x27;&lt;&#x27;:&#x27;&amp;lt;&#x27;,&#x27;&gt;&#x27;:&#x27;&amp;gt;&#x27;,&#x27;&quot;&#x27;:&#x27;&amp;quot;&#x27;,&quot;&#x27;&quot;:&#x27;&amp;#039;&#x27;}[ch]));
+}
+
+function renderClips(){
+  clipGrid.innerHTML = clips.map(clip =&gt; `
+    &lt;div class=&quot;clip&quot; id=&quot;clip-${clip.id}&quot;&gt;
+      &lt;div class=&quot;clip-head&quot;&gt;
+        &lt;div style=&quot;display:flex;align-items:center;gap:10px;&quot;&gt;
+          &lt;div class=&quot;clip-badge&quot;&gt;${clip.id}&lt;/div&gt;
+          &lt;div class=&quot;clip-title&quot;&gt;${clip.displayTitle}&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div style=&quot;font-size:23px&quot;&gt;${clip.icon}&lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;video-thumb&quot;&gt;
+        &lt;div class=&quot;preview-player&quot;&gt;
+          &lt;div id=&quot;yt-${clip.id}&quot;&gt;
+            &lt;div class=&quot;preview-poster&quot;&gt;
+              &lt;div class=&quot;preview-circle&quot;&gt;${clip.icon}&lt;/div&gt;
+              &lt;div class=&quot;preview-text&quot;&gt;CLIP ${clip.id}&lt;br&gt;${clip.displayTitle}&lt;/div&gt;
+              &lt;div class=&quot;preview-sub&quot;&gt;버튼을 눌러 영상을 열어 보세요.&lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;preview-controls no-print&quot;&gt;
+          &lt;a class=&quot;preview-btn&quot; href=&quot;${clip.full}&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;▶ 영상 열기&lt;/a&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;thumb-caption&quot;&gt;
+          &lt;div class=&quot;fake-top&quot;&gt;&lt;span&gt;CLIP ${clip.id}&lt;/span&gt;&lt;span&gt;한국 쇼츠 영상&lt;/span&gt;&lt;/div&gt;
+          &lt;div class=&quot;fake-main&quot;&gt;${clip.desc}&lt;/div&gt;
+          &lt;div class=&quot;fake-sub&quot;&gt;영상을 보고 실제 영상인지, AI 생성·변형 영상인지 판단해 보세요.&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;choice-row&quot;&gt;
+        &lt;button class=&quot;choice&quot; data-clip=&quot;${clip.id}&quot; data-value=&quot;실제 영상&quot;&gt;실제 영상 같음&lt;/button&gt;
+        &lt;button class=&quot;choice&quot; data-clip=&quot;${clip.id}&quot; data-value=&quot;추가 확인 필요&quot;&gt;추가 확인 필요&lt;/button&gt;
+        &lt;button class=&quot;choice&quot; data-clip=&quot;${clip.id}&quot; data-value=&quot;AI 생성·변형 영상&quot;&gt;AI 생성·변형 같음&lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;status-pill&quot; id=&quot;status-${clip.id}&quot;&gt;아직 선택하지 않았어요.&lt;/div&gt;
+    &lt;/div&gt;
+  `).join(&quot;&quot;);
+
+  document.querySelectorAll(&quot;.choice&quot;).forEach(btn =&gt; {
+    btn.addEventListener(&quot;click&quot;, () =&gt; chooseClip(btn.dataset.clip, btn.dataset.value));
+  });
+  updatePosterCards();
+}
+function chooseClip(id, value){
+  if(revealDone) return;
+  selections[id] = value;
+  document.querySelectorAll(`[data-clip=&quot;${id}&quot;]`).forEach(btn =&gt; {
+    btn.classList.remove(&quot;selected&quot;,&quot;real&quot;,&quot;sus&quot;,&quot;ai&quot;);
+    if(btn.dataset.value === value){
+      btn.classList.add(&quot;selected&quot;, answerToClass[value]);
+    }
+  });
+  document.getElementById(`status-${id}`).textContent = `선택 완료: ${selectionDisplay[value] || value}`;
+}
+function countSelections(){
+  return Object.keys(selections).length;
+}
+document.getElementById(&quot;countBtn&quot;).addEventListener(&quot;click&quot;, () =&gt; {
+  const count = countSelections();
+  roundGuide.className = count === 6 ? &quot;guide ok no-print&quot; : &quot;guide no-print&quot;;
+  roundGuide.textContent = count === 6
+    ? &quot;✅ 6개 영상 모두 선택했습니다. 이제 탐정 모드와 베팅하기를 진행해 보세요.&quot;
+    : `💡 현재 ${count}/6개를 선택했습니다. 나머지 영상도 직감으로 먼저 판단해 보세요.`;
+});
+document.getElementById(&quot;roundResetBtn&quot;).addEventListener(&quot;click&quot;, () =&gt; {
+  if(revealDone) return;
+  selections = {};
+  document.querySelectorAll(&quot;.choice&quot;).forEach(btn =&gt; btn.classList.remove(&quot;selected&quot;,&quot;real&quot;,&quot;sus&quot;,&quot;ai&quot;));
+  clips.forEach(clip =&gt; {
+    document.getElementById(`status-${clip.id}`).textContent = &quot;아직 선택하지 않았어요.&quot;;
+  });
+  roundGuide.className = &quot;guide no-print&quot;;
+  roundGuide.textContent = &quot;💡 아직 학생에게 정답을 보여주지 말고, 먼저 전체 영상을 직감으로 판단하도록 해 보세요. ‘추가 확인 필요’는 1차 판단 보류용 선택지이며 정답은 아닙니다.&quot;;
+});
+
+document.getElementById(&quot;memoExampleBtn&quot;).addEventListener(&quot;click&quot;, () =&gt; {
+  document.getElementById(&quot;memo1&quot;).value = &quot;입모양과 소리의 일치 여부, 얼굴 경계의 흔들림, 배경 글자의 어색함이 먼저 눈에 들어왔다.&quot;;
+  document.getElementById(&quot;memo2&quot;).value = &quot;이 영상의 원본이 공식 계정에 있는지, 업로드 날짜와 설명란에 AI 생성 또는 편집 표시가 있는지 확인해 보고 싶다.&quot;;
+});
+
+function calcScore(){
+  let s = 0;
+  clips.forEach(clip =&gt; {
+    if(selections[clip.id] === clip.answer) s += 1;
+  });
+  const betClip = document.getElementById(&quot;betClip&quot;).value;
+  const betCoin = Number(document.getElementById(&quot;betCoin&quot;).value || 0);
+  if(betClip &amp;&amp; betCoin){
+    const target = clips.find(c =&gt; c.id === betClip);
+    if(target &amp;&amp; target.answer === &quot;AI 생성·변형 영상&quot;) s += betCoin;
+  }
+  const betReason = document.getElementById(&quot;betReason&quot;).value.trim();
+  if(betReason.length &gt;= 15) s += 2;
+  return s;
+}
+
+document.getElementById(&quot;revealBtn&quot;).addEventListener(&quot;click&quot;, () =&gt; {
+  if(countSelections() &lt; 6){
+    answerGuide.className = &quot;guide warn no-print&quot;;
+    answerGuide.textContent = &quot;⚠️ 6개 영상을 모두 선택한 뒤 정답을 공개해 주세요.&quot;;
+    return;
+  }
+  revealDone = true;
+  score = calcScore();
+
+  const board = document.getElementById(&quot;answerBoard&quot;);
+  board.style.display = &quot;grid&quot;;
+  board.innerHTML = clips.map(clip =&gt; {
+    const picked = selections[clip.id] || &quot;-&quot;;
+    const ok = picked === clip.answer;
+    return `
+      &lt;div class=&quot;answer-box&quot;&gt;
+        &lt;b&gt;영상 ${clip.id} · ${clip.title}&lt;/b&gt;
+        &lt;div&gt;내 판단: &lt;b&gt;${esc(selectionDisplay[picked] || picked)}&lt;/b&gt;&lt;/div&gt;
+        &lt;div&gt;정답: &lt;b&gt;${esc(clip.answer)}&lt;/b&gt;&lt;/div&gt;
+        &lt;div style=&quot;margin-top:6px;color:${ok ? &#x27;#257348&#x27; : &#x27;#a24252&#x27;};font-weight:1000;&quot;&gt;${ok ? &#x27;정답!&#x27; : &#x27;다시 보기!&#x27;}&lt;/div&gt;
+        &lt;div style=&quot;margin-top:8px;color:#61708a;font-size:13px;line-height:1.65;&quot;&gt;${esc(clip.reason)}&lt;/div&gt;
+      &lt;/div&gt;`;
+  }).join(&quot;&quot;);
+
+  const scoreBar = document.getElementById(&quot;scoreBar&quot;);
+  scoreBar.style.display = &quot;block&quot;;
+  scoreBar.innerHTML = `🏁 &lt;b&gt;탐정 점수&lt;/b&gt;: ${score}점&lt;br&gt;
+    · 기본 점수: 정답 1개당 1점 (총 6점)&lt;br&gt;
+    · 베팅 보너스: 가장 AI 생성·변형 가능성이 높다고 느낀 영상을 정확히 AI 생성·변형 영상으로 맞히면 베팅 코인만큼 추가 점수&lt;br&gt;
+    · 근거 보너스: 베팅 이유를 충분히 적으면 2점 추가`;
+  answerGuide.className = &quot;guide ok no-print&quot;;
+  answerGuide.textContent = &quot;✅ 정답을 공개했습니다. 이제 탐정 보고서로 최종 판단을 정리해 보세요.&quot;;
+});
+
+function badgeNameByScore(s){
+  if(s &gt;= 10) return &quot;미디어 수사대장&quot;;
+  if(s &gt;= 8) return &quot;팩트체크 탐정&quot;;
+  if(s &gt;= 5) return &quot;출처 탐정&quot;;
+  return &quot;눈썰미 탐정&quot;;
+}
+document.getElementById(&quot;autoReportBtn&quot;).addEventListener(&quot;click&quot;, () =&gt; {
+  document.getElementById(&quot;finalClip&quot;).value = &quot;D&quot;;
+  document.getElementById(&quot;finalJudgment&quot;).value = &quot;AI 생성·변형 영상&quot;;
+  document.getElementById(&quot;top3&quot;).value = &quot;1) 실제 배우처럼 보일 만큼 자연스러운 표정\n2) 원 영상에서 AI 제작 사실을 밝힘\n3) 눈으로만 판단하기보다 출처 확인이 결정적이었음&quot;;
+  document.getElementById(&quot;finalReason&quot;).value = &quot;영상 D는 실제 배우가 연기한 것처럼 자연스럽게 보이지만, 원 영상에서 AI로 제작된 영상임을 밝히고 있다. 따라서 겉모습만으로 단정하지 않고 출처를 확인한 뒤 AI 생성·변형 영상으로 판단했다.&quot;;
+  const target = [...document.querySelectorAll(&#x27;input[name=&quot;shareAction&quot;]&#x27;)].find(x =&gt; x.value === &quot;공유하지 않는다&quot;);
+  if(target) target.checked = true;
+  reportGuide.className = &quot;guide ok no-print&quot;;
+  reportGuide.textContent = &quot;✅ 예시 답안을 채웠습니다. 필요한 부분을 수정한 뒤 보고서를 만들어 보세요.&quot;;
+});
+
+document.getElementById(&quot;makeReportBtn&quot;).addEventListener(&quot;click&quot;, () =&gt; {
+  const finalClip = document.getElementById(&quot;finalClip&quot;).value;
+  const finalJudgment = document.getElementById(&quot;finalJudgment&quot;).value;
+  const top3 = document.getElementById(&quot;top3&quot;).value.trim();
+  const finalReason = document.getElementById(&quot;finalReason&quot;).value.trim();
+  const actionEl = document.querySelector(&#x27;input[name=&quot;shareAction&quot;]:checked&#x27;);
+  const action = actionEl ? actionEl.value : &quot;&quot;;
+  const betCoin = document.getElementById(&quot;betCoin&quot;).value || &quot;-&quot;;
+  const currentScore = revealDone ? score : calcScore();
+
+  if(!finalClip || !finalJudgment || !top3 || !finalReason || !action){
+    reportGuide.className = &quot;guide warn no-print&quot;;
+    reportGuide.textContent = &quot;⚠️ 영상 번호, 최종 판단, 단서 TOP3, 판단 이유, SNS 대응을 모두 입력해 주세요.&quot;;
+    return;
+  }
+
+  document.getElementById(&quot;posterClip&quot;).textContent = finalClip;
+  document.getElementById(&quot;posterScore&quot;).textContent = `${currentScore}점`;
+  document.getElementById(&quot;posterCoin&quot;).textContent = betCoin === &quot;-&quot; ? &quot;-&quot; : `${betCoin}코인`;
+  document.getElementById(&quot;posterBadge&quot;).textContent = badgeNameByScore(currentScore);
+  document.getElementById(&quot;posterJudgment&quot;).textContent = finalJudgment;
+  document.getElementById(&quot;posterAction&quot;).textContent = action;
+  document.getElementById(&quot;posterTop3&quot;).textContent = top3;
+  document.getElementById(&quot;posterReason&quot;).textContent = finalReason;
+
+  let quote = &quot;멈추고 확인하면 더 안전하다!&quot;;
+  if(finalJudgment.includes(&quot;AI 생성·변형&quot;)) quote = &quot;AI 생성·변형 여부는 출처와 설명까지 함께 확인!&quot;;
+  else quote = &quot;실제 영상처럼 보여도 출처 확인은 기본!&quot;;
+  document.getElementById(&quot;posterQuote&quot;).textContent = quote;
+
+  const rr = document.getElementById(&quot;reportResult&quot;);
+  rr.style.display = &quot;block&quot;;
+  reportGuide.className = &quot;guide ok no-print&quot;;
+  reportGuide.textContent = &quot;🎉 탐정 보고서가 완성되었습니다! 아래 작품형 결과물을 확인하세요.&quot;;
+  rr.scrollIntoView({behavior:&quot;smooth&quot;, block:&quot;start&quot;});
+});
+
+document.getElementById(&quot;resetAllBtn&quot;).addEventListener(&quot;click&quot;, () =&gt; {
+  selections = {};
+  revealDone = false;
+  score = 0;
+  renderClips();
+  document.getElementById(&quot;memo1&quot;).value = &quot;&quot;;
+  document.getElementById(&quot;memo2&quot;).value = &quot;&quot;;
+  document.getElementById(&quot;betClip&quot;).value = &quot;&quot;;
+  document.getElementById(&quot;betCoin&quot;).value = &quot;&quot;;
+  document.getElementById(&quot;betReason&quot;).value = &quot;&quot;;
+  document.getElementById(&quot;finalClip&quot;).value = &quot;&quot;;
+  document.getElementById(&quot;finalJudgment&quot;).value = &quot;&quot;;
+  document.getElementById(&quot;top3&quot;).value = &quot;&quot;;
+  document.getElementById(&quot;finalReason&quot;).value = &quot;&quot;;
+  document.querySelectorAll(&#x27;input[name=&quot;shareAction&quot;]&#x27;).forEach(x =&gt; x.checked = false);
+  document.getElementById(&quot;answerBoard&quot;).style.display = &quot;none&quot;;
+  document.getElementById(&quot;scoreBar&quot;).style.display = &quot;none&quot;;
+  document.getElementById(&quot;reportResult&quot;).style.display = &quot;none&quot;;
+  roundGuide.className = &quot;guide no-print&quot;;
+  roundGuide.textContent = &quot;💡 아직 학생에게 정답을 보여주지 말고, 먼저 전체 영상을 직감으로 판단하도록 해 보세요. ‘추가 확인 필요’는 1차 판단 보류용 선택지이며 정답은 아닙니다.&quot;;
+  answerGuide.className = &quot;guide no-print&quot;;
+  answerGuide.textContent = &quot;💡 먼저 ROUND 1 선택을 마친 뒤 정답 공개를 눌러 주세요.&quot;;
+  reportGuide.className = &quot;guide no-print&quot;;
+  reportGuide.textContent = &quot;💡 최종 판단을 다 적으면 아래에 작품 같은 결과물이 만들어집니다.&quot;;
+});
+
+renderClips();
+loadYouTubeAPI();
+&lt;/script&gt;
+
+&lt;script&gt;
+(function(){
+  function sendHeight(){
+    try{
+      const h = Math.max(
+        document.documentElement.scrollHeight || 0,
+        document.body.scrollHeight || 0,
+        document.documentElement.offsetHeight || 0,
+        document.body.offsetHeight || 0
+      );
+      parent.postMessage({type:&quot;detectiveChallengeHeight&quot;, height:h}, &quot;*&quot;);
+    }catch(e){}
+  }
+  window.addEventListener(&quot;load&quot;, sendHeight);
+  window.addEventListener(&quot;resize&quot;, sendHeight);
+  setTimeout(sendHeight, 300);
+  setTimeout(sendHeight, 1000);
+  setTimeout(sendHeight, 2000);
+})();
+&lt;/script&gt;
+
+
+&lt;script&gt;
+(function(){
+  const btn = document.getElementById(&quot;returnToFirstInside&quot;);
+  if(btn){
+    btn.addEventListener(&quot;click&quot;, function(){
+      try{
+        parent.postMessage({type:&quot;backToFirstActivity&quot;}, &quot;*&quot;);
+      }catch(e){
+        window.scrollTo({top:0, behavior:&quot;smooth&quot;});
+      }
+    });
+  }
+})();
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+">
+      </iframe>
+    </div>
+  </section>
+
+
+  <div class="foot">딥페이크 판별 실험실 · 근거를 찾아 판단을 수정하는 활동</div>
+</main>
+
+<script>
+let firstChoice = "";
+let finalChoice = "";
+let confidence = 0;
+
+document.getElementById("firstJumpBtn").addEventListener("click", () => {
+  document.getElementById("firstJudgeBox").scrollIntoView({behavior:"smooth", block:"center"});
+});
+
+document.querySelectorAll(".choice").forEach(btn => {
+  btn.addEventListener("click", () => {
+    firstChoice = btn.dataset.first;
+    document.querySelectorAll(".choice").forEach(x => x.classList.remove("on"));
+    btn.classList.add("on");
+    document.getElementById("firstGuide").className = "guide ok";
+    document.getElementById("firstGuide").textContent = `1차 판단 저장: ${firstChoice}`;
+  });
+});
+
+document.querySelectorAll(".verdict").forEach(btn => {
+  btn.addEventListener("click", () => {
+    finalChoice = btn.dataset.verdict;
+    document.querySelectorAll(".verdict").forEach(x => x.classList.remove("on"));
+    btn.classList.add("on");
+  });
+});
+
+document.querySelectorAll(".star").forEach(btn => {
+  btn.addEventListener("click", () => {
+    confidence = Number(btn.dataset.score);
+    document.querySelectorAll(".star").forEach(x => {
+      x.classList.toggle("on", Number(x.dataset.score) <= confidence);
+    });
+  });
+});
+
+document.getElementById("makeBtn").addEventListener("click", () => {
+  const evidence = document.getElementById("evidence").value.trim();
+  if(!firstChoice || !finalChoice || !confidence || !evidence){
+    const g = document.getElementById("guide");
+    g.className = "guide warn";
+    g.textContent = "⚠️ 처음 판단, 최종 판단, 확신 정도, 가장 중요한 근거를 모두 작성해 주세요.";
+    return;
+  }
+  document.getElementById("rFirst").textContent = firstChoice;
+  document.getElementById("rFinal").textContent = finalChoice;
+  document.getElementById("rConfidence").textContent = "★".repeat(confidence) + "☆".repeat(5-confidence);
+  document.getElementById("rEvidence").textContent = evidence;
+  document.getElementById("resultVerdict").textContent = `최종 판정: ${finalChoice}`;
+  document.getElementById("result").classList.add("show");
+  const g = document.getElementById("guide");
+  g.className = "guide ok";
+  g.textContent = "✅ 실험 기록이 완성되었습니다. 이제 정답을 공개해도 좋습니다.";
+  document.getElementById("result").scrollIntoView({behavior:"smooth", block:"nearest"});
+});
+
+document.getElementById("revealBtn").addEventListener("click", () => {
+  const evidence = document.getElementById("evidence").value.trim();
+  if(!firstChoice || !finalChoice || !confidence || !evidence){
+    const g = document.getElementById("guide");
+    g.className = "guide warn";
+    g.textContent = "⚠️ 먼저 자신의 판단과 근거를 완성한 뒤 정답을 확인하세요.";
+    return;
+  }
+  document.getElementById("answer").classList.add("show");
+  document.getElementById("answer").scrollIntoView({behavior:"smooth", block:"center"});
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  firstChoice = "";
+  finalChoice = "";
+  confidence = 0;
+  document.querySelectorAll("input[type=text], textarea").forEach(x => x.value = "");
+  document.querySelectorAll("input[type=checkbox]").forEach(x => x.checked = false);
+  document.querySelectorAll(".choice,.verdict,.star").forEach(x => x.classList.remove("on"));
+  document.getElementById("result").classList.remove("show");
+  document.getElementById("answer").classList.remove("show");
+  document.getElementById("firstGuide").className = "guide";
+  document.getElementById("firstGuide").textContent = "아직 정답은 공개하지 않습니다.";
+  document.getElementById("guide").className = "guide";
+  document.getElementById("guide").textContent = "💡 정답을 보기 전에 먼저 자신의 판단과 근거를 완성하세요.";
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+
+const openChallengeBtn = document.getElementById("openChallengeBtn");
+const jumpTopBtn = document.getElementById("jumpTopBtn");
+const focusChallengeBtn = document.getElementById("focusChallengeBtn");
+const backToFirstBtn = document.getElementById("backToFirstBtn");
+const challengeWrap = document.getElementById("challengeWrap");
+const challengeFrame = document.getElementById("challengeFrame");
+const firstActivity = document.getElementById("firstActivity");
+
+if(openChallengeBtn){
+  openChallengeBtn.addEventListener("click", () => {
+    challengeWrap.classList.add("show");
+    setTimeout(() => {
+      challengeWrap.scrollIntoView({behavior:"smooth", block:"start"});
+    }, 80);
+  });
+}
+
+if(jumpTopBtn){
+  jumpTopBtn.addEventListener("click", () => {
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+}
+
+if(focusChallengeBtn){
+  focusChallengeBtn.addEventListener("click", () => {
+    challengeWrap.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+}
+
+if(backToFirstBtn){
+  backToFirstBtn.addEventListener("click", () => {
+    if(firstActivity){
+      firstActivity.scrollIntoView({behavior:"smooth", block:"start"});
+    }else{
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+  });
+}
+
+window.addEventListener("message", (event) => {
+  if(!event || !event.data) return;
+
+  if(event.data.type === "detectiveChallengeHeight"){
+    const h = Number(event.data.height || 0);
+    if(challengeFrame && h > 300){
+      challengeFrame.style.height = (h + 20) + "px";
+    }
+  }
+
+  if(event.data.type === "backToFirstActivity"){
+    if(firstActivity){
+      firstActivity.scrollIntoView({behavior:"smooth", block:"start"});
+    }else{
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+  }
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 정보 재판소 - 어떤 정보를 믿을 수 있을까?</title>
+  <style>
+    :root{
+      --ink:#24324b;
+      --muted:#6a7894;
+      --line:#dbe4f2;
+      --white:#ffffff;
+      --shadow:0 16px 40px rgba(54,66,107,.12);
+      --pink:#ff6ea8;   --pink-soft:#fff0f6;
+      --orange:#ff9a47; --orange-soft:#fff5e7;
+      --yellow:#ffd95a; --yellow-soft:#fff9db;
+      --mint:#31c79a;   --mint-soft:#e9fff8;
+      --sky:#4aa8ff;    --sky-soft:#eef8ff;
+      --violet:#8b6cf6; --violet-soft:#f3efff;
+      --good:#19a56e; --good-bg:#e5fff3;
+      --mid:#dc9422;  --mid-bg:#fff5d7;
+      --bad:#e04d62;  --bad-bg:#ffecef;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+      color:var(--ink);
+      min-height:100vh;
+      background:
+        radial-gradient(circle at 7% 11%, rgba(255,110,168,.26) 0 9%, transparent 10%),
+        radial-gradient(circle at 93% 9%, rgba(139,108,246,.22) 0 10%, transparent 11%),
+        radial-gradient(circle at 14% 86%, rgba(49,199,154,.22) 0 10%, transparent 11%),
+        radial-gradient(circle at 89% 82%, rgba(255,217,90,.27) 0 11%, transparent 12%),
+        linear-gradient(135deg,#fff8fb 0%,#f5f8ff 35%,#f5fff9 68%,#fff9e8 100%);
+      background-attachment:fixed;
+    }
+    .deco span{
+      position:fixed; z-index:-1; width:18px; height:18px; border-radius:6px; opacity:.28;
+      transform:rotate(28deg);
+    }
+    .d1{left:4%;top:31%;background:#ff6ea8}.d2{left:92%;top:28%;background:#ffd95a}
+    .d3{left:9%;top:68%;background:#4aa8ff}.d4{left:93%;top:64%;background:#31c79a}
+    .d5{left:49%;top:3%;background:#8b6cf6}.d6{left:57%;top:92%;background:#ff9a47}
+    .wrap{max-width:1180px;margin:0 auto;padding:26px 18px 72px}
+    .hero{
+      position:relative;overflow:hidden;
+      padding:30px;border-radius:30px;
+      background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(255,243,249,.97) 38%,rgba(240,247,255,.97) 70%,rgba(242,255,248,.97));
+      border:1px solid rgba(255,255,255,.85);
+      box-shadow:var(--shadow);
+    }
+    .hero:after{
+      content:"";position:absolute;right:-64px;top:-72px;width:240px;height:240px;border-radius:50%;
+      background:linear-gradient(135deg,rgba(255,110,168,.18),rgba(139,108,246,.18));
+    }
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;
+      background:linear-gradient(90deg,#ffeaf3,#efeaff);
+      color:#6d53c8;font-weight:900;font-size:13px;
+    }
+    h1{
+      margin:13px 0 7px;
+      font-size:clamp(30px,5vw,50px);
+      letter-spacing:-1.6px;
+    }
+    .rainbow{
+      background:linear-gradient(90deg,#ef4e84,#f2943d,#d7a914,#1fa87b,#398de3,#7357d8);
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+    .hero p{margin:0;color:var(--muted);line-height:1.7;font-size:16px;max-width:840px}
+    .mission{
+      margin-top:18px;padding:15px 17px;border-radius:18px;
+      background:linear-gradient(90deg,#fff0f6,#fff7d8,#ebfff7);
+      border:1px dashed #f0d7dd;font-weight:900;line-height:1.6;
+    }
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:18px}
+    .flow .step{
+      background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;
+      font-size:13px;line-height:1.45;
+    }
+    .flow b{display:block;margin-bottom:4px;font-size:14px}
+    .flow .step:nth-child(1) b{color:#e24f83}
+    .flow .step:nth-child(2) b{color:#f08c2f}
+    .flow .step:nth-child(3) b{color:#d5a200}
+    .flow .step:nth-child(4) b{color:#19996e}
+    .flow .step:nth-child(5) b{color:#5b6ce0}
+    .panel{
+      margin-top:18px;padding:23px;border-radius:24px;
+      background:rgba(255,255,255,.93);
+      border:1px solid #dfe6f2;box-shadow:var(--shadow);
+      backdrop-filter:blur(6px);
+    }
+    .panel h2{margin:0;font-size:23px;letter-spacing:-.5px}
+    .help{margin:8px 0 16px;color:var(--muted);line-height:1.6;font-size:14px}
+    .criteria{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .criteria .c{
+      border-radius:17px;padding:14px;line-height:1.55;font-size:13px
+    }
+    .criteria strong{display:block;font-size:16px;margin-bottom:4px}
+    .criteria .o{background:var(--good-bg);border:1px solid #bcefd7}
+    .criteria .m{background:var(--mid-bg);border:1px solid #f1dc9a}
+    .criteria .x{background:var(--bad-bg);border:1px solid #f5c3cc}
+    .topic{
+      margin-top:14px;padding:16px 18px;border-radius:18px;
+      background:linear-gradient(90deg,#fff2f7,#fff9df,#edf7ff);
+      border:1px solid #eedfe7;font-size:18px;font-weight:1000;line-height:1.6;
+    }
+    .topic small{display:block;margin-top:5px;color:#6c7993;font-size:12px;font-weight:700}
+    .source-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .card{
+      position:relative;overflow:hidden;border-radius:24px;padding:18px;
+      border:2px solid transparent;box-shadow:0 10px 24px rgba(73,86,127,.08);
+      transition:.18s ease;
+    }
+    .card:hover{transform:translateY(-2px)}
+    .pink{background:linear-gradient(145deg,#fff,#fff1f7);border-color:#ffd4e3}
+    .sky{background:linear-gradient(145deg,#fff,#edf8ff);border-color:#cfeaff}
+    .mint{background:linear-gradient(145deg,#fff,#ebfff8);border-color:#cbf4e2}
+    .violet{background:linear-gradient(145deg,#fff,#f2eeff);border-color:#ddd4ff}
+    .done{box-shadow:0 0 0 4px rgba(74,168,255,.12),0 10px 24px rgba(73,86,127,.08)}
+    .head{display:flex;gap:12px;align-items:flex-start}
+    .badge{
+      width:46px;height:46px;display:grid;place-items:center;border-radius:16px;color:#fff;
+      font-size:20px;font-weight:1000;flex:0 0 46px;
+      box-shadow:0 8px 16px rgba(60,70,100,.14);
+    }
+    .pink .badge{background:linear-gradient(135deg,#ff6ea8,#eb5c78)}
+    .sky .badge{background:linear-gradient(135deg,#4aa8ff,#5b7ee8)}
+    .mint .badge{background:linear-gradient(135deg,#31c79a,#18a97a)}
+    .violet .badge{background:linear-gradient(135deg,#8b6cf6,#6c51d7)}
+    .title{font-size:18px;font-weight:1000;line-height:1.35}
+    .meta{margin-top:4px;font-size:12px;color:#7482a0;line-height:1.45}
+    .pill{
+      display:inline-block;margin-top:8px;padding:5px 9px;border-radius:999px;
+      background:#fff;border:1px solid rgba(120,130,160,.23);font-size:11px;font-weight:900;color:#5f6b85;
+    }
+    .summary{
+      margin:14px 0 12px;padding:14px;border-radius:16px;
+      background:rgba(255,255,255,.82);border:1px solid rgba(170,180,200,.22);
+      line-height:1.64;font-size:14px;
+    }
+    .summary b{color:#33405d}
+    .source-box{
+      display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;
+      margin-bottom:10px;padding:11px 12px;border-radius:14px;background:#fff;border:1px dashed #c9d7ea;
+    }
+    .source-box .label{font-size:11px;color:#7b879f;font-weight:900}
+    .source-box .url{
+      font-size:12px;color:#355ca4;word-break:break-all;font-weight:800;line-height:1.45
+    }
+    .go{
+      border:none;border-radius:11px;background:#eef4ff;color:#345aa1;
+      padding:9px 11px;font-weight:1000;cursor:pointer;text-decoration:none;font-size:12px;white-space:nowrap
+    }
+    .check-title,.rating-title{margin:14px 0 8px;font-size:13px;font-weight:1000}
+    .checks{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+    .check{
+      display:flex;align-items:center;gap:5px;padding:8px;border-radius:11px;background:rgba(255,255,255,.72);
+      border:1px solid rgba(160,170,195,.25);font-size:11px;font-weight:900;cursor:pointer
+    }
+    .check input{accent-color:#567ee7}
+    .ratings{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .rate{
+      border:1px solid #ced7e8;border-radius:12px;padding:10px 6px;background:#fff;
+      font:inherit;font-size:13px;font-weight:1000;color:#52607b;cursor:pointer;transition:.15s
+    }
+    .rate:hover{transform:translateY(-1px)}
+    .rate[data-rate="O"].selected{background:var(--good-bg);border-color:#7ad5ae;color:#18754f}
+    .rate[data-rate="△"].selected{background:var(--mid-bg);border-color:#f0c24c;color:#9a6911}
+    .rate[data-rate="X"].selected{background:var(--bad-bg);border-color:#ef94a2;color:#a93444}
+    label{display:block;margin:10px 0 6px;font-size:13px;font-weight:1000}
+    textarea,input,select{
+      width:100%;border:1px solid #cbd6e5;border-radius:13px;padding:11px 12px;background:#fff;
+      color:var(--ink);font:inherit;outline:none
+    }
+    textarea{min-height:76px;resize:vertical}
+    textarea:focus,input:focus,select:focus{border-color:#79a8f6;box-shadow:0 0 0 3px #e7f0ff}
+    .progress-row{display:flex;gap:12px;align-items:center;margin-top:16px}
+    .progress-box{flex:1}
+    .bar{height:11px;border-radius:999px;overflow:hidden;background:#edf1f7}
+    .bar>span{
+      display:block;height:100%;width:0;
+      background:linear-gradient(90deg,#ff6ea8,#ffd95a,#31c79a,#4aa8ff,#8b6cf6);
+      transition:.2s ease
+    }
+    .progress-text{margin-top:6px;font-size:12px;color:var(--muted)}
+    .judge-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .tip{
+      margin-top:13px;padding:13px 14px;border-radius:15px;
+      background:linear-gradient(90deg,#fff5d4,#fff0f6,#eef6ff);
+      border:1px solid #eee1d3;font-size:13px;line-height:1.6;color:#59657d
+    }
+    .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
+    button{
+      border:none;border-radius:13px;padding:11px 15px;font:inherit;font-weight:1000;cursor:pointer;transition:.15s
+    }
+    button:hover:not(:disabled){transform:translateY(-1px)}
+    button:disabled{opacity:.42;cursor:not-allowed}
+    .primary{background:linear-gradient(90deg,#637df0,#8b6cf6);color:#fff;box-shadow:0 8px 14px rgba(99,125,240,.22)}
+    .secondary{background:#eef2f8;color:#4a5774}
+
+    .make-guide{
+      margin-top:10px;padding:11px 13px;border-radius:13px;
+      background:#f6f8fc;border:1px solid #dde5f1;
+      color:#66748f;font-size:13px;line-height:1.55;
+    }
+    .make-guide.ok{
+      background:#eafff4;border-color:#b8ead2;color:#21734f;font-weight:800;
+    }
+    .make-guide.warn{
+      background:#fff2f4;border-color:#f3bec8;color:#9b3546;font-weight:800;
+    }
+
+    .verdict{
+      margin-top:16px;padding:18px;border-radius:21px;
+      background:linear-gradient(145deg,#f3fff9,#f3f8ff);border:2px solid #bfe7d4
+    }
+    .verdict h3{margin:0 0 10px;color:#17774f}
+    .verdict-text{
+      background:#fff;border:1px dashed #9dcab2;border-radius:14px;padding:16px;
+      line-height:1.85;white-space:pre-wrap
+    }
+    details.teacher{
+      margin-top:14px;border-radius:16px;overflow:hidden;border:1px solid #e0d7ff;background:#faf8ff
+    }
+    details.teacher summary{cursor:pointer;padding:14px 16px;font-weight:1000;color:#694ec0}
+    .teacher-body{padding:0 16px 16px;font-size:13px;line-height:1.68;color:#56627c}
+    .teacher-item{
+      margin:7px 0;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid #e8e2fa
+    }
+    .teacher-item b{color:#36415b}
+    .hidden{display:none}
+    .foot{margin-top:22px;text-align:center;font-size:12px;color:#8b96ab;line-height:1.6}
+    @media(max-width:840px){
+      .flow,.criteria,.source-grid,.judge-grid{grid-template-columns:1fr}
+      .checks{grid-template-columns:1fr}
+      .source-box{grid-template-columns:1fr}
+    }
+    @media print{
+      body{background:#fff}.deco,.no-print{display:none!important}
+      .hero,.panel,.card{box-shadow:none;break-inside:avoid}
+      .wrap{max-width:none;padding:0}.source-grid{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+<div class="deco" aria-hidden="true">
+  <span class="d1"></span><span class="d2"></span><span class="d3"></span>
+  <span class="d4"></span><span class="d5"></span><span class="d6"></span>
+</div>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">⚖️ AI 정보 재판소</div>
+    <h1><span class="rainbow">AI 정보 재판소</span> ⚖️</h1>
+    <p>실제 인터넷 자료를 비교하며, <b>어떤 정보를 믿을 수 있는지</b> 판사처럼 판단해 보는 활동입니다. 중요한 것은 정답 맞히기가 아니라, <b>출처·근거·작성 목적</b>을 바탕으로 왜 그렇게 판단했는지 설명하는 것입니다.</p>
+    <div class="mission">📂 <b>오늘의 사건:</b> <u>미세먼지 많은 날 삼겹살을 먹으면 몸속 미세먼지가 배출될까?</u></div>
+
+    <div class="flow">
+      <div class="step"><b>① 사건 읽기</b>오늘의 사건과 증거자료를 읽어요.</div>
+      <div class="step"><b>② 출처 조사</b>누가 만들었는지 확인해요.</div>
+      <div class="step"><b>③ 증거 확인</b>연구·전문가·자료가 있는지 봐요.</div>
+      <div class="step"><b>④ 의도 파악</b>정보 제공인지, 광고인지 구별해요.</div>
+      <div class="step"><b>⑤ 최종 판결</b>가장 믿을 증거와 주의할 증거를 정해요.</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>🌈 증거자료 심사 기준</h2>
+    <p class="help">O·△·X는 사이트 전체를 평가하는 것이 아니라, <b>오늘의 질문에 대한 근거로 얼마나 적절한지</b>를 판단하는 것입니다.</p>
+    <div class="criteria">
+      <div class="c o"><strong>⭕ O · 신뢰도 높음</strong>출처가 분명하고, 전문가 설명이나 근거가 있고, 질문과 직접 관련이 있어요.</div>
+      <div class="c m"><strong>🔺 △ · 더 확인 필요</strong>도움은 되지만 근거가 약하거나, 일부 내용만 참고할 수 있어요.</div>
+      <div class="c x"><strong>❌ X · 주의 필요</strong>개인 경험, 광고, 속설 위주이거나 근거를 확인하기 어려워요.</div>
+    </div>
+    <div class="topic">🕵️ 재판 미션: <b>“미세먼지엔 삼겹살”</b>은 사실일까요?
+      <small>아래 증거자료는 모두 실제 존재하는 한국 웹자료입니다. 학생용으로 핵심만 짧게 요약했습니다.</small>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>📚 실제 증거자료 4가지</h2>
+    <p class="help">카드 색깔은 보기 쉽게 꾸민 것이고, 증거의 신뢰도와는 관계없어요. 각 카드의 <b>출처</b>와 <b>원문 링크</b>를 꼭 확인하세요.</p>
+    <div id="sourceGrid" class="source-grid"></div>
+
+    <div class="progress-row">
+      <div class="progress-box">
+        <div class="bar"><span id="bar"></span></div>
+        <div id="progressText" class="progress-text">0 / 4 자료 평가 완료</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>👩‍⚖️ AI 정보 재판소 최종 평의</h2>
+    <p class="help">네 개 증거자료를 모두 평가한 뒤, 가장 믿을 만한 증거와 가장 주의해야 할 증거를 선택하세요.</p>
+    <div class="judge-grid">
+      <div>
+        <label for="student">이름 / 모둠명</label>
+        <input id="student" placeholder="예: 1학년 5반 2모둠">
+      </div>
+      <div>
+        <label for="classThought">재판소의 한 줄 판결</label>
+        <input id="classThought" placeholder="예: ‘미세먼지엔 삼겹살’보다 공식 대응요령을 따르는 것이 더 타당하다.">
+      </div>
+    </div>
+
+    <div class="judge-grid">
+      <div>
+        <label for="best">👍 가장 신뢰할 수 있는 증거</label>
+        <select id="best"><option value="">4개 자료를 먼저 평가하세요</option></select>
+      </div>
+      <div>
+        <label for="caution">⚠️ 가장 주의해야 할 증거</label>
+        <select id="caution"><option value="">4개 자료를 먼저 평가하세요</option></select>
+      </div>
+    </div>
+
+    <div class="tip">💡 <b>판단 힌트:</b> “삼겹살이 맛있다”와 “미세먼지 배출에 효과가 있다”는 다른 말이에요. 또 <b>‘공식 행동요령’</b>, <b>‘전문가 설명’</b>, <b>‘개인 블로그’</b>, <b>‘광고·홍보성 글’</b>은 목적이 서로 다를 수 있어요.</div>
+
+    <div class="actions no-print">
+      <button id="make" class="primary">⚖️ 최종 판결 내리기</button>
+      <button id="print" class="secondary">🖨️ 출력 / PDF 저장</button>
+      <button id="reset" class="secondary">↺ 다시 하기</button>
+    </div>
+    <div id="makeGuide" class="make-guide no-print">
+      💡 4개 증거자료를 O·△·X로 평가하고, 각 자료의 판단 이유를 한 문장씩 쓰면 최종 판결을 만들 수 있어요.
+    </div>
+
+    <div id="verdict" class="verdict hidden">
+      <h3>⚖️ AI 정보 재판소 최종 판결문</h3>
+      <div id="verdictText" class="verdict-text"></div>
+    </div>
+
+    <details class="teacher no-print">
+      <summary>🔐 선생님 검토용 · 권장 판결 예시 보기</summary>
+      <div class="teacher-body">
+        <div class="teacher-item"><b>자료 A · 에어코리아</b><br>공식 기관의 미세먼지 대응요령 자료입니다. 고농도 미세먼지 시 실외활동 자제, 마스크 착용 등 구체적인 행동요령을 제시하므로 <b>O</b>가 가장 무난합니다.</div>
+        <div class="teacher-item"><b>자료 B · 농민신문 기사</b><br>‘미세먼지엔 삼겹살’ 속설을 다루며 식약처와 환경부 자료를 근거로 설명합니다. 출처가 비교적 분명하므로 <b>O 또는 △</b>로 판단할 수 있습니다.</div>
+        <div class="teacher-item"><b>자료 C · 개인 티스토리 글(근거 찾아보기)</b><br>개인이 작성했지만 속설의 배경과 근거를 스스로 탐색한 글입니다. 공식 자료는 아니므로 <b>△</b> 정도가 적절합니다.</div>
+        <div class="teacher-item"><b>자료 D · 개인 요리 블로그</b><br>‘황사엔 삼겹살’이라는 속설을 자연스럽게 받아들이는 글입니다. 실제 존재하는 글이지만, 미세먼지 배출 효과의 근거를 제시하지 않으므로 <b>X</b>가 적절합니다.</div>
+        <div class="teacher-item"><b>수업 핵심 정리</b><br>“미세먼지엔 삼겹살”은 널리 퍼진 말이지만, 실제로는 공식 행동요령과 전문가 근거가 더 중요합니다. 정보는 <b>출처가 어디인지</b>, <b>근거가 있는지</b>, <b>광고나 개인 경험은 아닌지</b>를 따져 봐야 합니다.</div>
+      </div>
+    </details>
+  </section>
+
+  <div class="foot">※ 각 증거카드의 요약 문장은 학생 활동용으로 다시 쓴 설명입니다. 원문은 링크 버튼으로 확인할 수 있습니다.<br>※ 수업 전, 학교 인터넷 환경에서 외부 링크가 열리는지 한 번 확인해 주세요.</div>
+</main>
+
+<script>
+const sources = [
+  {
+    id:"A",
+    color:"pink",
+    icon:"A",
+    title:"에어코리아 자료실 · 고농도 미세먼지 대응요령",
+    meta:"공식기관 자료 · 한국환경공단 에어코리아 · 실제 공개 자료",
+    type:"🏛️ 공식 행동요령",
+    summary:"에어코리아 자료실에는 <b>‘고농도 미세먼지 대응요령’</b>이 실제로 올라와 있습니다. 내용의 핵심은 <b>실외활동 자제, 보건용 마스크 착용, 귀가 후 손 씻기</b>처럼 과학적·실천적인 대응입니다. 이 자료에는 ‘미세먼지엔 삼겹살’ 같은 음식 속설은 제시되지 않습니다.",
+    url:"https://www.airkorea.or.kr/web/link/?pMENU_NO=145"
+  },
+  {
+    id:"B",
+    color:"sky",
+    icon:"B",
+    title:"농민신문 · “미세먼지에 삼겹살?…좋음 음식은 따로 있다”",
+    meta:"언론 기사 · 2025년 4월 19일 · 실제 공개 기사",
+    type:"📰 기사 + 근거 제시",
+    summary:"이 기사는 <b>‘삼겹살 기름이 미세먼지를 씻어 준다’는 속설에는 의학적 근거가 없다고</b> 설명합니다. 기사 안에는 <b>식품의약품안전처 설명</b>과 <b>삼겹살을 구울 때 오히려 초미세먼지가 증가할 수 있다는 환경부 조사 내용</b>이 함께 제시됩니다.",
+    url:"https://www.nongmin.com/article/20250415500294"
+  },
+  {
+    id:"C",
+    color:"mint",
+    icon:"C",
+    title:"티엘에이 일기장 · “황사엔 삼겹살? 이야기의 근거 찾아보기”",
+    meta:"개인 블로그 · 2018년 2월 24일 · 실제 공개 글",
+    type:"✍️ 개인 탐구 글",
+    summary:"개인이 쓴 글이지만, <b>왜 이런 말이 퍼졌는지</b>를 스스로 찾아보며 정리한 글입니다. ‘광부들이 돼지고기를 먹었다’는 이야기를 소개하면서도, <b>정말 과학적 근거가 있는지 의문을 제기</b>합니다. 공식 자료는 아니지만 생각해 볼 만한 출발점이 됩니다.",
+    url:"https://tlastory.tistory.com/124"
+  },
+  {
+    id:"D",
+    color:"violet",
+    icon:"D",
+    title:"코기맘스토리 · “황사엔 삼겹살 구이”",
+    meta:"개인 요리 블로그 · 2011년 4월 16일 · 실제 공개 글",
+    type:"🍳 개인 경험/속설",
+    summary:"요리 블로그 글로, <b>‘황사철엔 삼겹살’</b>이라는 말을 자연스럽게 사용하며 삼겹살 레시피를 소개합니다. 하지만 <b>미세먼지 배출 효과에 대한 과학적 근거</b>나 전문가 설명은 제시하지 않습니다. 학생들이 ‘많이 보이는 말’과 ‘근거가 있는 말’의 차이를 구별하기에 좋은 사례입니다.",
+    url:"https://womenpia.tistory.com/431"
+  }
+];
+
+const state = sources.map(() => ({
+  rating:"",
+  reason:"",
+  checks:{source:false, evidence:false, purpose:false}
+}));
+
+const sourceGrid = document.getElementById("sourceGrid");
+const best = document.getElementById("best");
+const caution = document.getElementById("caution");
+const makeBtn = document.getElementById("make");
+
+function esc(str){
+  return String(str ?? "").replace(/[&<>"']/g, s => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[s]));
+}
+
+function renderCards(){
+  sourceGrid.innerHTML = sources.map((s, i) => `
+    <article class="card ${s.color} ${state[i].rating ? "done" : ""}">
+      <div class="head">
+        <div class="badge">${s.icon}</div>
+        <div>
+          <div class="title">${s.title}</div>
+          <div class="meta">${s.meta}</div>
+          <span class="pill">${s.type}</span>
+        </div>
+      </div>
+
+      <div class="summary">${s.summary}</div>
+
+      <div class="source-box">
+        <div>
+          <div class="label">출처 URL</div>
+          <div class="url">${s.url}</div>
+        </div>
+        <a class="go" href="${s.url}" target="_blank" rel="noopener noreferrer">원문 보기</a>
+      </div>
+
+      <div class="check-title">확인한 항목에 체크해 보세요.</div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" data-i="${i}" data-check="source" ${state[i].checks.source ? "checked" : ""}> 출처·기관 확인</label>
+        <label class="check"><input type="checkbox" data-i="${i}" data-check="evidence" ${state[i].checks.evidence ? "checked" : ""}> 근거·전문가 확인</label>
+        <label class="check"><input type="checkbox" data-i="${i}" data-check="purpose" ${state[i].checks.purpose ? "checked" : ""}> 목적·광고성 확인</label>
+      </div>
+
+      <div class="rating-title">이 증거자료의 신뢰도는?</div>
+      <div class="ratings">
+        ${["O","△","X"].map(r => `
+          <button type="button" class="rate ${state[i].rating === r ? "selected" : ""}" data-i="${i}" data-rate="${r}">
+            ${r === "O" ? "⭕ O" : r === "△" ? "🔺 △" : "❌ X"}
+          </button>
+        `).join("")}
+      </div>
+
+      <label for="reason_${i}">판단 이유 <span style="font-weight:700;color:#8791a6">(짧게 1문장)</span></label>
+      <textarea id="reason_${i}" data-reason="${i}" placeholder="예: 공식 기관이 만든 자료이고 대응 방법이 구체적으로 제시되어 있기 때문이다.">${esc(state[i].reason)}</textarea>
+    </article>
+  `).join("");
+
+  document.querySelectorAll(".rate").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const i = Number(btn.dataset.i);
+      state[i].rating = btn.dataset.rate;
+      renderCards();
+      updateState();
+    });
+  });
+
+  document.querySelectorAll("[data-reason]").forEach(el => {
+    el.addEventListener("input", () => {
+      state[Number(el.dataset.reason)].reason = el.value;
+      updateState();
+    });
+  });
+
+  document.querySelectorAll("[data-check]").forEach(el => {
+    el.addEventListener("change", () => {
+      state[Number(el.dataset.i)].checks[el.dataset.check] = el.checked;
+    });
+  });
+}
+
+function updateSelects(){
+  const allRated = state.every(s => s.rating);
+  const prevBest = best.value;
+  const prevCaution = caution.value;
+
+  if(!allRated){
+    best.innerHTML = '<option value="">4개 자료를 먼저 평가하세요</option>';
+    caution.innerHTML = '<option value="">4개 자료를 먼저 평가하세요</option>';
+    return;
+  }
+
+  const options = sources.map((s, i) =>
+    `<option value="${i}">자료 ${s.id} · ${s.title.split("·")[0].trim()} (${state[i].rating})</option>`
+  ).join("");
+
+  best.innerHTML = '<option value="">선택하세요</option>' + options;
+  caution.innerHTML = '<option value="">선택하세요</option>' + options;
+
+  if(prevBest !== "") best.value = prevBest;
+  if(prevCaution !== "") caution.value = prevCaution;
+
+  if(best.value === ""){
+    let idx = state.findIndex(s => s.rating === "O");
+    if(idx < 0) idx = state.findIndex(s => s.rating === "△");
+    if(idx >= 0) best.value = String(idx);
+  }
+  if(caution.value === ""){
+    let idx = state.findIndex(s => s.rating === "X");
+    if(idx < 0) idx = state.findIndex(s => s.rating === "△");
+    if(idx >= 0) caution.value = String(idx);
+  }
+}
+
+function updateState(){
+  const rated = state.filter(s => s.rating).length;
+  document.getElementById("bar").style.width = (rated * 25) + "%";
+  document.getElementById("progressText").textContent = `${rated} / 4 자료 평가 완료`;
+  updateSelects();
+
+  const reasonCount = state.filter(s => s.reason.trim().length >= 2).length;
+  const guide = document.getElementById("makeGuide");
+
+  if(rated < 4){
+    guide.className = "make-guide no-print";
+    guide.textContent = `💡 먼저 4개 증거자료를 모두 평가해 주세요. 현재 ${rated}/4 완료`;
+  }else if(reasonCount < 4){
+    guide.className = "make-guide warn no-print";
+    guide.textContent = `✏️ 평가 완료! 이제 판단 이유를 모두 써 주세요. 현재 ${reasonCount}/4 작성`;
+  }else{
+    guide.className = "make-guide ok no-print";
+    guide.textContent = "✅ 준비 완료! 「최종 판결 내리기」를 눌러 보세요.";
+  }
+}
+
+best.addEventListener("change", updateState);
+caution.addEventListener("change", updateState);
+
+document.getElementById("make").addEventListener("click", () => {
+  const rated = state.filter(s => s.rating).length;
+  const missingReason = state.findIndex(s => s.reason.trim().length < 2);
+  const guide = document.getElementById("makeGuide");
+
+  if(rated < 4){
+    guide.className = "make-guide warn no-print";
+    guide.textContent = `⚠️ 증거자료 4개를 모두 O·△·X로 평가해 주세요. 현재 ${rated}/4입니다.`;
+    const firstUnrated = state.findIndex(s => !s.rating);
+    if(firstUnrated >= 0){
+      document.querySelectorAll(".card")[firstUnrated].scrollIntoView({behavior:"smooth", block:"center"});
+    }
+    return;
+  }
+
+  if(missingReason >= 0){
+    guide.className = "make-guide warn no-print";
+    guide.textContent = `⚠️ 자료 ${sources[missingReason].id}의 판단 이유를 한 문장으로 써 주세요.`;
+    const target = document.getElementById(`reason_${missingReason}`);
+    target.focus();
+    target.scrollIntoView({behavior:"smooth", block:"center"});
+    return;
+  }
+
+  if(best.value === ""){
+    let idx = state.findIndex(s => s.rating === "O");
+    if(idx < 0) idx = 0;
+    best.value = String(idx);
+  }
+
+  if(caution.value === ""){
+    let idx = state.findIndex(s => s.rating === "X");
+    if(idx < 0) idx = state.findIndex(s => s.rating === "△");
+    if(idx < 0) idx = sources.length - 1;
+    caution.value = String(idx);
+  }
+
+  const bi = Number(best.value);
+  const ci = Number(caution.value);
+  const student = document.getElementById("student").value.trim();
+  const classThought = document.getElementById("classThought").value.trim() ||
+    "‘미세먼지엔 삼겹살’이라는 말보다, 공식 기관의 행동요령과 근거 있는 자료를 따르는 것이 더 중요하다.";
+
+  const lines = state.map((s, i) => `자료 ${sources[i].id}: ${s.rating} — ${s.reason.trim()}`).join("\n");
+
+  const text = `${student ? student + "의 " : ""}재판 주제
+“미세먼지 많은 날 삼겹살을 먹으면 몸속 미세먼지가 배출될까?”
+
+[증거자료별 판단]
+${lines}
+
+[최종 판결]
+가장 신뢰할 수 있는 증거는 자료 ${sources[bi].id} (${sources[bi].title})이다.
+이유: ${state[bi].reason.trim()}
+
+가장 주의해서 보아야 할 증거는 자료 ${sources[ci].id} (${sources[ci].title})이다.
+이유: ${state[ci].reason.trim()}
+
+[재판소의 최종 결론]
+${classThought}
+
+[정보 재판소의 원칙]
+인터넷에서 많이 보이는 말이라고 해서 바로 믿지 않고,
+출처·근거·작성 목적을 확인하고 여러 자료를 비교한 뒤 판단한다.`;
+
+  document.getElementById("verdictText").textContent = text;
+  document.getElementById("verdict").classList.remove("hidden");
+  guide.className = "make-guide ok no-print";
+  guide.textContent = "🎉 최종 판결문이 완성되었습니다! 아래 결과를 확인하세요.";
+  document.getElementById("verdict").scrollIntoView({behavior:"smooth", block:"start"});
+});
+
+document.getElementById("print").addEventListener("click", () => window.print());
+
+document.getElementById("reset").addEventListener("click", () => {
+  state.forEach(s => {
+    s.rating = "";
+    s.reason = "";
+    s.checks = {source:false, evidence:false, purpose:false};
+  });
+  document.getElementById("student").value = "";
+  document.getElementById("classThought").value = "";
+  document.getElementById("verdict").classList.add("hidden");
+  best.value = "";
+  caution.value = "";
+  renderCards();
+  updateState();
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+
+renderCards();
+updateState();
+</script>
+</body>
+</html>

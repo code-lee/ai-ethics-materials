@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4. 허위정보 대응 — SNS 정보, 근거를 따라가며 판단하기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --ink:#1c2230; --ink-2:#4b5563; --ink-3:#8a94a6;
+  --paper:#ffffff; --bg:#f3f5f9; --line:#d9dee8; --line-2:#eceff4;
+  --blue:#2457d6; --blue-soft:#e9effc; --blue-ink:#1a3f9e;
+  --ok:#1f8f5f; --ok-soft:#e5f5ec; --warn:#b45309; --warn-soft:#fff4e5; --red:#c62828;
+  --radius:10px;
+  --font:"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--font);color:var(--ink);background:var(--bg);font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+textarea,input,select{font-family:inherit;font-size:15px;color:var(--ink)}
+
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.rail{background:var(--paper);border-right:1px solid var(--line);padding:22px 18px;position:sticky;top:0;height:100vh;overflow:auto}
+.rail .unit{font-size:12.5px;color:var(--ink-3);margin-bottom:4px}
+.rail .title{font-size:17px;font-weight:700;line-height:1.35;margin:0 0 18px}
+.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:10px;align-items:flex-start;padding:9px 8px;border-radius:8px;color:var(--ink-3);font-size:14px;cursor:default}
+.steps li .n{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:12px;flex:none;background:var(--paper)}
+.steps li.done{color:var(--ink-2);cursor:pointer}
+.steps li.done .n{background:var(--ok);border-color:var(--ok);color:#fff}
+.steps li.current{color:var(--blue-ink);background:var(--blue-soft);font-weight:600}
+.steps li.current .n{border-color:var(--blue);color:var(--blue)}
+.steps li.done:hover{background:var(--line-2)}
+.rail .who{margin-top:22px;padding-top:16px;border-top:1px solid var(--line-2)}
+.rail .who label{display:block;font-size:12px;color:var(--ink-3);margin:8px 0 3px}
+.rail .who input{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:7px}
+.rail .tools{margin-top:22px;display:flex;flex-direction:column;gap:8px}
+.rail .save{font-size:12px;color:var(--ink-3);margin-top:10px;min-height:18px}
+
+.main{padding:34px 40px 80px;max-width:820px;width:100%}
+.stage{display:none}
+.stage.active{display:block}
+.stage h1{font-size:26px;line-height:1.3;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
+.stage h1 small{display:block;font-size:13px;color:var(--ink-3);font-weight:500;margin-bottom:6px;letter-spacing:0}
+.stage .lead{color:var(--ink-2);margin:0 0 22px}
+.stage h2{font-size:18px;margin:34px 0 10px;font-weight:700}
+.stage h3{font-size:15.5px;margin:22px 0 8px;font-weight:700}
+.stage p{margin:0 0 10px}
+.stage .note{font-size:13px;color:var(--ink-3)}
+.kq{border-left:4px solid var(--blue);background:var(--paper);padding:14px 18px;border-radius:0 var(--radius) var(--radius) 0;margin:10px 0 24px;font-weight:600;color:var(--blue-ink);line-height:1.55}
+.kq .tag{display:block;font-size:12px;font-weight:600;color:var(--blue);margin-bottom:4px}
+.box{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:12px 0}
+.box.tint{background:var(--blue-soft);border-color:transparent}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.concept{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:12px 0}
+.concept b.t{display:block;font-size:16px;margin-bottom:6px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;background:var(--paper);margin:8px 0 12px}
+.tbl th,.tbl td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+.tbl th{background:var(--line-2);font-weight:600;font-size:13px}
+
+/* SNS 게시물 */
+.post{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:12px 0}
+.post .u{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.post .u .av{width:36px;height:36px;border-radius:50%;background:#dfe4ee}
+.post .u b{display:block;font-size:14px}
+.post .u span{font-size:12px;color:var(--ink-3)}
+.post h3{margin:0 0 10px;font-size:20px;line-height:1.3}
+.post p{margin:0 0 8px;font-size:15px}
+.post .src{font-size:13px;color:var(--ink-3);border-top:1px solid var(--line-2);padding-top:8px;margin-top:10px}
+.post .react{display:flex;gap:26px;font-size:13px;color:var(--ink-2);margin-top:8px}
+.chat{display:flex;flex-direction:column;gap:6px;margin:10px 0 14px}
+.chat span{align-self:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:14px 14px 14px 3px;padding:7px 13px;font-size:14px}
+
+/* 검색 결과 */
+.serp{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:10px 0 14px}
+.serp .bar{background:var(--line-2);padding:10px 14px;font-size:13.5px;display:flex;gap:8px;align-items:center}
+.serp .bar span{background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:5px 14px;flex:1}
+.serp .r{display:grid;grid-template-columns:24px 1fr;gap:12px;padding:12px 16px;border-top:1px solid var(--line-2)}
+.serp .r .n{color:var(--ink-3);font-size:13px;padding-top:2px}
+.serp .r .site{font-size:12.5px;color:var(--ink-3)}
+.serp .r .t{color:var(--blue);font-weight:600;font-size:15px}
+.serp .r .d{font-size:13.5px;color:var(--ink-2)}
+.serp .r .cite{display:inline-block;margin-top:5px;font-size:12px;border:1px solid var(--line);border-radius:5px;padding:1px 8px;color:var(--ink-2)}
+.serp .r .cite b{font-weight:600;color:var(--ink-3);margin-right:4px}
+.serp .r.doc .t{color:#5b3fb5}
+
+/* 리빌/단서 */
+.clue{border:1.5px solid var(--line);border-radius:var(--radius);margin:14px 0;background:var(--paper);overflow:hidden}
+.clue .ch{display:flex;align-items:center;gap:12px;padding:14px 18px}
+.clue .ch b{font-size:15.5px}
+.clue .ch .st{font-size:12.5px;color:var(--ink-3)}
+.clue .ch button{margin-left:auto}
+.clue .cb{display:none;padding:0 18px 18px;border-top:1px solid var(--line-2)}
+.clue.open .cb{display:block}
+.clue.open{border-color:var(--blue)}
+.clue.open .ch .st{color:var(--ok)}
+.reveal{display:flex;gap:14px;align-items:center;background:var(--blue-soft);border-radius:var(--radius);padding:14px 18px;margin:18px 0}
+.reveal .rt{flex:1;font-size:14.5px;color:var(--blue-ink)}
+.echo{background:var(--line-2);border-radius:8px;padding:10px 14px;margin:8px 0 12px;font-size:14px}
+.echo div{display:flex;gap:10px}
+.echo b{flex:none;color:var(--blue)}
+.echo .empty{color:var(--ink-3)}
+
+/* 질문 */
+.q{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:14px 0}
+.q .ql{font-weight:700;margin-bottom:8px;display:flex;gap:8px;align-items:baseline}
+.q .ql .no{color:var(--blue);flex:none}
+.q .qh{font-size:13.5px;color:var(--ink-2);margin:-4px 0 10px}
+.q textarea{width:100%;min-height:78px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;resize:vertical;line-height:1.55;background:#fbfcfe}
+.q input[type=text]{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:#fbfcfe}
+.q select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fbfcfe;min-width:160px}
+.q textarea:focus,.q input:focus,.q select:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:var(--blue)}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opts.row{flex-direction:row;flex-wrap:wrap;gap:8px 16px}
+.opt{display:flex;gap:9px;align-items:flex-start;padding:8px 10px;border-radius:8px;border:1px solid transparent;cursor:pointer}
+.opt:hover{background:var(--line-2)}
+.opt input{margin-top:4px;accent-color:var(--blue)}
+.opt.sel{background:var(--blue-soft);border-color:#c7d5f7}
+.opt .etc{flex:1;padding:4px 8px;border:0;border-bottom:1px solid var(--line);background:transparent}
+.blank{line-height:2.3}
+.blank input{width:min(100%,340px);padding:4px 8px;border:0;border-bottom:1.5px solid var(--ink-3);background:transparent;border-radius:0;margin:0 4px}
+.blank input:focus{outline:0;border-bottom-color:var(--blue)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2 .lab{font-size:13px;font-weight:600;margin-bottom:4px;color:var(--ink-2)}
+.mtx{width:100%;border-collapse:collapse;font-size:14px}
+.mtx th,.mtx td{border:1px solid var(--line);padding:9px 10px;text-align:center}
+.mtx td:first-child,.mtx th:first-child{text-align:left}
+.mtx input{accent-color:var(--blue)}
+.mtx th{background:var(--line-2);font-weight:600;font-size:13px}
+.rows3 .row{display:grid;grid-template-columns:70px 1fr;gap:10px;align-items:start;margin-bottom:10px}
+.rows3 .row .lb{font-weight:600;color:var(--blue);padding-top:8px}
+.claimgrid{display:grid;grid-template-columns:80px 1fr 1fr 150px;gap:8px;align-items:start}
+.claimgrid .hd{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.claimgrid .lb{font-weight:600;color:var(--blue);padding-top:8px}
+.claimgrid textarea{min-height:64px}
+.claimgrid .opts{gap:2px}
+.claimgrid .opt{padding:4px 6px;font-size:13.5px}
+.judge{display:grid;grid-template-columns:80px 190px 1fr;gap:8px;align-items:start;margin-bottom:8px}
+.judge .lb{font-weight:600;color:var(--blue);padding-top:8px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.compare .col{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.compare .col .k{font-size:12.5px;color:var(--ink-3);margin-bottom:4px}
+.compare .col .v{font-weight:600}
+.compare .col .v.empty{color:var(--ink-3);font-weight:400}
+
+.stage.locked textarea,.stage.locked input,.stage.locked select{background:#f5f7fa;color:var(--ink-2)}
+.stage.locked .opt{cursor:default}
+.lockbar{display:flex;gap:10px;align-items:center;background:var(--ok-soft);color:#125c3c;border-radius:8px;padding:9px 14px;font-size:13.5px;margin:0 0 18px}
+.lockbar::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok)}
+
+.btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:9px 16px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600}
+.btn:hover{background:var(--line-2)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--blue-ink)}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn.ghost{border-color:transparent;color:var(--ink-3)}
+.btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:36px;padding-top:20px;border-top:1px solid var(--line)}
+.nav .hint{font-size:13px;color:var(--ink-3)}
+
+@media (max-width:820px){
+  .app{grid-template-columns:1fr}
+  .rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:14px 16px}
+  .rail .steps{display:flex;gap:4px;overflow:auto;padding-bottom:4px}
+  .rail .steps li{flex:none;padding:6px 10px;font-size:13px}
+  .rail .steps li .lbl{display:none}
+  .rail .steps li.current .lbl{display:inline}
+  .rail .who{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:0;margin-top:10px;padding-top:0}
+  .rail .tools{flex-direction:row;flex-wrap:wrap;margin-top:12px}
+  .main{padding:22px 16px 60px}
+  .two,.grid2,.compare{grid-template-columns:1fr}
+  .claimgrid{grid-template-columns:1fr}
+  .judge{grid-template-columns:1fr}
+  .stage h1{font-size:22px}
+}
+
+#printView{display:none}
+@media print{
+  @page{size:A4;margin:16mm 15mm}
+  body{background:#fff;font-size:11.5pt;color:#000}
+  .app{display:none!important}
+  #printView{display:block}
+  .pv h1{font-size:17pt;margin:0 0 2pt}
+  .pv .meta{font-size:10pt;color:#444;margin-bottom:10pt;display:flex;justify-content:space-between;border-bottom:1.5px solid #000;padding-bottom:6pt}
+  .pv .kq{border-left:3pt solid #2457d6;padding:5pt 9pt;margin:6pt 0 10pt;font-weight:600;background:none;border-radius:0;color:#000}
+  .pv h2{font-size:13pt;margin:14pt 0 5pt;padding-bottom:3pt;border-bottom:1px solid #999;break-after:avoid}
+  .pv h3{font-size:11.5pt;margin:9pt 0 4pt;break-after:avoid}
+  .pv .item{margin:0 0 7pt;break-inside:avoid}
+  .pv .item .l{font-weight:600;font-size:10.5pt;color:#333}
+  .pv .item .v{border:1px solid #bbb;padding:5pt 7pt;min-height:22pt;white-space:pre-wrap;margin-top:2pt;border-radius:3pt}
+  .pv .item .v.inline{border:0;padding:0;min-height:0;margin-top:0;white-space:normal;line-height:1.9}
+  .pv .blank{border-bottom:1px solid #000;padding:0 4pt;font-weight:600}
+  .pv .blank.empty{color:#999;font-weight:400}
+  .pv .empty{color:#999}
+  .pv .stamp{font-size:9pt;color:#666;margin-left:6pt;font-weight:400}
+  .pv table{width:100%;border-collapse:collapse;font-size:10.5pt;margin:4pt 0 8pt}
+  .pv th,.pv td{border:1px solid #999;padding:4pt 6pt;vertical-align:top;white-space:pre-wrap}
+  .pv th{background:#eee;text-align:left}
+  .pv .summary{border:1.5px solid #000;padding:8pt 10pt;margin:10pt 0 4pt;break-inside:avoid}
+  .pv .summary h2{border:0;margin:0 0 6pt;padding:0}
+  .pv .pb{break-before:page}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="rail">
+    <div class="unit" id="railUnit"></div>
+    <h1 class="title" id="railTitle"></h1>
+    <ul class="steps" id="steps"></ul>
+    <div class="who">
+      <label for="cls">학번</label><input id="cls" placeholder="예: 10315">
+      <label for="nm">이름</label><input id="nm" placeholder="이름">
+    </div>
+    <div class="tools">
+      <button class="btn" id="btnPrint">PDF로 저장</button>
+      <button class="btn ghost sm" id="btnReset">처음부터 다시 하기</button>
+      <div class="save" id="saveMsg"></div>
+    </div>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+<div id="printView"></div>
+
+<script>
+/* =====================================================================
+   모듈 정의 — 교재(학생용 V3, 4. 허위정보 대응)의 장 구조를 그대로 옮김
+   ===================================================================== */
+const MODULE = {
+  key:"ai-ethics-04-misinformation",
+  unit:"고등학교 AI 윤리 · 4차시",
+  railTitle:"SNS 정보,<br>근거를 따라가며<br>판단하기",
+  printTitle:"4. 허위정보 대응 — SNS 정보, 근거를 따라가며 판단하기",
+  keyQuestion:"여러 곳에서 반복된 정보라면 우리는 무엇을 어디까지 사실이라고 믿고 공유할 수 있을까?",
+  /* 6단계 비교 카드: 처음 판단 ↔ 지금 판단 */
+  compare:{firstKey:"s1.share", firstWhy:"s1.shareWhy", firstStage:"s1", firstLabel:"1단계 · 처음 판단", lastKey:"s4.handle", lastWhy:"s4.handleWhy", lastStage:"s4", lastLabel:"4단계 · 근거로 판단"},
+  /* 인쇄 첫 장 요약표 */
+  summary:[
+    ["처음 판단 (1단계 ②)","s1.share"],
+    ["친구에게 답할 수 있나 (1단계 ③)","s1.true"],
+    ["검색 결과 3개 = 근거 3개? (2단계 ④)","s2.indep"],
+    ["주장 판정 (4단계 ②)",["s4.j1","s4.j2","s4.j3"]],
+    ["게시물 처리 (4단계 ④)","s4.handle"],
+    ["판단 변화 (6단계 ①)","s6.change"]
+  ]
+};
+
+const JUDGE=["사실","대체로 사실","맥락 누락","근거 부족","거짓","판단 유보"];
+
+const STAGES = [
+/* ---------------- 1. 주제 만나기 ---------------- */
+{
+  id:"s1", short:"주제 만나기", title:"1. 주제 만나기", sub:"허위정보 대응",
+  blocks:[
+    {kind:"kq"},
+    {kind:"h2", text:"생각 열기 — 뉴스에도 나왔다는데, 친구에게 보내도 될까?"},
+    {kind:"html", html:`
+      <p>점심시간, 학급 단체 채팅방에 게시물 하나가 올라왔습니다. 친구들은 바로 반응합니다.</p>
+      <div class="chat"><span>이거 진짜래. 뉴스에도 나왔다던데?</span><span>다음 달부터면 우리도 해당되는 거 아냐?</span></div>
+      <div class="post">
+        <div class="u"><div class="av"></div><div><b>하늘빛</b><span>3시간 전 · 모두에게 공개</span></div></div>
+        <h3>🔥 다음 달부터 청소년 SNS 제한 시작?</h3>
+        <p><b>다음 달</b>부터 청소년 SNS 이용 제한이 시작된대요.<br><b>만 18세 미만</b>은 숏폼을 <b>하루 1시간</b>만 이용할 수 있고, <b>밤 10시 이후</b>에는 SNS 접속이 자동으로 차단된다고 해요.</p>
+        <p>최근 조사에서는 청소년 <b>10명 중 8명</b>이 숏폼 때문에 학업에 문제가 생겼다는 결과도 나왔다고 해요.<br>다음 달 바로 시작한다는데, 친구들한테도 알려 줘야 할까요?</p>
+        <div class="src">○○뉴스 참고</div>
+        <div class="react"><span>♡ 좋아요 3.2만</span><span>💬 댓글 2,300</span><span>↗ 공유 1.4만</span></div>
+      </div>`},
+    {kind:"h2", text:"먼저 생각해 보기"},
+    {kind:"field", key:"s1.first", no:"①", label:"게시물을 보면서 가장 먼저 눈에 들어온 내용이나 표현은 무엇인가요?", type:"text"},
+    {kind:"field", key:"s1.share", no:"②", label:"지금 이 게시물을 받았다면 어떻게 할까요?", help:"현재 정보만 보고, 지금의 생각과 가장 가까운 것을 하나 골라 보세요.", type:"radio", required:true, options:["지금 바로 공유한다","조금 더 확인한 뒤 결정한다","일단 공유를 보류한다","공유하지 않는다","아직 결정하기 어렵다"]},
+    {kind:"field", key:"s1.shareWhy", label:"그렇게 생각한 가장 큰 이유", type:"text"},
+    {kind:"field", key:"s1.true", no:"③", label:"친구가 “그래서 이거 진짜야?”라고 묻는다면?", type:"radio", required:true, options:["대체로 사실이라고 답할 수 있다","일부 내용에 대해서만 답할 수 있다","아직 사실 여부를 말하기 어렵다"]},
+    {kind:"field", key:"s1.trueWhy", label:"그렇게 생각한 이유", type:"text"}
+  ]
+},
+/* ---------------- 2. 근거 탐구하기 ---------------- */
+{
+  id:"s2", short:"근거 탐구하기", title:"2. 근거 탐구하기", sub:"검색 결과가 많으면, 근거도 많은 걸까?",
+  lead:"앞에서 본 게시물에는 여러 내용이 한꺼번에 들어 있었습니다. 게시물 전체를 바로 ‘맞다’ 또는 ‘틀리다’고 판단하기 전에, 자료로 확인할 수 있는 주장부터 나누어 봅시다.",
+  blocks:[
+    {kind:"h2", text:"① 게시물에서 무엇을 확인해야 할까?"},
+    {kind:"html", html:`<p>앞의 게시물을 다시 보고, 확인이 필요한 핵심 주장을 세 가지로 나누어 보세요.</p><p class="note">※ 날짜, 대상, 정책 내용, 수치처럼 다른 자료와 비교해 확인할 수 있는 내용을 찾아보세요.</p>`},
+    {kind:"rows", title:"확인할 주장", rows:[["주장 ①","s2.claim1"],["주장 ②","s2.claim2"],["주장 ③","s2.claim3"]]},
+
+    {kind:"reveal", id:"r1", need:["s2.claim1","s2.claim2","s2.claim3"], text:"세 주장을 적었다면 게시물의 내용을 검색해 봅시다.", btn:"검색 결과 보기"},
+
+    {kind:"h2", gate:"r1", text:"② 검색해 보니 같은 이야기가 여러 곳에 나온다"},
+    {kind:"html", gate:"r1", html:`
+      <p>게시물의 내용을 검색하자 다음과 같은 결과가 나타났습니다.</p>
+      <div class="serp"><div class="bar">🔍 <span>청소년 SNS 이용 제한 다음 달</span></div>
+        <div class="r"><div class="n">1</div><div><div class="site">한빛뉴스 · 9월 3일</div><div class="t">청소년 SNS 이용 제한 추진…디지털 웰빙 시범사업 검토</div><div class="d">한빛시가 청소년의 과도한 SNS 이용을 줄이기 위한 시범사업을 검토하고 있다는 내용.</div><span class="cite"><b>인용 출처</b>한빛시 디지털미디어정책센터 검토안</span></div></div>
+        <div class="r"><div class="n">2</div><div><div class="site">오늘핫 · 9월 3일</div><div class="t">밤 10시 SNS 차단, 다음 달부터 시작되나</div><div class="d">청소년 SNS 이용 제한 방안이 알려지며 온라인에서 논란이 커지고 있다는 내용.</div><span class="cite"><b>인용 출처</b>한빛뉴스 기사</span></div></div>
+        <div class="r"><div class="n">3</div><div><div class="site">모아블로그 · 9월 4일</div><div class="t">청소년 SNS 금지 확정? 핵심 내용 정리</div><div class="d">다음 달부터 SNS 제한이 시작될 가능성이 있다는 소식이 퍼지고 있다는 내용.</div><span class="cite"><b>인용 출처</b>오늘핫 기사, 온라인 커뮤니티</span></div></div>
+        <div class="r doc"><div class="n">4</div><div><div class="site">한빛시 디지털미디어정책센터 · 9월 2일</div><div class="t">청소년 디지털 웰빙 시범사업 검토안</div><div class="d">청소년의 건강한 디지털 이용을 지원하기 위한 시범사업의 대상·운영 방식·추진 일정을 검토한 자료.</div></div></div>
+        <div class="r doc"><div class="n">5</div><div><div class="site">한빛청소년연구원 · 8월 28일</div><div class="t">2026 청소년 미디어 이용 조사</div><div class="d">고등학생의 숏폼 이용 경험과 이용 습관, 학습에 미치는 영향에 대한 인식을 조사한 자료.</div></div></div>
+      </div>`},
+    {kind:"field", gate:"r1", key:"s2.trace", no:"③", label:"정보가 어디에서 시작됐는지 따라가 보자", help:"검색 결과의 ‘인용 출처’를 따라 빈칸을 채워 보세요.", type:"blank",
+      tpl:"모아블로그 → ___ → ___ → 청소년 디지털 웰빙 시범사업 검토안\n정책 내용을 직접 확인하려면 검색 결과 ___ 을 살펴봐야 합니다.\n청소년 10명 중 8명이라는 숫자의 의미를 확인하려면 검색 결과 ___ 을 살펴봐야 합니다."},
+    {kind:"field", gate:"r1", key:"s2.indep", no:"④", label:"검색 결과 3개 = 서로 다른 근거 3개?", help:"한빛뉴스, 오늘핫, 모아블로그는 서로 다른 사이트입니다. 세 사이트의 내용이 비슷하다는 사실을 ‘서로 독립적으로 확인된 근거 3개’라고 볼 수 있을까요?", type:"radio", inline:true, required:true, options:["그렇다","그렇지 않다","아직 판단하기 어렵다"]},
+    {kind:"field", gate:"r1", key:"s2.indepWhy", label:"검색 결과의 인용 관계를 근거로 설명해 보세요.", type:"text"},
+
+    {kind:"reveal", id:"r2", gate:"r1", need:["s2.indep"], text:"이제 검색으로 찾은 자료를 직접 열어 봅시다.", btn:"실제 자료 확인하기"},
+
+    {kind:"h2", gate:"r2", text:"⑤ 실제 자료는 어디까지 말해 줄까?"},
+    {kind:"html", gate:"r2", html:`
+      <p>앞에서 본 게시물과 비교하면서 자료가 말해 주는 것과 아직 말해 주지 않는 것을 찾아보세요.</p>
+      <h3>▢ 정책 자료 — 「청소년 디지털 웰빙 시범사업 검토안」</h3>
+      <table class="tbl"><tr><th style="width:110px">확인 내용</th><th>문서에 적힌 내용</th></tr>
+        <tr><td>추진 상황</td><td>시범사업 도입을 검토 중이다. 다음 달 시작을 목표로 하지만 구체적인 날짜는 정해지지 않았다.</td></tr>
+        <tr><td>대상</td><td>만 16세 미만·일부 참여 플랫폼을 우선 대상으로 검토한다.</td></tr>
+        <tr><td>야간 이용</td><td>밤 10시 이후 알림을 줄이는 기능을 검토한다.</td></tr>
+        <tr><td>이용 시간</td><td>60분 이용 시 사용 시간을 알려 주는 알림을 검토한다.</td></tr></table>
+      <h3>▢ 조사 자료 — 「2026 청소년 미디어 이용 조사」</h3>
+      <p class="note">고등학생 1,000명 대상 자기 보고식 설문</p>
+      <table class="tbl"><tr><th>조사 질문</th><th style="width:44%">응답 결과</th></tr>
+        <tr><td>최근 한 달 동안 숏폼 동영상을 이용한 적이 있습니까?</td><td>그렇다 82%</td></tr>
+        <tr><td>숏폼을 예상보다 오래 본 적이 있습니까?</td><td>자주 31% / 가끔 42% / 거의 없음 27%</td></tr>
+        <tr><td>숏폼 이용이 자신의 학습에 부정적인 영향을 주었다고 느낀 적이 있습니까?</td><td>많이 14% / 어느 정도 29% / 거의 없음 38% / 전혀 없음 19%</td></tr></table>
+      <h3>▢ 다른 자료에서도 확인해 보자</h3>
+      <div class="two">
+        <div class="box"><b>한빛시 정책 공청회 기록</b><p style="margin:6px 0 0">플랫폼과 협의 중이며, 시범 운영의 구체적인 시작 날짜는 아직 정해지지 않았다.</p></div>
+        <div class="box"><b>◯◯대학교 청소년미디어연구소 연구 요약</b><p style="margin:6px 0 0">숏폼 이용 시간이 긴 학생에게 학습 집중의 어려움이 더 많이 보고되었다. 다만 다른 요인의 영향도 확인할 필요가 있다.</p></div>
+      </div>`},
+    {kind:"h2", gate:"r2", text:"⑥ 세 주장을 다시 확인해 보자"},
+    {kind:"html", gate:"r2", html:`<p>앞에서 나눈 주장 ①~③에 대해 지금 가진 자료로 어디까지 말할 수 있는지 정리하세요.</p>`},
+    {kind:"echo", gate:"r2", items:[["주장 ①","s2.claim1"],["주장 ②","s2.claim2"],["주장 ③","s2.claim3"]]},
+    {kind:"claims", gate:"r2", rows:[
+      {lb:"주장 ①", ok:"s2.ok1", not:"s2.not1", src:"s2.src1", srcOpts:["정책 자료","공청회"]},
+      {lb:"주장 ②", ok:"s2.ok2", not:"s2.not2", src:"s2.src2", srcOpts:["정책 자료","공청회"]},
+      {lb:"주장 ③", ok:"s2.ok3", not:"s2.not3", src:"s2.src3", srcOpts:["조사 자료","별도 연구"]}]}
+  ]
+},
+/* ---------------- 3. 개념으로 다시 보기 ---------------- */
+{
+  id:"s3", short:"개념으로 다시 보기", title:"3. 개념으로 다시 보기", sub:"자료를 ‘찾는 것’과 ‘검증하는 것’은 무엇이 다를까?",
+  blocks:[
+    {kind:"html", html:`
+      <div class="concept"><b class="t">핵심 개념 1. 원출처</b><p style="margin:0">원출처는 주장, 통계, 정책 등의 근거를 직접 확인할 수 있는 자료입니다. 정책이라면 실제 정책 문서, 조사 결과라면 실제 조사 자료까지 확인하는 것이 실제 팩트체크의 기본 검증 방법입니다. 출처가 적혀 있다는 것과 원출처를 확인했다는 것은 다릅니다.</p></div>
+      <div class="concept"><b class="t">핵심 개념 2. 측면 읽기</b><p style="margin:0">측면 읽기는 정보 검증 전략으로 한 사이트의 내용만 읽지 않고 다른 자료로 이동해 누가 만들었는지, 무엇을 근거로 했는지, 다른 자료에서도 따로 확인되는지 살펴보는 방법입니다. 같은 자료를 반복해서 인용했다면 독립적인 확인이 늘어난 것은 아닐 수 있습니다.</p></div>
+      <div class="concept"><b class="t">핵심 개념 3. 불확실성 표시</b><p style="margin:0">불확실성 표시는 현재 근거로 확인할 수 있는 것과 아직 확인할 수 없는 것을 구분해 표현하는 것입니다. 근거가 부족하다면 단정하기보다 무엇이 아직 확인되지 않았는지 밝히는 것이 더 정확합니다.</p></div>
+      <div class="box tint"><b>AI 시대에는 왜 더 중요할까?</b><p style="margin:6px 0 0">생성형 AI는 여러 자료를 빠르게 요약·재표현할 수 있지만, 이 과정에서 원래의 조건이나 불확실성이 빠질 수도 있습니다. AI가 만들었는지를 추측하기보다 주장의 근거와 원출처를 확인하는 것이 중요합니다.</p></div>`},
+    {kind:"h2", text:"개념 적용하기"},
+    {kind:"field", key:"s3.three", no:"①", label:"같은 내용을 다룬 사이트가 3개라면?", help:"한빛뉴스, 오늘핫, 모아블로그가 비슷한 내용을 다뤘습니다. 왜 이것만으로 ‘세 번 확인된 정보’라고 말하기 어려울까요? 이전에 확인했던 인용 관계와 원출처 또는 측면 읽기를 연결해 설명해 보세요.", type:"text", rows:4},
+    {kind:"field", key:"s3.rewrite", no:"②", label:"더 정확하게 표현한다면?", help:"앞의 문장 “다음 달부터 청소년 SNS 이용 제한이 시행된다.”를 지금까지 확인한 자료와 불확실성 표시를 적용해 더 정확하게 고쳐 보세요.", type:"text", rows:4}
+  ]
+},
+/* ---------------- 4. 근거로 판단하기 ---------------- */
+{
+  id:"s4", short:"근거로 판단하기", title:"4. 근거로 판단하기", sub:"근거가 있다면, 그 주장도 사실일까?",
+  lead:"앞에서 확인한 자료와 원출처, 측면 읽기, 불확실성 표시를 바탕으로 각 주장을 판단해 봅시다.",
+  blocks:[
+    {kind:"h2", text:"① 판정 기준을 살펴보자"},
+    {kind:"html", html:`<p>한 게시물 안의 모든 주장에 같은 판정이 나올 필요는 없습니다.</p>
+      <table class="tbl"><tr><th style="width:120px">판정</th><th>의미</th></tr>
+        <tr><td>사실</td><td>핵심 내용이 확인한 근거와 일치한다.</td></tr>
+        <tr><td>대체로 사실</td><td>핵심은 맞지만 일부 표현이나 조건이 부정확하다.</td></tr>
+        <tr><td>맥락 누락</td><td>사실의 일부만 제시되어 의미가 달라졌다.</td></tr>
+        <tr><td>근거 부족</td><td>현재 자료가 주장을 충분히 뒷받침하지 못한다.</td></tr>
+        <tr><td>거짓</td><td>핵심 주장이 확인한 근거와 명확히 다르다.</td></tr>
+        <tr><td>판단 유보</td><td>필요한 정보가 부족해 지금은 결론 내리기 어렵다.</td></tr></table>`},
+    {kind:"h2", text:"② 세 주장을 판정해 보자"},
+    {kind:"echo", items:[["주장 ①","s2.claim1"],["주장 ②","s2.claim2"],["주장 ③","s2.claim3"]]},
+    {kind:"judge", rows:[["주장 1","s4.j1","s4.j1why"],["주장 2","s4.j2","s4.j2why"],["주장 3","s4.j3","s4.j3why"]]},
+    {kind:"h2", text:"③ 게시자의 주장을 검토해 보자"},
+    {kind:"html", html:`<div class="box">게시물을 작성한 사람이 이렇게 주장한다면?<p style="margin:6px 0 0;font-weight:600">“SNS 이용 제한을 검토하는 건 사실이고, 82%라는 숫자도 실제 조사에 있잖아. 그러면 내 게시물이 틀렸다고 할 수는 없는 것 아닌가?”</p></div>`},
+    {kind:"pair", la:"받아들일 수 있는 점", lb:"그래도 더 따져야 할 점", a:[{key:"s4.accept", type:"text"}], b:[{key:"s4.argue", type:"text"}]},
+    {kind:"field", key:"s4.handle", no:"④", label:"이제 이 게시물을 어떻게 다룰까?", help:"지금 이 게시물을 다시 받는다면?", type:"radio", required:true, options:["그대로 공유한다","확인된 내용과 주의점을 덧붙여 공유한다","잘못 전달된 부분을 고친 뒤 공유한다","일단 공유를 보류한다","공유하지 않는다","추가 확인 후 결정한다"]},
+    {kind:"field", key:"s4.handleWhy", label:"나의 선택을 가른 가장 중요한 이유", type:"text"}
+  ]
+},
+/* ---------------- 5. 산출물 완성하기 ---------------- */
+{
+  id:"s5", short:"산출물 완성하기", title:"5. 산출물 완성하기", sub:"나의 근거 기반 팩트체크 프로세스",
+  lead:"다른 게시물이나 정보에도 적용할 수 있는 나만의 팩트체크 과정을 완성해 보세요.",
+  blocks:[
+    {kind:"h2", text:"① 나의 팩트체크 5단계"},
+    {kind:"field", key:"s5.st1", no:"1", label:"무엇을 확인할까? (검증할 주장 나누기)", type:"blank", tpl:"나는 먼저 게시물에서 ___ 을/를 나눈다."},
+    {kind:"field", key:"s5.st2", no:"2", label:"어디에서 나온 정보일까? (정보의 시작 자료 찾기)", type:"blank", tpl:"나는 출처를 따라 ___ 까지 확인한다."},
+    {kind:"field", key:"s5.st3", no:"3", label:"정말 다른 근거일까? (인용 관계와 독립성 확인)", type:"blank", tpl:"여러 자료가 있다면 서로 ___ 인지 확인한다."},
+    {kind:"field", key:"s5.st4", no:"4", label:"어디까지 말할 수 있을까? (확인된 것과 미확인 내용 구분)", type:"blank", tpl:"근거가 확인해 주는 범위와 ___ 을 구분한다."},
+    {kind:"field", key:"s5.st5", no:"5", label:"어떻게 판단하고 전달할까? (근거에 맞게 판정 및 표현)", type:"blank", tpl:"나는 근거에 맞게 ___ 표현한다."},
+    {kind:"h2", text:"② 앞으로 기억할 팩트체크 원칙"},
+    {kind:"field", key:"s5.p1", type:"blank", tpl:"여러 사이트에서 같은 내용이 보여도 ___"},
+    {kind:"field", key:"s5.p2", type:"blank", tpl:"숫자나 통계가 제시되어 있어도 ___"},
+    {kind:"field", key:"s5.p3", type:"blank", tpl:"아직 확인되지 않은 내용은 ___"}
+  ]
+},
+/* ---------------- 6. 돌아보기 ---------------- */
+{
+  id:"s6", short:"돌아보기", title:"6. 돌아보기", sub:"처음 생각에서 지금의 판단까지",
+  lead:"처음 게시물을 보았을 때의 생각과 근거를 확인한 뒤의 판단을 비교해 보세요. 판단이 바뀌지 않아도 괜찮습니다. 중요한 것은 어떤 근거가 내 판단을 뒷받침하거나 바꾸었는지 설명하는 것입니다.",
+  blocks:[
+    {kind:"compare"},
+    {kind:"field", key:"s6.change", no:"①", label:"처음 판단과 지금 판단은 어떻게 달라졌을까?", help:"근거를 확인한 뒤 나의 판단은", type:"radio", inline:true, required:true, options:["처음 판단을 유지했다","처음 판단을 수정했다","판단에 조건을 추가했다","아직 판단을 유보했다"]},
+    {kind:"field", key:"s6.changeWhy", label:"그 판단을 유지하거나 바꾸는 데 가장 중요했던 근거는 무엇인가요?", type:"text"},
+    {kind:"h2", text:"② 처음에는 눈에 들어왔지만, 지금은 다르게 보이는 것은?"},
+    {kind:"html", html:`<p>처음 게시물을 보았을 때 눈에 들어왔던 표현·숫자·출처·반응 등을 떠올려 보세요. 그때 어떻게 생각했는지, 지금은 무엇을 더 확인하게 되었는지 비교해 보세요.</p>`},
+    {kind:"echo", items:[["처음에 눈에 들어온 것 (1단계 ①)","s1.first"]]},
+    {kind:"pair", la:"처음에는", lb:"지금은", a:[{key:"s6.then", type:"text"}], b:[{key:"s6.now", type:"text"}]},
+    {kind:"h2", text:"스스로 확인하기 — 나는 할 수 있다"},
+    {kind:"matrix", key:"s6.self", cols:["할 수 있다","어느 정도","연습 필요"], rows:[
+      "확인이 필요한 주장을 나누고 원출처까지 따라가 볼 수 있다.",
+      "여러 자료의 인용 관계와 독립성을 살펴 근거의 질을 판단할 수 있다.",
+      "확인된 것과 아직 확인되지 않은 것을 구분해 판단하고 표현할 수 있다."]}
+  ]
+}
+];
+
+/* =====================================================================
+   엔진 — 상태
+   ===================================================================== */
+const KEY=MODULE.key;
+let S=load();
+function blank(){ return {answers:{},current:0,locked:[],clues:{},stamps:{},meta:{}}; }
+function load(){ try{ const j=JSON.parse(localStorage.getItem(KEY)); if(j&&j.answers) return Object.assign(blank(),j);}catch(e){} return blank(); }
+let saveT=null;
+function save(){ clearTimeout(saveT); saveT=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); const d=new Date(); msg(`자동 저장됨 ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`);}catch(e){ msg("저장 실패: 브라우저 저장 공간을 확인하세요."); } },250); }
+function msg(t){ document.getElementById("saveMsg").textContent=t; }
+const pad=n=>String(n).padStart(2,"0");
+const get=k=>S.answers[k];
+const set=(k,v)=>{ S.answers[k]=v; save(); };
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+
+/* 필드 색인 (인쇄·검증용) */
+const FIELDS={};
+function collectFields(){
+  STAGES.forEach(st=>st.blocks.forEach(b=>{
+    const add=f=>{ if(f&&f.key) FIELDS[f.key]=f; };
+    if(b.kind==="field") add(b);
+    if(b.kind==="pair"){ b.a.forEach(add); b.b.forEach(add); }
+    if(b.kind==="clue") b.fields.forEach(add);
+    if(b.kind==="rows") b.rows.forEach(r=>add({key:r[1],label:r[0],type:"line"}));
+    if(b.kind==="claims") b.rows.forEach(r=>{ add({key:r.ok,label:r.lb+" 자료로 확인할 수 있는 것",type:"text"}); add({key:r.not,label:r.lb+" 아직 확정해서 말하기 어려운 것",type:"text"}); add({key:r.src,label:r.lb+" 근거 자료",type:"check",options:r.srcOpts}); });
+    if(b.kind==="judge") b.rows.forEach(r=>{ add({key:r[1],label:r[0]+" 판정",type:"select",options:JUDGE}); add({key:r[2],label:r[0]+" 이 판정을 가른 가장 중요한 이유",type:"text"}); });
+  }));
+}
+collectFields();
+
+/* =====================================================================
+   렌더링
+   ===================================================================== */
+const main=document.getElementById("main");
+function isOpen(gate){ return !gate || !!S.clues[gate]; }
+function render(){
+  main.innerHTML="";
+  STAGES.forEach((st,i)=>{
+    const sec=document.createElement("section");
+    sec.className="stage"+(i===S.current?" active":"")+(S.locked.includes(i)?" locked":"");
+    sec.dataset.i=i;
+    let h=`<h1><small>${esc(st.sub||"")}</small>${esc(st.title)}</h1>`;
+    if(S.locked.includes(i)) h+=`<div class="lockbar">이 단계는 ${esc(S.stamps[st.id]||"")}에 제출되어 잠겼습니다. 답은 읽기만 할 수 있습니다.</div>`;
+    if(st.lead) h+=`<p class="lead">${esc(st.lead)}</p>`;
+    h+=st.blocks.map(b=>{ if(!isOpen(b.gate)) return ""; return renderBlock(b,st,i); }).join("");
+    h+=renderNav(i);
+    sec.innerHTML=h;
+    main.appendChild(sec);
+  });
+  bind(); renderSteps(); lockInputs();
+  if(STAGES[S.current].blocks.some(b=>b.kind==="compare")) renderCompare();
+  window.scrollTo({top:0});
+}
+function renderBlock(b){
+  switch(b.kind){
+    case "kq": return `<div class="kq"><span class="tag">핵심 질문</span>${esc(MODULE.keyQuestion)}</div>`;
+    case "h2": return `<h2>${esc(b.text)}</h2>`;
+    case "h3": return `<h3>${esc(b.text)}</h3>`;
+    case "html": return `<div>${b.html}</div>`;
+    case "field": return `<div class="q">${fieldHead(b)}${fieldInput(b)}</div>`;
+    case "pair": return `<div class="q">${b.title?`<div class="ql">${esc(b.title)}</div>`:""}<div class="grid2">
+        <div><div class="lab">${esc(b.la||"A")}</div>${b.a.map(f=>`<div style="margin-bottom:10px">${f.label?`<div class="qh">${esc(f.label)}</div>`:""}${fieldInput(f)}</div>`).join("")}</div>
+        <div><div class="lab">${esc(b.lb||"B")}</div>${b.b.map(f=>`<div style="margin-bottom:10px">${f.label?`<div class="qh">${esc(f.label)}</div>`:""}${fieldInput(f)}</div>`).join("")}</div></div></div>`;
+    case "rows": return `<div class="q rows3">${b.title?`<div class="ql">${esc(b.title)}</div>`:""}${b.rows.map(r=>`<div class="row"><div class="lb">${esc(r[0])}</div>${fieldInput({key:r[1],type:"line"})}</div>`).join("")}</div>`;
+    case "echo": return `<div class="echo">${b.items.map(it=>{ const v=get(it[1]); return `<div><b>${esc(it[0])}</b><span class="${v?"":"empty"}">${esc(v||"(아직 입력하지 않음)")}</span></div>`; }).join("")}</div>`;
+    case "reveal": {
+      if(S.clues[b.id]) return "";
+      const ready=b.need.every(k=>!isEmpty(FIELDS[k]||{type:"line"},get(k)));
+      return `<div class="reveal"><div class="rt">${esc(b.text)}${ready?"":"<br><span class='note'>위 항목을 먼저 입력하세요.</span>"}</div><button class="btn primary" data-reveal="${b.id}" ${ready?"":"disabled"}>${esc(b.btn)}</button></div>`;
+    }
+    case "clue": {
+      const open=!!S.clues[b.id];
+      return `<div class="clue${open?" open":""}" data-clue="${b.id}"><div class="ch"><b>${esc(b.title)}</b><span class="st">${open?"확인함":"아직 열지 않음"}</span>${open?"":`<button class="btn sm primary" data-reveal="${b.id}">열기</button>`}</div>
+        <div class="cb">${b.html}${b.fields.map(f=>`<div class="q" style="margin-bottom:0">${fieldHead(f)}${fieldInput(f)}</div>`).join("")}</div></div>`;
+    }
+    case "claims": return `<div class="q"><div class="claimgrid"><div></div><div class="hd">자료로 확인할 수 있는 것</div><div class="hd">아직 확정해서 말하기 어려운 것</div><div class="hd">근거 자료</div>
+      ${b.rows.map(r=>`<div class="lb">${esc(r.lb)}</div><div>${fieldInput({key:r.ok,type:"text",rows:3})}</div><div>${fieldInput({key:r.not,type:"text",rows:3})}</div><div>${fieldInput({key:r.src,type:"check",options:r.srcOpts})}</div>`).join("")}</div></div>`;
+    case "judge": return `<div class="q"><div class="judge"><div></div><div class="hd" style="font-size:12.5px;font-weight:600;color:var(--ink-2)">판정</div><div class="hd" style="font-size:12.5px;font-weight:600;color:var(--ink-2)">이 판정을 가른 가장 중요한 이유</div>
+      ${b.rows.map(r=>`<div class="lb">${esc(r[0])}</div><div>${fieldInput({key:r[1],type:"select",options:JUDGE})}</div><div>${fieldInput({key:r[2],type:"text",rows:2})}</div>`).join("")}</div></div>`;
+    case "matrix": return `<div class="q"><table class="mtx"><thead><tr><th>확인할 내용</th>${b.cols.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>
+      ${b.rows.map((r,ri)=>`<tr><td>${esc(r)}</td>${b.cols.map(c=>`<td><input type="radio" name="${b.key}.${ri}" data-key="${b.key}.${ri}" value="${esc(c)}" ${get(b.key+"."+ri)===c?"checked":""}></td>`).join("")}</tr>`).join("")}
+      </tbody></table></div>`;
+    case "compare": return `<div class="q"><div class="ql">처음 판단과 지금 판단</div><div class="compare" id="cmp"></div></div>`;
+  }
+  return "";
+}
+function fieldHead(b){ return `${b.label?`<div class="ql">${b.no?`<span class="no">${esc(b.no)}</span>`:""}<span>${esc(b.label)}</span></div>`:""}${b.help?`<div class="qh">${esc(b.help)}</div>`:""}`; }
+function fieldInput(b){
+  const v=get(b.key);
+  switch(b.type){
+    case "text": return `<textarea data-key="${b.key}" rows="${b.rows||3}" placeholder="${esc(b.placeholder||"")}">${esc(v||"")}</textarea>`;
+    case "line": return `<input type="text" data-key="${b.key}" value="${esc(v||"")}" placeholder="${esc(b.placeholder||"")}">`;
+    case "select": return `<select data-key="${b.key}" data-type="select"><option value="">선택</option>${b.options.map((o,i)=>`<option value="${esc(o)}" ${v===o?"selected":""}>${i+1}. ${esc(o)}</option>`).join("")}</select>`;
+    case "radio": { const cur=v||{};
+      return `<div class="opts${b.inline?" row":""}">${b.options.map(o=>{ const isEtc=typeof o==="object"; const val=isEtc?"__etc__":o; const sel=cur.value===val;
+        return `<label class="opt${sel?" sel":""}"><input type="radio" name="${b.key}" data-key="${b.key}" data-type="radio" value="${esc(val)}" ${sel?"checked":""}>${isEtc?`<span style="flex:none">${esc(o.etc)}:</span><input class="etc" type="text" data-etc="${b.key}" value="${esc(cur.etc||"")}" placeholder="직접 쓰기">`:`<span>${esc(o)}</span>`}</label>`;}).join("")}</div>`; }
+    case "check": { const cur=v||{values:[],etc:""};
+      return `<div class="opts">${b.options.map(o=>{ const isEtc=typeof o==="object"; const val=isEtc?"__etc__":o; const sel=cur.values.includes(val);
+        return `<label class="opt${sel?" sel":""}"><input type="checkbox" data-key="${b.key}" data-type="check" data-max="${b.max||0}" value="${esc(val)}" ${sel?"checked":""}>${isEtc?`<span style="flex:none">${esc(o.etc)}:</span><input class="etc" type="text" data-etc="${b.key}" value="${esc(cur.etc||"")}" placeholder="직접 쓰기">`:`<span>${esc(o)}</span>`}</label>`;}).join("")}</div>`; }
+    case "blank": { const parts=b.tpl.split("___"); const cur=Array.isArray(v)?v:[]; let out=`<div class="blank">`;
+      parts.forEach((p,pi)=>{ out+=esc(p).replace(/\n/g,"<br>"); if(pi<parts.length-1) out+=`<input type="text" data-key="${b.key}" data-type="blank" data-idx="${pi}" value="${esc(cur[pi]||"")}">`; });
+      return out+"</div>"; }
+  }
+  return "";
+}
+function renderNav(i){
+  const last=i===STAGES.length-1, locked=S.locked.includes(i);
+  return `<div class="nav"><div>${i>0?`<button class="btn" data-go="${i-1}">이전 단계 보기</button>`:""}</div>
+    <div class="hint">${locked?"":"제출하면 이 단계의 답은 고정됩니다."}</div>
+    <div>${locked?(last?`<button class="btn primary" data-print="1">PDF로 저장</button>`:`<button class="btn primary" data-go="${i+1}">다음 단계 보기</button>`):
+      (last?`<button class="btn primary" data-submit="${i}">제출하고 PDF 만들기</button>`:`<button class="btn primary" data-submit="${i}">제출하고 다음 단계로</button>`)}</div></div>`;
+}
+function renderSteps(){
+  const ul=document.getElementById("steps"); ul.innerHTML="";
+  STAGES.forEach((st,i)=>{ const li=document.createElement("li"); const done=S.locked.includes(i);
+    li.className=(done?"done":"")+(i===S.current?" current":"");
+    li.innerHTML=`<span class="n">${done?"✓":i+1}</span><span class="lbl">${esc(st.short)}</span>`;
+    li.addEventListener("click",()=>{ if(done||i===S.current){S.current=i;save();render();} });
+    ul.appendChild(li); });
+}
+function lockInputs(){ document.querySelectorAll(".stage.locked").forEach(sec=>sec.querySelectorAll("textarea,input,select,button[data-reveal]").forEach(el=>{ if(!el.closest(".nav")) el.disabled=true; })); }
+function renderCompare(){
+  const el=document.getElementById("cmp"); if(!el) return; const c=MODULE.compare;
+  const txt=r=>{ if(!r||!r.value) return `<span class="empty">(미입력)</span>`; return r.value==="__etc__"?esc(r.etc||"(다른 설명)"):esc(r.value); };
+  el.innerHTML=`<div class="col"><div class="k">${esc(c.firstLabel)} (${esc(S.stamps[c.firstStage]||"")})</div><div class="v">${txt(get(c.firstKey))}</div><div class="k" style="margin-top:8px">이유</div><div class="v ${get(c.firstWhy)?"":"empty"}">${esc(get(c.firstWhy)||"(미입력)")}</div></div>
+  <div class="col"><div class="k">${esc(c.lastLabel)} (${esc(S.stamps[c.lastStage]||"")})</div><div class="v">${txt(get(c.lastKey))}</div><div class="k" style="margin-top:8px">이유</div><div class="v ${get(c.lastWhy)?"":"empty"}">${esc(get(c.lastWhy)||"(미입력)")}</div></div>`;
+}
+
+/* =====================================================================
+   이벤트
+   ===================================================================== */
+function bind(){
+  main.querySelectorAll("textarea,input[type=text]").forEach(el=>{
+    if(el.dataset.etc){ el.addEventListener("input",()=>{ const k=el.dataset.etc; const cur=get(k)||{}; cur.etc=el.value; set(k,cur); }); return; }
+    if(el.dataset.type==="blank"){ el.addEventListener("input",()=>{ const k=el.dataset.key; const arr=Array.isArray(get(k))?get(k).slice():[]; arr[+el.dataset.idx]=el.value; set(k,arr); refreshReveals(); }); return; }
+    if(el.dataset.key) el.addEventListener("input",()=>{ set(el.dataset.key,el.value); refreshReveals(); });
+  });
+  main.querySelectorAll("select[data-key]").forEach(el=>el.addEventListener("change",()=>set(el.dataset.key,el.value)));
+  main.querySelectorAll("input[type=radio]").forEach(el=>el.addEventListener("change",()=>{
+    const k=el.dataset.key; if(el.dataset.type==="radio"){ const cur=get(k)||{}; cur.value=el.value; set(k,cur); } else set(k,el.value);
+    el.closest(".opts")?.querySelectorAll(".opt").forEach(o=>o.classList.toggle("sel",o.querySelector("input").checked));
+    refreshReveals();
+  }));
+  main.querySelectorAll("input[type=checkbox]").forEach(el=>el.addEventListener("change",()=>{
+    const k=el.dataset.key; const cur=get(k)||{values:[],etc:""}; const max=+el.dataset.max;
+    if(el.checked){ if(max&&cur.values.length>=max){ el.checked=false; toast(`최대 ${max}개까지 선택할 수 있습니다.`); return; } cur.values.push(el.value); }
+    else cur.values=cur.values.filter(x=>x!==el.value);
+    set(k,cur); el.closest(".opt").classList.toggle("sel",el.checked);
+  }));
+  main.querySelectorAll("[data-reveal]").forEach(b=>b.addEventListener("click",()=>{ S.clues[b.dataset.reveal]=true; save(); const y=window.scrollY; render(); window.scrollTo({top:y}); }));
+  main.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{ S.current=+b.dataset.go; save(); render(); }));
+  main.querySelectorAll("[data-submit]").forEach(b=>b.addEventListener("click",()=>submit(+b.dataset.submit)));
+  main.querySelectorAll("[data-print]").forEach(b=>b.addEventListener("click",doPrint));
+}
+/* 입력에 따라 리빌 버튼 활성화만 갱신 (전체 재렌더 없이) */
+function refreshReveals(){
+  document.querySelectorAll("[data-reveal]").forEach(btn=>{
+    const st=STAGES[S.current]; const b=st.blocks.find(x=>x.kind==="reveal"&&x.id===btn.dataset.reveal); if(!b) return;
+    const ready=b.need.every(k=>!isEmpty(FIELDS[k]||{type:"line"},get(k)));
+    btn.disabled=!ready; const note=btn.parentElement.querySelector(".note"); if(note) note.style.display=ready?"none":"";
+  });
+}
+function toast(t){ msg(t); setTimeout(()=>msg(""),2500); }
+function submit(i){
+  const st=STAGES[i]; const missing=[], req=[];
+  const walk=f=>{ if(!f||!f.key) return; if(isEmpty(f,get(f.key))) (f.required?req:missing).push(f.label||f.key); };
+  st.blocks.forEach(b=>{
+    if(b.kind==="field") walk(b);
+    if(b.kind==="pair"){ b.a.forEach(f=>walk(Object.assign({label:b.la},f))); b.b.forEach(f=>walk(Object.assign({label:b.lb},f))); }
+    if(b.kind==="clue"){ b.fields.forEach(walk); if(!S.clues[b.id]) req.push(b.title); }
+    if(b.kind==="reveal"&&!S.clues[b.id]) req.push(`“${b.btn}” 열기`);
+    if(b.kind==="rows") b.rows.forEach(r=>walk(FIELDS[r[1]]));
+    if(b.kind==="claims") b.rows.forEach(r=>[r.ok,r.not,r.src].forEach(k=>walk(FIELDS[k])));
+    if(b.kind==="judge") b.rows.forEach(r=>{ walk(Object.assign({required:true},FIELDS[r[1]])); walk(FIELDS[r[2]]); });
+    if(b.kind==="matrix") b.rows.forEach((r,ri)=>{ if(!get(b.key+"."+ri)) missing.push("스스로 확인하기 "+(ri+1)); });
+  });
+  if(i===0&&!(S.meta.cls&&S.meta.name)) req.push("학번·이름 (왼쪽 입력란)");
+  if(req.length){ alert("다음 항목은 꼭 입력해야 제출할 수 있습니다:\n\n- "+req.join("\n- ")); return; }
+  const warn=missing.length?`아직 비어 있는 항목이 ${missing.length}개 있습니다:\n- ${missing.slice(0,6).join("\n- ")}${missing.length>6?"\n- …":""}\n\n`:"";
+  if(!confirm(warn+"제출하면 이 단계의 답은 더 이상 고칠 수 없습니다. 제출할까요?")) return;
+  const d=new Date(); S.stamps[st.id]=`${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if(!S.locked.includes(i)) S.locked.push(i);
+  if(i<STAGES.length-1) S.current=i+1;
+  save(); render();
+  if(i===STAGES.length-1) setTimeout(doPrint,300);
+}
+function isEmpty(f,v){
+  if(v==null) return true;
+  if(f.type==="radio") return !v.value||(v.value==="__etc__"&&!(v.etc||"").trim());
+  if(f.type==="check") return !v.values||!v.values.length;
+  if(f.type==="blank") return !Array.isArray(v)||v.every(x=>!(x||"").trim());
+  return !String(v).trim();
+}
+
+/* =====================================================================
+   인쇄(PDF) 뷰 — STAGES 정의에서 자동 생성
+   ===================================================================== */
+function ans(f){
+  const v=get(f.key);
+  if(f.type==="radio"){ if(!v||!v.value) return `<span class="empty">(미입력)</span>`; return v.value==="__etc__"?`다른: ${esc(v.etc||"")}`:esc(v.value); }
+  if(f.type==="check"){ if(!v||!v.values.length) return `<span class="empty">(미선택)</span>`; return v.values.map(x=>x==="__etc__"?`☑ 다른: ${esc(v.etc||"")}`:`☑ ${esc(x)}`).join("<br>"); }
+  if(f.type==="blank"){ const parts=f.tpl.split("___"); const cur=Array.isArray(v)?v:[]; let o=""; parts.forEach((p,pi)=>{ o+=esc(p).replace(/\n/g,"<br>"); if(pi<parts.length-1) o+=`<span class="blank${(cur[pi]||"").trim()?"":" empty"}">${esc((cur[pi]||"").trim()||"　　　　　　")}</span>`; }); return o; }
+  return v&&String(v).trim()?esc(v):`<span class="empty">(미입력)</span>`;
+}
+function item(f){ return `<div class="item">${f.label?`<div class="l">${f.no?esc(f.no)+" ":""}${esc(f.label)}</div>`:""}<div class="v${f.type==="blank"?" inline":""}">${ans(f)}</div></div>`; }
+function plain(k){ const f=FIELDS[k]; const v=get(k); if(!f||v==null) return "—";
+  if(f.type==="radio") return v.value?(v.value==="__etc__"?(v.etc||"다른"):v.value):"—";
+  if(f.type==="check") return v.values&&v.values.length?v.values.map(x=>x==="__etc__"?(v.etc||"다른"):x).join(" / "):"—";
+  if(f.type==="blank") return Array.isArray(v)?v.filter(x=>x&&x.trim()).join(" / ")||"—":"—";
+  return String(v).trim()||"—"; }
+function buildPrint(){
+  const pv=document.getElementById("printView");
+  const stamp=id=>S.stamps[id]?`<span class="stamp">제출 ${esc(S.stamps[id])}</span>`:`<span class="stamp">(미제출)</span>`;
+  let h=`<div class="pv"><h1>${esc(MODULE.printTitle)}</h1>
+    <div class="meta"><span>고등학교 AI 윤리 교육 · 학생 활동지</span><span>${esc(S.meta.cls||"")} ${esc(S.meta.name||"")}</span></div>
+    <div class="kq">핵심 질문 — ${esc(MODULE.keyQuestion)}</div>
+    <div class="summary"><h2>답변 요약</h2><table>${MODULE.summary.map(([l,k])=>`<tr><th style="width:36%">${esc(l)}</th><td>${Array.isArray(k)?k.map((kk,i)=>`주장${i+1}: ${esc(plain(kk))}`).join(" · "):esc(plain(k))}</td></tr>`).join("")}</table>
+      <div style="font-size:9pt;color:#555">제출 단계 ${S.locked.length}/${STAGES.length}</div></div>`;
+  STAGES.forEach((st,si)=>{
+    h+=`<h2${si===3?" class='pb'":""}>${esc(st.title)}${st.sub?" — "+esc(st.sub):""} ${stamp(st.id)}</h2>`;
+    st.blocks.forEach(b=>{
+      switch(b.kind){
+        case "h2": if(/^[①-⑩0-9]/.test(b.text)||/확인하기|적용|원칙|단계/.test(b.text)) h+=`<h3>${esc(b.text)}</h3>`; break;
+        case "field": h+=item(b); break;
+        case "rows": h+=`<table>${b.rows.map(r=>`<tr><th style="width:18%">${esc(r[0])}</th><td>${ans(FIELDS[r[1]])}</td></tr>`).join("")}</table>`; break;
+        case "pair": h+=`<table><tr><th style="width:50%">${esc(b.la||"A")}</th><th>${esc(b.lb||"B")}</th></tr><tr><td>${b.a.map(f=>`${f.label?"<b>"+esc(f.label)+"</b><br>":""}${ans(f)}`).join("<br>")}</td><td>${b.b.map(f=>`${f.label?"<b>"+esc(f.label)+"</b><br>":""}${ans(f)}`).join("<br>")}</td></tr></table>`; break;
+        case "clue": b.fields.forEach(f=>h+=item(f)); break;
+        case "claims": h+=`<table><tr><th style="width:12%"></th><th>자료로 확인할 수 있는 것</th><th>아직 확정해서 말하기 어려운 것</th><th style="width:16%">근거 자료</th></tr>${b.rows.map(r=>`<tr><th>${esc(r.lb)}</th><td>${ans(FIELDS[r.ok])}</td><td>${ans(FIELDS[r.not])}</td><td>${ans(FIELDS[r.src])}</td></tr>`).join("")}</table>`; break;
+        case "judge": h+=`<table><tr><th style="width:12%"></th><th style="width:22%">판정</th><th>이 판정을 가른 가장 중요한 이유</th></tr>${b.rows.map(r=>`<tr><th>${esc(r[0])}</th><td>${esc(get(r[1])||"—")}</td><td>${ans(FIELDS[r[2]])}</td></tr>`).join("")}</table>`; break;
+        case "matrix": h+=`<table><tr><th>확인할 내용</th><th style="width:22%">평가</th></tr>${b.rows.map((r,ri)=>`<tr><td>${esc(r)}</td><td>${esc(get(b.key+"."+ri)||"—")}</td></tr>`).join("")}</table>`; break;
+      }
+    });
+  });
+  pv.innerHTML=h+"</div>";
+}
+function doPrint(){
+  const left=STAGES.length-S.locked.length;
+  if(left>0&&!confirm(`아직 제출하지 않은 단계가 ${left}개 있습니다. 지금 상태로 PDF를 만들까요?`)) return;
+  buildPrint(); setTimeout(()=>window.print(),100);
+}
+window.addEventListener("beforeprint",buildPrint);
+
+/* =====================================================================
+   초기화
+   ===================================================================== */
+document.getElementById("railUnit").textContent=MODULE.unit;
+document.getElementById("railTitle").innerHTML=MODULE.railTitle;
+document.getElementById("btnPrint").addEventListener("click",doPrint);
+document.getElementById("btnReset").addEventListener("click",()=>{
+  if(!confirm("모든 답과 진행 상태가 지워집니다. 처음부터 다시 할까요?")) return;
+  if(!confirm("정말 지울까요? 되돌릴 수 없습니다.")) return;
+  localStorage.removeItem(KEY); S=blank(); document.getElementById("cls").value=""; document.getElementById("nm").value=""; render(); msg("초기화됨");
+});
+[["cls","cls"],["nm","name"]].forEach(([id,k])=>{ const el=document.getElementById(id); el.value=S.meta[k]||""; el.addEventListener("input",()=>{ S.meta[k]=el.value; save(); }); });
+render();
+</script>
+</body>
+</html>

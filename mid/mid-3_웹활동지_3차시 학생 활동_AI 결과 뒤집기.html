@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3차시 활동 - AI 결과 뒤집기</title>
+<style>
+:root{
+  --bg1:#081120; --bg2:#10203a; --panel:#101b31cc; --line:#2c4b7a; --text:#eef5ff; --muted:#a8b8d6;
+  --cyan:#35d7ff; --blue:#5f8dff; --yellow:#ffd44d; --green:#56e39f; --pink:#ff78c7; --orange:#ff9f43; --red:#ff6677;
+  --shadow:0 18px 40px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; min-height:100vh; color:var(--text);
+  font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(53,215,255,.16) 0 10%, transparent 11%),
+    radial-gradient(circle at 86% 18%, rgba(255,212,77,.10) 0 9%, transparent 10%),
+    radial-gradient(circle at 82% 80%, rgba(255,120,199,.10) 0 8%, transparent 9%),
+    linear-gradient(135deg, #07101e 0%, #0c1630 35%, #0b2038 70%, #091223 100%);
+  background-attachment:fixed;
+}
+body:before{
+  content:""; position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size:40px 40px; pointer-events:none;
+  mask-image:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.12));
+}
+.stars span{position:fixed; width:4px; height:4px; border-radius:50%; background:#fff; opacity:.75; z-index:-1; box-shadow:0 0 10px rgba(255,255,255,.6);}
+.s1{left:8%;top:12%}.s2{left:24%;top:32%}.s3{left:53%;top:10%}.s4{left:78%;top:25%}.s5{left:90%;top:8%}.s6{left:12%;top:73%}.s7{left:44%;top:84%}.s8{left:68%;top:76%}
+.wrap{max-width:1240px; margin:0 auto; padding:24px 18px 72px}
+.hero{
+  position:relative; overflow:hidden; border-radius:30px; padding:30px;
+  background:linear-gradient(135deg, rgba(16,30,53,.95), rgba(14,28,58,.88));
+  border:1px solid rgba(83,138,255,.28); box-shadow:var(--shadow);
+}
+.hero:after{content:""; position:absolute; right:-60px; top:-60px; width:240px; height:240px; border-radius:50%; background:radial-gradient(circle, rgba(53,215,255,.28), transparent 70%);}
+.eyebrow{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); font-weight:900; color:#d9e8ff; font-size:13px;}
+h1{font-size:clamp(32px,5vw,54px); line-height:1.15; margin:12px 0 10px; letter-spacing:-1.8px;}
+.rainbow{background:linear-gradient(90deg,var(--yellow), var(--orange), var(--pink), var(--cyan), #8cffca); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.hero p{margin:0; max-width:870px; color:var(--muted); line-height:1.7; font-size:16px}
+.mission{margin-top:18px; padding:15px 16px; border-radius:18px; background:linear-gradient(90deg, rgba(95,141,255,.12), rgba(53,215,255,.12), rgba(255,212,77,.12)); border:1px dashed rgba(147,193,255,.34); font-weight:900; line-height:1.65;}
+.steps{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:18px}
+.step{background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:18px; padding:13px; font-size:13px; line-height:1.5; backdrop-filter:blur(5px);}
+.step b{display:block; margin-bottom:4px; font-size:14px}
+.step:nth-child(1) b{color:var(--yellow)} .step:nth-child(2) b{color:var(--cyan)} .step:nth-child(3) b{color:var(--green)} .step:nth-child(4) b{color:var(--pink)}
+.panel{margin-top:18px; padding:22px; border-radius:24px; background:var(--panel); border:1px solid rgba(108,149,230,.20); box-shadow:var(--shadow); backdrop-filter:blur(7px);}
+.panel h2{margin:0; font-size:25px; letter-spacing:-.6px; display:flex; align-items:center; gap:10px;}
+.help{margin:8px 0 16px; color:var(--muted); line-height:1.65; font-size:14px}
+.badge-num{width:34px; height:34px; flex:0 0 34px; border-radius:50%; display:grid; place-items:center; color:white; font-weight:1000; background:linear-gradient(135deg, var(--blue), var(--cyan)); box-shadow:0 0 0 4px rgba(95,141,255,.12);}
+.table-wrap{overflow:auto; border-radius:18px; border:1px solid rgba(117,160,242,.25); background:rgba(255,255,255,.04);}
+table{width:100%; border-collapse:collapse; min-width:760px; font-size:15px;}
+th,td{border:1px solid rgba(129,164,235,.18); padding:12px 10px; text-align:center;}
+th{background:rgba(95,141,255,.13); color:#eaf2ff; font-weight:1000;}
+td:first-child,th:first-child{text-align:left; padding-left:14px}
+.name-pill{display:inline-flex; align-items:center; gap:8px; font-weight:1000}
+.emoji{width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-size:20px; background:rgba(255,255,255,.08);}
+.ga{color:#7ef089}.na{color:#ffa658}.da{color:#69b0ff}
+.score-boxes{display:grid; grid-template-columns:1.15fr .85fr; gap:14px; margin-top:16px}
+.card{border-radius:20px; padding:16px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10);}
+.ranking{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:10px}
+.rank-card{border-radius:18px; padding:14px; text-align:center; border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.04);}
+.rank-card.top{background:linear-gradient(180deg, rgba(255,212,77,.18), rgba(255,255,255,.04)); border-color:rgba(255,212,77,.35)}
+.rank-medal{font-size:28px}.rank-name{font-weight:1000; font-size:18px; margin-top:4px}.rank-score{font-size:14px; color:#c6d4ef; margin-top:5px}
+.answer-box{margin-top:12px; padding:15px; border-radius:16px; background:linear-gradient(90deg, rgba(53,215,255,.10), rgba(95,141,255,.10)); border:1px dashed rgba(116,191,255,.36); font-weight:900; line-height:1.6;}
+.actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:15px}
+button{border:none; border-radius:14px; padding:12px 15px; font:inherit; font-weight:1000; cursor:pointer; transition:.16s; color:#091325;}
+button:hover:not(:disabled){transform:translateY(-1px)} button:disabled{opacity:.5; cursor:not-allowed}
+.primary{background:linear-gradient(90deg,var(--yellow), #ffb84d); box-shadow:0 8px 18px rgba(255,180,77,.18)}
+.secondary{background:linear-gradient(90deg,var(--cyan), #84f3ff); box-shadow:0 8px 18px rgba(53,215,255,.16)}
+.darkbtn{background:linear-gradient(90deg,var(--blue), #8fa8ff); color:#fff}
+.sub{background:rgba(255,255,255,.10); color:#eaf2ff; border:1px solid rgba(255,255,255,.12)}
+.roulette-layout{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.game-panel{position:relative; border-radius:24px; padding:18px; background:linear-gradient(180deg, rgba(17,31,58,.95), rgba(12,22,43,.95)); border:1px solid rgba(85,137,235,.25); overflow:hidden;}
+.game-panel:before{content:""; position:absolute; inset:auto -80px -80px auto; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(53,215,255,.20), transparent 70%);}
+.wheel-wrap{position:relative; width:min(92vw, 340px); aspect-ratio:1/1; margin:12px auto 8px;}
+.wheel{
+  width:100%; height:100%; border-radius:50%; border:10px solid rgba(255,255,255,.18);
+  box-shadow:0 0 0 8px rgba(255,255,255,.04), 0 16px 36px rgba(0,0,0,.35);
+  background:conic-gradient(from -45deg,#44d27a 0 25%,#f1cc2f 25% 50%,#ff7ec1 50% 75%,#39b8ff 75% 100%);
+  position:relative; transition:transform 4.3s cubic-bezier(.15,.9,.16,1);
+}
+.wheel:after{content:""; position:absolute; inset:50%; transform:translate(-50%,-50%); width:92px; height:92px; border-radius:50%; background:radial-gradient(circle, #1a2950, #0d162d 75%); border:8px solid rgba(255,255,255,.14); box-shadow:0 0 18px rgba(53,215,255,.26);}
+.wheel-label{position:absolute; font-weight:1000; color:#081325; font-size:18px; text-shadow:0 1px 0 rgba(255,255,255,.4);}
+.lb1{top:52px; left:204px; transform:translateX(-50%)} .lb2{top:52px; left:95px; transform:translateX(-50%)} .lb3{top:220px; left:95px; transform:translateX(-50%)} .lb4{top:220px; left:205px; transform:translateX(-50%)}
+.pointer{position:absolute; top:-16px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:20px solid transparent; border-right:20px solid transparent; border-top:40px solid #ff5656; filter:drop-shadow(0 5px 10px rgba(255,86,86,.5)); z-index:3;}
+.pointer:after{content:""; position:absolute; left:-8px; top:-38px; width:16px; height:16px; border-radius:50%; background:#fff4f5;}
+.spin-flash{position:absolute; inset:0; border-radius:50%; box-shadow:0 0 0 0 rgba(255,255,255,0); pointer-events:none;}
+.spin-flash.active{animation:flash .65s ease 5;}
+@keyframes flash{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 0 12px rgba(255,255,255,.10)}}
+.hud{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:12px}
+.hud-card{border-radius:16px; padding:12px; text-align:center; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10);}
+.hud-title{font-size:12px; color:#a9bbd8; font-weight:900}.hud-value{font-size:26px; font-weight:1000; line-height:1.15; margin-top:4px}
+.roulette-result{margin-top:14px; padding:14px; border-radius:18px; background:linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); border:1px dashed rgba(255,255,255,.14); line-height:1.7;}
+.roulette-result .big{font-size:26px; font-weight:1000; margin:3px 0 6px}
+.mini-pills,.criterion-tags{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+.pill,.crit{display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border-radius:999px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); font-size:12px; font-weight:900;}
+.crit{font-size:13px; cursor:pointer}
+.log-list{display:flex; flex-direction:column; gap:10px}
+.log-item{border-radius:16px; padding:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10);}
+.log-top{display:flex; justify-content:space-between; gap:8px; align-items:center; margin-bottom:6px; font-weight:1000;}
+.log-badge{padding:5px 9px; border-radius:999px; font-size:12px; font-weight:1000;}
+.flip{background:rgba(86,227,159,.18); color:#abffd1} .same{background:rgba(255,120,199,.16); color:#ffd3ee}
+.judge-layout{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.compare-cards{display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center}
+.compare{border-radius:18px; padding:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); text-align:center;}
+.compare .cap{font-size:12px; color:#a9bbd8; font-weight:900}.compare .name{font-size:28px; font-weight:1000; margin-top:4px}.compare .meta{font-size:13px; color:#cbd8ed; margin-top:5px}
+.arrow{font-size:42px; text-align:center; color:var(--yellow)}
+textarea,input,select{width:100%; border:1px solid rgba(152,184,238,.24); border-radius:14px; padding:12px 13px; color:var(--text); background:rgba(255,255,255,.06); font:inherit; outline:none;}
+textarea{min-height:92px; resize:vertical}
+input:focus,textarea:focus,select:focus{border-color:rgba(83,220,255,.55); box-shadow:0 0 0 3px rgba(53,215,255,.12);}
+label{display:block; margin:10px 0 6px; font-size:13px; font-weight:1000}
+.bias-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:14px}
+.alarm{border-radius:22px; padding:16px; background:linear-gradient(145deg, rgba(255,102,119,.16), rgba(255,255,255,.04)); border:1px solid rgba(255,102,119,.28);}
+.alarm-title{display:flex; align-items:center; gap:10px; font-size:22px; font-weight:1000}
+.alarm-light{width:44px; height:44px; border-radius:14px; display:grid; place-items:center; background:linear-gradient(145deg, #ff6b77, #ff3c53); box-shadow:0 0 20px rgba(255,88,112,.45); animation:blink 1.2s ease infinite;}
+@keyframes blink{0%,100%{transform:scale(1); box-shadow:0 0 20px rgba(255,88,112,.45)}50%{transform:scale(1.05); box-shadow:0 0 28px rgba(255,88,112,.65)}}
+.warn-list{margin-top:10px; display:flex; flex-direction:column; gap:8px}
+.warn-item{padding:10px 12px; border-radius:14px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10);}
+.top3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+.pick{border-radius:20px; padding:15px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10);}
+.pick-title{font-size:18px; font-weight:1000; display:flex; align-items:center; gap:8px}
+.pick-no{width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-weight:1000; color:#081325;}
+.top3 .pick:nth-child(1) .pick-no{background:var(--yellow)} .top3 .pick:nth-child(2) .pick-no{background:#7eb3ff} .top3 .pick:nth-child(3) .pick-no{background:#7ef5b3}
+.final-box{
+  margin-top:16px;
+  padding:18px;
+  border-radius:24px;
+  background:linear-gradient(135deg, rgba(53,215,255,.12), rgba(255,212,77,.10), rgba(255,120,199,.10));
+  border:1px solid rgba(161,199,255,.32);
+  box-shadow:0 18px 36px rgba(0,0,0,.20);
+}
+.manifesto{
+  position:relative;
+  overflow:hidden;
+  border-radius:24px;
+  padding:24px 22px;
+  background:
+    radial-gradient(circle at 90% 12%, rgba(255,212,77,.14) 0 12%, transparent 13%),
+    radial-gradient(circle at 10% 88%, rgba(53,215,255,.14) 0 12%, transparent 13%),
+    linear-gradient(160deg, rgba(10,20,38,.95), rgba(16,29,54,.96));
+  border:1px solid rgba(255,255,255,.10);
+}
+.manifesto:before{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border:1px dashed rgba(255,255,255,.10);
+  border-radius:18px;
+  pointer-events:none;
+}
+.manifesto-header{
+  position:relative;
+  text-align:center;
+  padding:6px 12px 18px;
+}
+.manifesto-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  color:#dce8ff;
+  font-size:12px;
+  font-weight:1000;
+}
+.manifesto-title{
+  margin-top:12px;
+  font-size:34px;
+  font-weight:1000;
+  line-height:1.2;
+  letter-spacing:-1px;
+  background:linear-gradient(90deg,#ffd44d,#ffb74d,#ff84d4,#5ce1ff,#82f7b4);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.manifesto-sub{
+  margin-top:8px;
+  color:#bdd0f2;
+  font-size:14px;
+  line-height:1.7;
+}
+.manifesto-stats{
+  position:relative;
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+.stat-card{
+  border-radius:18px;
+  padding:12px;
+  text-align:center;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+}
+.stat-name{
+  font-size:12px;
+  color:#a9bbd8;
+  font-weight:900;
+}
+.stat-value{
+  margin-top:5px;
+  font-size:24px;
+  font-weight:1000;
+  color:#ffffff;
+}
+.manifesto-top3{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:18px;
+}
+.m-card{
+  border-radius:20px;
+  padding:16px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+}
+.m-card.first{background:linear-gradient(180deg, rgba(255,212,77,.18), rgba(255,255,255,.04)); border-color:rgba(255,212,77,.30)}
+.m-card.second{background:linear-gradient(180deg, rgba(95,141,255,.18), rgba(255,255,255,.04)); border-color:rgba(95,141,255,.30)}
+.m-card.third{background:linear-gradient(180deg, rgba(86,227,159,.18), rgba(255,255,255,.04)); border-color:rgba(86,227,159,.30)}
+.m-rank{
+  display:inline-grid;
+  place-items:center;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  font-size:21px;
+  font-weight:1000;
+  color:#081325;
+}
+.m-card.first .m-rank{background:#ffd44d}
+.m-card.second .m-rank{background:#8cb7ff}
+.m-card.third .m-rank{background:#85f5b3}
+.m-criterion{
+  margin-top:10px;
+  font-size:22px;
+  font-weight:1000;
+  color:#fff;
+}
+.m-reason-title{
+  margin-top:8px;
+  font-size:12px;
+  color:#bdd0f2;
+  font-weight:900;
+}
+.m-reason{
+  margin-top:4px;
+  color:#e8f0ff;
+  line-height:1.7;
+  font-size:14px;
+}
+.manifesto-grid{
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:16px;
+}
+.info-panel{
+  border-radius:18px;
+  padding:15px 16px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+}
+.info-panel h4{
+  margin:0 0 8px;
+  font-size:18px;
+  color:#ffffff;
+}
+.info-panel p{
+  margin:0;
+  color:#d8e5fb;
+  line-height:1.75;
+  font-size:14px;
+}
+.quote-box{
+  position:relative;
+  margin-top:16px;
+  border-radius:20px;
+  padding:18px;
+  background:linear-gradient(90deg, rgba(53,215,255,.12), rgba(255,212,77,.12), rgba(255,120,199,.12));
+  border:1px dashed rgba(196,225,255,.28);
+}
+.quote-box .q-title{
+  font-size:13px;
+  color:#dbebff;
+  font-weight:900;
+}
+.quote-box .q-text{
+  margin-top:8px;
+  font-size:19px;
+  line-height:1.8;
+  font-weight:1000;
+  color:#ffffff;
+}
+.sign-row{
+  margin-top:16px;
+  padding-top:12px;
+  border-top:1px dashed rgba(255,255,255,.16);
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  color:#b9cbed;
+  font-size:12px;
+  font-weight:900;
+}
+@media(max-width:860px){
+  .manifesto-stats, .manifesto-top3, .manifesto-grid{grid-template-columns:1fr}
+  .manifesto-title{font-size:28px}
+}
+.guide{margin-top:10px; padding:12px 13px; border-radius:14px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); color:#c4d4ee; font-size:13px; line-height:1.6;}
+.guide.ok{background:rgba(86,227,159,.14); border-color:rgba(86,227,159,.28); color:#d6ffeb; font-weight:900}
+.guide.warn{background:rgba(255,102,119,.14); border-color:rgba(255,102,119,.26); color:#ffe0e5; font-weight:900}
+details.teacher{margin-top:14px; border-radius:18px; overflow:hidden; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10);}
+details.teacher summary{cursor:pointer; padding:14px 16px; font-weight:1000; color:#eaf1ff;}
+.teacher-body{padding:0 16px 16px; font-size:13px; line-height:1.72; color:#c9d7ed}
+.teacher-body .box{margin-top:8px; padding:12px; border-radius:14px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09);}
+.foot{margin-top:22px; text-align:center; color:#9bb1d4; font-size:12px; line-height:1.6;}
+@media(max-width:980px){.score-boxes,.roulette-layout,.judge-layout,.bias-grid{grid-template-columns:1fr}}
+@media(max-width:860px){.steps,.ranking,.top3{grid-template-columns:1fr}.compare-cards{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
+@media print{
+  body{background:#fff; color:#111} body:before,.stars,.no-print{display:none!important}
+  .hero,.panel,.card,.pick,.compare,.rank-card{box-shadow:none; background:#fff; color:#111; border-color:#ccc}
+  .help,.hero p,.foot{color:#444!important}
+  .wrap{max-width:none; padding:0}
+}
+</style>
+</head>
+<body>
+<div class="stars" aria-hidden="true"><span class="s1"></span><span class="s2"></span><span class="s3"></span><span class="s4"></span><span class="s5"></span><span class="s6"></span><span class="s7"></span><span class="s8"></span></div>
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">🎮 3차시 활동</div>
+    <h1><span class="rainbow">AI 결과 뒤집기</span> – 기준 하나가 추천을 바꾼다!</h1>
+    <p>AI가 어떤 <b>기준</b>으로 판단하는지 살펴보고, 기준이 하나만 추가되어도 결과가 달라질 수 있음을 알아보는 활동입니다. 룰렛을 돌리며 새로운 판단 기준을 추가하고, <b>더 공정한 AI 기준</b>이 무엇인지 생각해 봅시다.</p>
+    <div class="mission">🎯 <b>오늘의 미션:</b> 처음에는 <u>시험 점수 + 발표 횟수</u>만으로 학급 대표를 추천한 뒤, 룰렛으로 새로운 기준을 하나씩 추가해 보세요. 추천이 바뀌는 순간, 왜 그런지 설명하고 <b>우리 모둠의 공정한 AI 기준 3가지</b>를 정합니다.</div>
+    <div class="steps">
+      <div class="step"><b>① 후보 확인</b>학생 자료를 보고 AI의 첫 추천 결과를 확인해요.</div>
+      <div class="step"><b>② 룰렛 돌리기</b>협력·창의성·노력·의사소통 중 새로운 기준을 뽑아요.</div>
+      <div class="step"><b>③ 결과 뒤집기</b>추가된 기준으로 AI가 다시 추천한 결과를 비교해요.</div>
+      <div class="step"><b>④ 공정 기준 정하기</b>우리 모둠이 생각하는 중요한 기준 3가지를 정리해요.</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2><span class="badge-num">1</span> 후보 학생 자료 확인하기</h2>
+    <p class="help">AI는 처음에 <b>시험 점수</b>와 <b>발표 횟수</b>만 보고 학급 대표를 추천합니다. 아래 자료를 보고 먼저 누가 추천되는지 확인해 보세요.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>후보</th><th>시험 점수<br>(5점 만점)</th><th>발표 횟수<br>(5점 만점)</th><th>협력<br>(5점 만점)</th><th>창의성<br>(5점 만점)</th><th>노력<br>(5점 만점)</th><th>의사소통<br>(5점 만점)</th></tr></thead>
+        <tbody>
+          <tr><td><span class="name-pill ga"><span class="emoji">🧒</span>가온</span></td><td>5</td><td>4</td><td>2</td><td>2</td><td>3</td><td>2</td></tr>
+          <tr><td><span class="name-pill na"><span class="emoji">👧</span>나래</span></td><td>4</td><td>3</td><td>5</td><td>5</td><td>4</td><td>5</td></tr>
+          <tr><td><span class="name-pill da"><span class="emoji">👦</span>다온</span></td><td>4</td><td>4</td><td>3</td><td>3</td><td>5</td><td>3</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="score-boxes">
+      <div class="card">
+        <b>🧠 첫 추천 기준</b>
+        <div class="answer-box">AI는 처음에 <b>시험 점수 + 발표 횟수</b>만 사용합니다.</div>
+        <div class="actions no-print"><button id="firstBtn" class="primary">첫 추천 결과 보기</button><button id="resetBtn" class="sub">처음부터 다시 하기</button></div>
+        <div id="firstGuide" class="guide no-print">💡 먼저 「첫 추천 결과 보기」를 눌러 보세요.</div>
+      </div>
+      <div class="card">
+        <b>🏆 첫 추천 결과</b>
+        <div id="ranking" class="ranking"><div class="rank-card"><div class="rank-medal">❔</div><div class="rank-name">아직 계산 전</div><div class="rank-score">버튼을 눌러 확인해 보세요.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2><span class="badge-num">2</span> 기준 룰렛 돌리기</h2>
+    <p class="help">룰렛을 돌려 새로운 판단 기준을 하나씩 추가해 보세요. 같은 기준은 한 번만 등장합니다. 추천 결과가 바뀌면 <b>결과 뒤집기 성공</b>입니다!</p>
+    <div class="roulette-layout">
+      <div class="game-panel">
+        <div class="hud">
+          <div class="hud-card"><div class="hud-title">남은 기준</div><div id="remainCount" class="hud-value">4</div></div>
+          <div class="hud-card"><div class="hud-title">뒤집기 성공</div><div id="flipCount" class="hud-value">0</div></div>
+          <div class="hud-card"><div class="hud-title">공정성 포인트</div><div id="pointCount" class="hud-value">0</div></div>
+        </div>
+        <div class="wheel-wrap">
+          <div class="pointer"></div>
+          <div id="wheel" class="wheel"><div id="flash" class="spin-flash"></div></div>
+          <div class="wheel-label lb1">창의성</div><div class="wheel-label lb2">협력</div><div class="wheel-label lb3">의사소통</div><div class="wheel-label lb4">노력</div>
+        </div>
+        <div class="actions no-print" style="justify-content:center;"><button id="spinBtn" class="secondary">🎯 룰렛 돌리기</button><button id="retryBtn" class="sub">룰렛 기록 지우기</button></div>
+        <div id="rouletteResult" class="roulette-result">
+          <div>이번에 추가할 기준</div><div class="big">아직 없음</div><div>먼저 첫 추천 결과를 본 뒤 룰렛을 돌려 주세요.</div>
+          <div class="mini-pills"><span class="pill">🌀 추천이 바뀌면 +100점</span><span class="pill">⭐ 모든 기준 탐험 시 +50점</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <b>📜 룰렛 탐험 기록</b>
+        <p class="help">룰렛을 돌릴 때마다 어떤 기준이 추가되었고 추천 결과가 어떻게 달라졌는지 자동으로 기록됩니다.</p>
+        <div id="logList" class="log-list"><div class="log-item">아직 룰렛 기록이 없습니다. 첫 추천 결과를 본 뒤 룰렛을 돌려 보세요.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2><span class="badge-num">3</span> 결과 뒤집기!</h2>
+    <p class="help">추가된 기준을 포함해 AI가 다시 추천한 결과를 정리해 보세요. 추천 학생이 바뀌었다면, <b>왜 바뀌었는지</b>를 설명해 보세요.</p>
+    <div class="judge-layout">
+      <div class="card">
+        <div class="compare-cards">
+          <div class="compare"><div class="cap">처음 추천</div><div id="beforeName" class="name">-</div><div id="beforeMeta" class="meta">시험 점수 + 발표 횟수</div></div>
+          <div class="arrow">➡️</div>
+          <div class="compare"><div class="cap">새 기준 추가 후 추천</div><div id="afterName" class="name">-</div><div id="afterMeta" class="meta">룰렛을 먼저 돌려 주세요.</div></div>
+        </div>
+        <div id="compareGuide" class="guide no-print">💡 룰렛 결과가 나오면 여기에 비교 결과가 나타납니다.</div>
+      </div>
+      <div class="card">
+        <label for="reasonInput">결과가 바뀐 이유를 한 문장으로 써 보세요.</label>
+        <textarea id="reasonInput" placeholder="예: 처음에는 시험과 발표만 봤지만, 협력을 추가하자 나래의 장점이 더 잘 드러나 추천이 바뀌었다."></textarea>
+        <label for="importantInput">이번에 추가한 기준이 왜 중요한가요?</label>
+        <textarea id="importantInput" placeholder="예: 학급 대표는 친구들과 함께 일할 일이 많아서 협력이 중요하다."></textarea>
+        <div class="criterion-tags no-print">
+          <button type="button" class="crit quickReason" data-kind="협력">협력 중요 이유 넣기</button>
+          <button type="button" class="crit quickReason" data-kind="창의성">창의성 중요 이유 넣기</button>
+          <button type="button" class="crit quickReason" data-kind="노력">노력 중요 이유 넣기</button>
+          <button type="button" class="crit quickReason" data-kind="의사소통">의사소통 중요 이유 넣기</button>
+        </div>
+        <div class="actions no-print"><button id="autoReasonBtn" class="darkbtn">AI 추천 이유 자동 예시 넣기</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2><span class="badge-num">4</span> 편향 경보 외치기!</h2>
+    <p class="help">처음 기준이 너무 적으면 중요한 장점이 빠질 수 있습니다. 어떤 기준이 빠졌을 때 불리했는지 생각해 보고, 우리 모둠의 <b>편향 경보</b>를 정리해 보세요.</p>
+    <div class="bias-grid">
+      <div class="alarm">
+        <div class="alarm-title"><span class="alarm-light">🚨</span> 우리 모둠의 편향 경보!</div>
+        <div class="warn-list">
+          <div class="warn-item"><b>처음 기준:</b> 시험 점수 + 발표 횟수</div>
+          <div class="warn-item"><b>빠진 기준:</b> <span id="missedText">아직 룰렛을 돌리지 않았어요.</span></div>
+          <div class="warn-item"><b>결과 뒤집힌 횟수:</b> <span id="flipText">0회</span></div>
+          <div class="warn-item"><b>편향 경보 한 줄:</b> <span id="alertLine">새로운 기준을 추가해 보면 어떤 학생의 장점이 가려졌는지 알 수 있어요.</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <label for="biasReason">빠진 정보나 불리하게 작용한 기준은?</label>
+        <textarea id="biasReason" placeholder="예: 시험과 발표만 보면 협력과 의사소통이 좋은 학생의 강점이 잘 드러나지 않는다."></textarea>
+        <label for="bestChange">가장 크게 달라진 결과 한 줄 정리</label>
+        <textarea id="bestChange" placeholder="예: 협력·창의성·의사소통을 넣자 나래가 추천되었다."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2><span class="badge-num">5</span> 최종 미션! 우리 모둠의 공정한 AI 기준 3가지 정하기</h2>
+    <p class="help">가장 공정하다고 생각하는 기준 3가지를 순서대로 골라 이유를 적어 보세요. 마지막에 모둠 선언문이 자동으로 생성됩니다.</p>
+    <div class="top3">
+      <div class="pick">
+        <div class="pick-title"><span class="pick-no">1</span> 가장 중요한 기준</div>
+        <label for="pick1">기준 선택</label>
+        <select id="pick1"><option value="">선택하세요</option><option>시험 점수</option><option>발표 횟수</option><option>협력</option><option>창의성</option><option>노력</option><option>의사소통</option></select>
+        <label for="why1">선택 이유</label><textarea id="why1" placeholder="왜 가장 중요하다고 생각했는지 적어 보세요."></textarea>
+      </div>
+      <div class="pick">
+        <div class="pick-title"><span class="pick-no">2</span> 두 번째 기준</div>
+        <label for="pick2">기준 선택</label>
+        <select id="pick2"><option value="">선택하세요</option><option>시험 점수</option><option>발표 횟수</option><option>협력</option><option>창의성</option><option>노력</option><option>의사소통</option></select>
+        <label for="why2">선택 이유</label><textarea id="why2" placeholder="왜 중요하다고 생각했는지 적어 보세요."></textarea>
+      </div>
+      <div class="pick">
+        <div class="pick-title"><span class="pick-no">3</span> 세 번째 기준</div>
+        <label for="pick3">기준 선택</label>
+        <select id="pick3"><option value="">선택하세요</option><option>시험 점수</option><option>발표 횟수</option><option>협력</option><option>창의성</option><option>노력</option><option>의사소통</option></select>
+        <label for="why3">선택 이유</label><textarea id="why3" placeholder="왜 중요하다고 생각했는지 적어 보세요."></textarea>
+      </div>
+    </div>
+    <div class="actions no-print"><button id="finalBtn" class="primary">📢 모둠 선언문 만들기</button><button id="printBtn" class="sub">🖨️ 출력 / PDF 저장</button></div>
+    <div id="finalGuide" class="guide no-print">💡 기준 3가지를 고르고 이유를 적으면 선언문을 만들 수 있어요.</div>
+    <div id="finalBox" class="final-box" style="display:none;"></div>
+    <details class="teacher no-print">
+      <summary>🔐 선생님 검토용 · 권장 정답 예시 보기</summary>
+      <div class="teacher-body">
+        <div class="box"><b>첫 추천 결과:</b> 시험 점수 + 발표 횟수만 더하면 가온(9점)이 가장 높아 처음 추천 학생은 <b>가온</b>입니다.</div>
+        <div class="box"><b>기준 추가 후:</b> 협력/창의성/의사소통을 추가하면 <b>나래</b>가 추천되고, 노력을 추가하면 <b>다온</b>이 추천됩니다.</div>
+        <div class="box"><b>핵심 개념:</b> AI의 판단이 바뀐 이유는 기준이 달라졌기 때문입니다. 처음 기준이 적으면 특정 학생의 장점이 가려질 수 있고, 그래서 더 공정한 판단을 위해 다양한 기준이 필요합니다.</div>
+        <div class="box"><b>예시 문장:</b> “시험 점수와 발표 횟수만으로는 학급 대표에게 필요한 여러 능력을 충분히 반영하지 못하므로, 협력·의사소통·노력 같은 기준도 함께 고려해야 한다.”</div>
+      </div>
+    </details>
+  </section>
+
+  <div class="foot">1·2차시와는 다른 <b>다크 네온 게임풍</b>으로 구성했습니다. 이 활동의 핵심은 “AI가 틀렸다”가 아니라 <b>어떤 기준을 쓰느냐에 따라 결과가 달라질 수 있다</b>는 점을 이해하는 것입니다.</div>
+</main>
+
+<script>
+const students = [
+  {name:"가온", className:"ga", exam:5, speak:4, coop:2, creative:2, effort:3, comm:2},
+  {name:"나래", className:"na", exam:4, speak:3, coop:5, creative:5, effort:4, comm:5},
+  {name:"다온", className:"da", exam:4, speak:4, coop:3, creative:3, effort:5, comm:3}
+];
+const criteriaInfo = {
+  coop:{label:"협력", emoji:"🤝", degrees:315, quick:"학급 대표는 친구들과 함께 의견을 조율하고 모둠 활동을 이끄는 일이 많아서 협력이 중요하다."},
+  creative:{label:"창의성", emoji:"💡", degrees:45, quick:"문제를 새롭게 해결하고 아이디어를 내는 능력은 학급 대표가 다양한 상황에 대응하는 데 도움이 된다."},
+  effort:{label:"노력", emoji:"💪", degrees:135, quick:"꾸준히 노력하는 학생은 맡은 일을 끝까지 책임감 있게 해낼 가능성이 크므로 중요하다."},
+  comm:{label:"의사소통", emoji:"💬", degrees:225, quick:"학급 대표는 친구들과 선생님의 의견을 잘 듣고 전달해야 하므로 의사소통이 중요하다."}
+};
+
+let firstResult = null;
+let remainingCriteria = ["coop","creative","effort","comm"];
+let logs = [];
+let currentCriterion = null;
+let spinning = false;
+let totalPoints = 0;
+let totalFlips = 0;
+let totalRotation = 0;
+
+const firstGuide = document.getElementById("firstGuide");
+const compareGuide = document.getElementById("compareGuide");
+const finalGuide = document.getElementById("finalGuide");
+const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, ch => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+}[ch]));
+
+
+function calcRanking(criteria){
+  return students.map(s => {
+    const total = criteria.reduce((sum,key)=>sum + s[key], 0);
+    return {...s, total};
+  }).sort((a,b)=> b.total - a.total || a.name.localeCompare(b.name, "ko"));
+}
+
+function renderFirstRanking(ranking){
+  const medals = ["🥇","🥈","🥉"];
+  document.getElementById("ranking").innerHTML = ranking.map((s, idx) => `
+    <div class="rank-card ${idx===0 ? "top" : ""}">
+      <div class="rank-medal">${medals[idx]}</div>
+      <div class="rank-name ${s.className}">${s.name}</div>
+      <div class="rank-score">총점 ${s.total}점</div>
+      <div class="rank-score">${idx===0 ? "첫 추천 학생" : "후보"}</div>
+    </div>`).join("");
+}
+
+function updateHUD(){
+  document.getElementById("remainCount").textContent = remainingCriteria.length;
+  document.getElementById("flipCount").textContent = totalFlips;
+  document.getElementById("pointCount").textContent = totalPoints;
+}
+
+function renderLogs(){
+  const box = document.getElementById("logList");
+  if(logs.length === 0){
+    box.innerHTML = '<div class="log-item">아직 룰렛 기록이 없습니다. 첫 추천 결과를 본 뒤 룰렛을 돌려 보세요.</div>';
+    return;
+  }
+  box.innerHTML = logs.map((log, idx) => `
+    <div class="log-item">
+      <div class="log-top">
+        <span>${idx+1}회차 · ${criteriaInfo[log.criterion].emoji} ${criteriaInfo[log.criterion].label}</span>
+        <span class="log-badge ${log.flipped ? "flip" : "same"}">${log.flipped ? "결과 뒤집힘!" : "결과 유지"}</span>
+      </div>
+      <div>기준: 시험 점수 + 발표 횟수 + ${criteriaInfo[log.criterion].label}</div>
+      <div>추천 학생: <b>${log.winner}</b> (총점 ${log.topScore}점)</div>
+      <div>비교: 처음 <b>${firstResult.winner}</b> → 새 결과 <b>${log.winner}</b></div>
+    </div>`).join("");
+}
+
+function renderBiasArea(){
+  const triedLabels = logs.map(l => criteriaInfo[l.criterion].label);
+  document.getElementById("missedText").textContent = triedLabels.length ? triedLabels.join(", ") : "아직 룰렛을 돌리지 않았어요.";
+  document.getElementById("flipText").textContent = `${totalFlips}회`;
+  document.getElementById("alertLine").textContent = totalFlips > 0 ? "처음 기준만으로는 일부 학생의 중요한 장점이 가려질 수 있다!" : "새로운 기준을 추가해 보면 어떤 학생의 장점이 가려졌는지 알 수 있어요.";
+}
+
+function setCompare(winner, criterionKey, total, flipped){
+  document.getElementById("beforeName").textContent = firstResult ? firstResult.winner : "-";
+  document.getElementById("afterName").textContent = winner || "-";
+  document.getElementById("afterMeta").textContent = criterionKey ? `시험 점수 + 발표 횟수 + ${criteriaInfo[criterionKey].label} (총점 ${total}점)` : "룰렛을 먼저 돌려 주세요.";
+  compareGuide.className = `guide ${flipped ? "ok" : ""} no-print`.trim();
+  compareGuide.textContent = criterionKey ? (flipped ? `🎉 추천 학생이 바뀌었습니다! 새 기준 ${criteriaInfo[criterionKey].label}을 넣자 결과가 뒤집혔어요.` : `🙂 새 기준 ${criteriaInfo[criterionKey].label}을 넣었지만 추천 학생은 그대로예요. 그래도 점수 차이를 비교해 보세요.`) : "💡 룰렛 결과가 나오면 여기에 비교 결과가 나타납니다.";
+}
+
+function resetRouletteProgress(){
+  remainingCriteria = ["coop","creative","effort","comm"];
+  logs = [];
+  currentCriterion = null;
+  totalPoints = 0;
+  totalFlips = 0;
+  updateHUD();
+  renderLogs();
+  renderBiasArea();
+  setCompare(null, null);
+  document.getElementById("rouletteResult").innerHTML = '<div>이번에 추가할 기준</div><div class="big">아직 없음</div><div>첫 추천 결과를 본 뒤 룰렛을 돌려 주세요.</div><div class="mini-pills"><span class="pill">🌀 추천이 바뀌면 +100점</span><span class="pill">⭐ 모든 기준 탐험 시 +50점</span></div>';
+  document.getElementById("reasonInput").value = "";
+  document.getElementById("importantInput").value = "";
+}
+
+document.getElementById("firstBtn").addEventListener("click", () => {
+  const ranking = calcRanking(["exam","speak"]);
+  firstResult = {winner: ranking[0].name, topScore: ranking[0].total};
+  renderFirstRanking(ranking);
+  document.getElementById("beforeName").textContent = firstResult.winner;
+  firstGuide.className = "guide ok no-print";
+  firstGuide.textContent = `✅ 첫 추천 학생은 ${firstResult.winner}입니다. 이제 룰렛을 돌려 새로운 기준을 추가해 보세요.`;
+  resetRouletteProgress();
+});
+
+function autoReasonText(criterionKey, winner, flipped){
+  if(!criterionKey || !firstResult) return;
+  const label = criteriaInfo[criterionKey].label;
+  document.getElementById("reasonInput").value = flipped
+    ? `처음에는 시험 점수와 발표 횟수만 보아 ${firstResult.winner}이(가) 추천되었지만, ${label} 기준을 추가하자 ${winner}의 장점이 더 잘 드러나 추천 결과가 바뀌었다.`
+    : `${label} 기준을 추가해도 추천 학생은 ${winner}로 유지되었지만, 처음 기준만으로는 다른 학생의 장점을 충분히 살피기 어렵다는 점을 알 수 있다.`;
+  document.getElementById("importantInput").value = criteriaInfo[criterionKey].quick;
+}
+
+function spinToCriterion(criterionKey){
+  const wheel = document.getElementById("wheel");
+  const flash = document.getElementById("flash");
+  const target = criteriaInfo[criterionKey].degrees;
+  const extraTurns = 5 + Math.floor(Math.random() * 3);
+  totalRotation += extraTurns * 360 + target;
+  spinning = true;
+  wheel.style.transform = `rotate(${totalRotation}deg)`;
+  flash.classList.remove("active");
+  setTimeout(() => flash.classList.add("active"), 80);
+
+  setTimeout(() => {
+    spinning = false;
+    currentCriterion = criterionKey;
+    const ranking = calcRanking(["exam","speak",criterionKey]);
+    const winner = ranking[0].name;
+    const topScore = ranking[0].total;
+    const flipped = firstResult && winner !== firstResult.winner;
+
+    totalPoints += 50;
+    if(flipped) totalPoints += 100;
+    if(remainingCriteria.length === 0) totalPoints += 50;
+    if(flipped) totalFlips += 1;
+    updateHUD();
+
+    logs.push({criterion:criterionKey, winner, topScore, flipped});
+    renderLogs();
+    renderBiasArea();
+    setCompare(winner, criterionKey, topScore, flipped);
+
+    document.getElementById("rouletteResult").innerHTML = `
+      <div>이번에 추가된 기준</div>
+      <div class="big">${criteriaInfo[criterionKey].emoji} ${criteriaInfo[criterionKey].label}</div>
+      <div>${flipped ? "🎉 추천 학생이 바뀌었어요!" : "🙂 추천 학생은 유지되었어요."}</div>
+      <div class="mini-pills">
+        <span class="pill">추천 학생: ${winner}</span>
+        <span class="pill">기준: 시험 점수 + 발표 횟수 + ${criteriaInfo[criterionKey].label}</span>
+        <span class="pill">얻은 점수: +${flipped ? 150 : 50}점${remainingCriteria.length===0 ? " + 보너스 50점" : ""}</span>
+      </div>`;
+    autoReasonText(criterionKey, winner, flipped);
+  }, 4400);
+}
+
+document.getElementById("spinBtn").addEventListener("click", () => {
+  if(!firstResult){
+    document.getElementById("rouletteResult").innerHTML = '<div>이번에 추가할 기준</div><div class="big">아직 없음</div><div style="color:#ffd0d8;font-weight:1000">⚠️ 먼저 「첫 추천 결과 보기」를 눌러 주세요.</div>';
+    firstGuide.className = "guide warn no-print";
+    firstGuide.textContent = "⚠️ 첫 추천 결과를 먼저 확인해야 룰렛을 돌릴 수 있어요.";
+    return;
+  }
+  if(spinning) return;
+  if(remainingCriteria.length === 0){
+    document.getElementById("rouletteResult").innerHTML = '<div>이번에 추가할 기준</div><div class="big">탐험 완료!</div><div>모든 기준을 다 돌려 보았습니다. 룰렛 기록 지우기를 눌러 다시 시작할 수 있어요.</div>';
+    return;
+  }
+  const idx = Math.floor(Math.random() * remainingCriteria.length);
+  const criterionKey = remainingCriteria.splice(idx, 1)[0];
+  updateHUD();
+  spinToCriterion(criterionKey);
+});
+
+document.getElementById("retryBtn").addEventListener("click", () => {
+  if(!firstResult){
+    firstGuide.className = "guide warn no-print";
+    firstGuide.textContent = "⚠️ 첫 추천 결과를 먼저 확인해 주세요.";
+    return;
+  }
+  resetRouletteProgress();
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  firstResult = null; remainingCriteria = ["coop","creative","effort","comm"]; logs = []; currentCriterion = null; spinning = false; totalPoints = 0; totalFlips = 0; totalRotation = 0;
+  document.getElementById("wheel").style.transform = "rotate(0deg)";
+  document.getElementById("ranking").innerHTML = '<div class="rank-card"><div class="rank-medal">❔</div><div class="rank-name">아직 계산 전</div><div class="rank-score">버튼을 눌러 확인해 보세요.</div></div>';
+  document.getElementById("beforeName").textContent = "-"; document.getElementById("afterName").textContent = "-"; document.getElementById("afterMeta").textContent = "룰렛을 먼저 돌려 주세요.";
+  firstGuide.className = "guide no-print"; firstGuide.textContent = "💡 먼저 「첫 추천 결과 보기」를 눌러 보세요.";
+  compareGuide.className = "guide no-print"; compareGuide.textContent = "💡 룰렛 결과가 나오면 여기에 비교 결과가 나타납니다.";
+  document.getElementById("reasonInput").value = ""; document.getElementById("importantInput").value = "";
+  document.getElementById("biasReason").value = ""; document.getElementById("bestChange").value = "";
+  document.getElementById("pick1").value = ""; document.getElementById("pick2").value = ""; document.getElementById("pick3").value = "";
+  document.getElementById("why1").value = ""; document.getElementById("why2").value = ""; document.getElementById("why3").value = "";
+  document.getElementById("finalBox").style.display = "none";
+  finalGuide.className = "guide no-print"; finalGuide.textContent = "💡 기준 3가지를 고르고 이유를 적으면 선언문을 만들 수 있어요.";
+  updateHUD(); renderLogs(); renderBiasArea();
+  document.getElementById("rouletteResult").innerHTML = '<div>이번에 추가할 기준</div><div class="big">아직 없음</div><div>먼저 첫 추천 결과를 본 뒤 룰렛을 돌려 주세요.</div><div class="mini-pills"><span class="pill">🌀 추천이 바뀌면 +100점</span><span class="pill">⭐ 모든 기준 탐험 시 +50점</span></div>';
+});
+
+document.querySelectorAll(".quickReason").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const key = Object.keys(criteriaInfo).find(k => criteriaInfo[k].label === btn.dataset.kind);
+    if(key) document.getElementById("importantInput").value = criteriaInfo[key].quick;
+  });
+});
+document.getElementById("autoReasonBtn").addEventListener("click", () => {
+  if(!logs.length){
+    compareGuide.className = "guide warn no-print";
+    compareGuide.textContent = "⚠️ 먼저 룰렛을 한 번 이상 돌려 주세요.";
+    return;
+  }
+  const last = logs[logs.length - 1];
+  autoReasonText(last.criterion, last.winner, last.flipped);
+});
+
+document.getElementById("finalBtn").addEventListener("click", () => {
+  const p1 = document.getElementById("pick1").value;
+  const p2 = document.getElementById("pick2").value;
+  const p3 = document.getElementById("pick3").value;
+  const w1 = document.getElementById("why1").value.trim();
+  const w2 = document.getElementById("why2").value.trim();
+  const w3 = document.getElementById("why3").value.trim();
+
+  if(!p1 || !p2 || !p3){
+    finalGuide.className = "guide warn no-print";
+    finalGuide.textContent = "⚠️ 기준 3가지를 모두 선택해 주세요.";
+    return;
+  }
+  if(new Set([p1,p2,p3]).size < 3){
+    finalGuide.className = "guide warn no-print";
+    finalGuide.textContent = "⚠️ 같은 기준을 중복해서 선택하지 않도록 해 주세요.";
+    return;
+  }
+
+  const bias = document.getElementById("biasReason").value.trim() || "시험 점수와 발표 횟수만으로는 학생의 다양한 장점을 충분히 반영하기 어렵다.";
+  const resultLine = document.getElementById("bestChange").value.trim() || "기준이 바뀌면 AI의 추천 결과도 달라질 수 있다.";
+
+  const flipSummary = totalFlips > 0 ? `${totalFlips}회` : "0회";
+  const pointSummary = `${totalPoints}점`;
+  const exploredSummary = `${4 - remainingCriteria.length}/4개`;
+
+  const box = document.getElementById("finalBox");
+  if(!box){
+    finalGuide.className = "guide warn no-print";
+    finalGuide.textContent = "⚠️ 결과 영역을 찾지 못했습니다. 페이지를 새로 열어 다시 시도해 주세요.";
+    return;
+  }
+
+  const manifestoHtml = `
+  <div class="manifesto">
+    <div class="manifesto-header">
+      <div class="manifesto-kicker">🏛️ 3차시 활동 결과물 · 우리 모둠 선언문</div>
+      <div class="manifesto-title">우리 모둠의 공정한 AI 기준 선언문</div>
+      <div class="manifesto-sub">기준이 하나 바뀌면 AI의 추천도 달라질 수 있다는 사실을 바탕으로,<br>우리 모둠이 생각한 더 공정한 판단 기준을 시각적으로 정리했습니다.</div>
+    </div>
+
+    <div class="manifesto-stats">
+      <div class="stat-card">
+        <div class="stat-name">뒤집기 성공</div>
+        <div class="stat-value">${flipSummary}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-name">공정성 포인트</div>
+        <div class="stat-value">${pointSummary}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-name">탐험한 기준</div>
+        <div class="stat-value">${exploredSummary}</div>
+      </div>
+    </div>
+
+    <div class="manifesto-top3">
+      <div class="m-card first">
+        <div class="m-rank">1</div>
+        <div class="m-criterion">${escapeHtml(p1)}</div>
+        <div class="m-reason-title">선택 이유</div>
+        <div class="m-reason">${escapeHtml(w1 || "이유 미입력")}</div>
+      </div>
+      <div class="m-card second">
+        <div class="m-rank">2</div>
+        <div class="m-criterion">${escapeHtml(p2)}</div>
+        <div class="m-reason-title">선택 이유</div>
+        <div class="m-reason">${escapeHtml(w2 || "이유 미입력")}</div>
+      </div>
+      <div class="m-card third">
+        <div class="m-rank">3</div>
+        <div class="m-criterion">${escapeHtml(p3)}</div>
+        <div class="m-reason-title">선택 이유</div>
+        <div class="m-reason">${escapeHtml(w3 || "이유 미입력")}</div>
+      </div>
+    </div>
+
+    <div class="manifesto-grid">
+      <div class="info-panel">
+        <h4>🚨 우리 모둠의 편향 경보</h4>
+        <p>${escapeHtml(bias)}</p>
+      </div>
+      <div class="info-panel">
+        <h4>💡 활동을 통해 알게 된 점</h4>
+        <p>${escapeHtml(resultLine)}</p>
+      </div>
+    </div>
+
+    <div class="quote-box">
+      <div class="q-title">📢 최종 선언</div>
+      <div class="q-text">우리는 AI가 한 가지 정보만 보고 사람을 판단하면 공정하지 않을 수 있다고 생각한다. 그래서 시험 점수나 발표 횟수뿐 아니라 <b>${escapeHtml(p1)}</b>, <b>${escapeHtml(p2)}</b>, <b>${escapeHtml(p3)}</b> 같은 다양한 기준을 함께 고려해야 더 공정한 추천이 가능하다고 본다.</div>
+    </div>
+
+    <div class="sign-row">
+      <span>✅ 모둠 합의 완료</span>
+      <span>🧠 공정한 AI 기준 선택 완료</span>
+      <span>🏆 작품처럼 완성된 선언문</span>
+    </div>
+  </div>`;
+
+  box.innerHTML = manifestoHtml;
+  box.style.display = "block";
+  finalGuide.className = "guide ok no-print";
+  finalGuide.textContent = "🎉 모둠 선언문이 완성되었습니다! 아래 내용을 확인하세요.";
+  box.scrollIntoView({behavior:"smooth", block:"start"});
+});
+
+document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+updateHUD(); renderLogs(); renderBiasArea();
+</script>
+</body>
+</html>

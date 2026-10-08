@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5. 딥페이크 대응 — AI 변형 콘텐츠의 공개와 피해 대응</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --ink:#1c2230; --ink-2:#4b5563; --ink-3:#8a94a6;
+  --paper:#ffffff; --bg:#f3f5f9; --line:#d9dee8; --line-2:#eceff4;
+  --blue:#2457d6; --blue-soft:#e9effc; --blue-ink:#1a3f9e;
+  --ok:#1f8f5f; --ok-soft:#e5f5ec; --warn:#b45309; --warn-soft:#fff4e5; --red:#c62828;
+  --radius:10px;
+  --font:"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--font);color:var(--ink);background:var(--bg);font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+textarea,input,select{font-family:inherit;font-size:15px;color:var(--ink)}
+
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.rail{background:var(--paper);border-right:1px solid var(--line);padding:22px 18px;position:sticky;top:0;height:100vh;overflow:auto}
+.rail .unit{font-size:12.5px;color:var(--ink-3);margin-bottom:4px}
+.rail .title{font-size:17px;font-weight:700;line-height:1.35;margin:0 0 18px}
+.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:10px;align-items:flex-start;padding:9px 8px;border-radius:8px;color:var(--ink-3);font-size:14px;cursor:default}
+.steps li .n{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:12px;flex:none;background:var(--paper)}
+.steps li.done{color:var(--ink-2);cursor:pointer}
+.steps li.done .n{background:var(--ok);border-color:var(--ok);color:#fff}
+.steps li.current{color:var(--blue-ink);background:var(--blue-soft);font-weight:600}
+.steps li.current .n{border-color:var(--blue);color:var(--blue)}
+.steps li.done:hover{background:var(--line-2)}
+.rail .who{margin-top:22px;padding-top:16px;border-top:1px solid var(--line-2)}
+.rail .who label{display:block;font-size:12px;color:var(--ink-3);margin:8px 0 3px}
+.rail .who input{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:7px}
+.rail .tools{margin-top:22px;display:flex;flex-direction:column;gap:8px}
+.rail .save{font-size:12px;color:var(--ink-3);margin-top:10px;min-height:18px}
+
+.main{padding:34px 40px 80px;max-width:820px;width:100%}
+.stage{display:none}
+.stage.active{display:block}
+.stage h1{font-size:26px;line-height:1.3;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
+.stage h1 small{display:block;font-size:13px;color:var(--ink-3);font-weight:500;margin-bottom:6px;letter-spacing:0}
+.stage .lead{color:var(--ink-2);margin:0 0 22px}
+.stage h2{font-size:18px;margin:34px 0 10px;font-weight:700}
+.stage h3{font-size:15.5px;margin:22px 0 8px;font-weight:700}
+.stage p{margin:0 0 10px}
+.stage .note{font-size:13px;color:var(--ink-3)}
+.kq{border-left:4px solid var(--blue);background:var(--paper);padding:14px 18px;border-radius:0 var(--radius) var(--radius) 0;margin:10px 0 24px;font-weight:600;color:var(--blue-ink);line-height:1.55}
+.kq .tag{display:block;font-size:12px;font-weight:600;color:var(--blue);margin-bottom:4px}
+.box{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:12px 0}
+.box.tint{background:var(--blue-soft);border-color:transparent}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.concept{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:12px 0}
+.concept b.t{display:block;font-size:16px;margin-bottom:6px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;background:var(--paper);margin:8px 0 12px}
+.tbl th,.tbl td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+.tbl th{background:var(--line-2);font-weight:600;font-size:13px}
+
+/* SNS 게시물 */
+.post{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:12px 0}
+.post .u{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.post .u .av{width:36px;height:36px;border-radius:50%;background:#dfe4ee}
+.post .u b{display:block;font-size:14px}
+.post .u span{font-size:12px;color:var(--ink-3)}
+.post h3{margin:0 0 10px;font-size:20px;line-height:1.3}
+.post p{margin:0 0 8px;font-size:15px}
+.post .src{font-size:13px;color:var(--ink-3);border-top:1px solid var(--line-2);padding-top:8px;margin-top:10px}
+.post .react{display:flex;gap:26px;font-size:13px;color:var(--ink-2);margin-top:8px}
+.chat{display:flex;flex-direction:column;gap:6px;margin:10px 0 14px}
+.chat span{align-self:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:14px 14px 14px 3px;padding:7px 13px;font-size:14px}
+
+/* 검색 결과 */
+.serp{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:10px 0 14px}
+.serp .bar{background:var(--line-2);padding:10px 14px;font-size:13.5px;display:flex;gap:8px;align-items:center}
+.serp .bar span{background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:5px 14px;flex:1}
+.serp .r{display:grid;grid-template-columns:24px 1fr;gap:12px;padding:12px 16px;border-top:1px solid var(--line-2)}
+.serp .r .n{color:var(--ink-3);font-size:13px;padding-top:2px}
+.serp .r .site{font-size:12.5px;color:var(--ink-3)}
+.serp .r .t{color:var(--blue);font-weight:600;font-size:15px}
+.serp .r .d{font-size:13.5px;color:var(--ink-2)}
+.serp .r .cite{display:inline-block;margin-top:5px;font-size:12px;border:1px solid var(--line);border-radius:5px;padding:1px 8px;color:var(--ink-2)}
+.serp .r .cite b{font-weight:600;color:var(--ink-3);margin-right:4px}
+.serp .r.doc .t{color:#5b3fb5}
+
+/* 리빌/단서 */
+.clue{border:1.5px solid var(--line);border-radius:var(--radius);margin:14px 0;background:var(--paper);overflow:hidden}
+.clue .ch{display:flex;align-items:center;gap:12px;padding:14px 18px}
+.clue .ch b{font-size:15.5px}
+.clue .ch .st{font-size:12.5px;color:var(--ink-3)}
+.clue .ch button{margin-left:auto}
+.clue .cb{display:none;padding:0 18px 18px;border-top:1px solid var(--line-2)}
+.clue.open .cb{display:block}
+.clue.open{border-color:var(--blue)}
+.clue.open .ch .st{color:var(--ok)}
+.reveal{display:flex;gap:14px;align-items:center;background:var(--blue-soft);border-radius:var(--radius);padding:14px 18px;margin:18px 0}
+.reveal .rt{flex:1;font-size:14.5px;color:var(--blue-ink)}
+.echo{background:var(--line-2);border-radius:8px;padding:10px 14px;margin:8px 0 12px;font-size:14px}
+.echo div{display:flex;gap:10px}
+.echo b{flex:none;color:var(--blue)}
+.echo .empty{color:var(--ink-3)}
+
+/* 질문 */
+.q{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:14px 0}
+.q .ql{font-weight:700;margin-bottom:8px;display:flex;gap:8px;align-items:baseline}
+.q .ql .no{color:var(--blue);flex:none}
+.q .qh{font-size:13.5px;color:var(--ink-2);margin:-4px 0 10px}
+.q textarea{width:100%;min-height:78px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;resize:vertical;line-height:1.55;background:#fbfcfe}
+.q input[type=text]{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:#fbfcfe}
+.q select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fbfcfe;min-width:160px}
+.q textarea:focus,.q input:focus,.q select:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:var(--blue)}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opts.row{flex-direction:row;flex-wrap:wrap;gap:8px 16px}
+.opt{display:flex;gap:9px;align-items:flex-start;padding:8px 10px;border-radius:8px;border:1px solid transparent;cursor:pointer}
+.opt:hover{background:var(--line-2)}
+.opt input{margin-top:4px;accent-color:var(--blue)}
+.opt.sel{background:var(--blue-soft);border-color:#c7d5f7}
+.opt .etc{flex:1;padding:4px 8px;border:0;border-bottom:1px solid var(--line);background:transparent}
+.blank{line-height:2.3}
+.blank input{width:min(100%,340px);padding:4px 8px;border:0;border-bottom:1.5px solid var(--ink-3);background:transparent;border-radius:0;margin:0 4px}
+.blank input:focus{outline:0;border-bottom-color:var(--blue)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2 .lab{font-size:13px;font-weight:600;margin-bottom:4px;color:var(--ink-2)}
+.mtx{width:100%;border-collapse:collapse;font-size:14px}
+.mtx th,.mtx td{border:1px solid var(--line);padding:9px 10px;text-align:center}
+.mtx td:first-child,.mtx th:first-child{text-align:left}
+.mtx input{accent-color:var(--blue)}
+.mtx th{background:var(--line-2);font-weight:600;font-size:13px}
+.rows3 .row{display:grid;grid-template-columns:170px 1fr;gap:10px;align-items:start;margin-bottom:10px}
+.rows3 .row .lb{font-weight:600;color:var(--blue);padding-top:8px}
+.claimgrid{display:grid;grid-template-columns:80px 1fr 1fr 150px;gap:8px;align-items:start}
+.claimgrid .hd{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.claimgrid .lb{font-weight:600;color:var(--blue);padding-top:8px}
+.claimgrid textarea{min-height:64px}
+.claimgrid .opts{gap:2px}
+.claimgrid .opt{padding:4px 6px;font-size:13.5px}
+.judge{display:grid;grid-template-columns:80px 190px 1fr;gap:8px;align-items:start;margin-bottom:8px}
+.judge .lb{font-weight:600;color:var(--blue);padding-top:8px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.compare .col{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.compare .col .k{font-size:12.5px;color:var(--ink-3);margin-bottom:4px}
+.compare .col .v{font-weight:600}
+.compare .col .v.empty{color:var(--ink-3);font-weight:400}
+
+.stage.locked textarea,.stage.locked input,.stage.locked select{background:#f5f7fa;color:var(--ink-2)}
+.stage.locked .opt{cursor:default}
+.lockbar{display:flex;gap:10px;align-items:center;background:var(--ok-soft);color:#125c3c;border-radius:8px;padding:9px 14px;font-size:13.5px;margin:0 0 18px}
+.lockbar::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok)}
+
+.btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:9px 16px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600}
+.btn:hover{background:var(--line-2)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--blue-ink)}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn.ghost{border-color:transparent;color:var(--ink-3)}
+.btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:36px;padding-top:20px;border-top:1px solid var(--line)}
+.nav .hint{font-size:13px;color:var(--ink-3)}
+
+@media (max-width:820px){
+  .app{grid-template-columns:1fr}
+  .rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:14px 16px}
+  .rail .steps{display:flex;gap:4px;overflow:auto;padding-bottom:4px}
+  .rail .steps li{flex:none;padding:6px 10px;font-size:13px}
+  .rail .steps li .lbl{display:none}
+  .rail .steps li.current .lbl{display:inline}
+  .rail .who{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:0;margin-top:10px;padding-top:0}
+  .rail .tools{flex-direction:row;flex-wrap:wrap;margin-top:12px}
+  .main{padding:22px 16px 60px}
+  .two,.grid2,.compare{grid-template-columns:1fr}
+  .claimgrid{grid-template-columns:1fr}
+  .judge{grid-template-columns:1fr}
+  .stage h1{font-size:22px}
+}
+
+/* 장면 카드 */
+.scenes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}
+.scene{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.scene .sh{background:var(--line-2);padding:8px 14px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.scene .sb{padding:12px 14px;font-size:14px}
+.scene .bubble{display:inline-block;background:var(--blue-soft);color:var(--blue-ink);border-radius:12px 12px 12px 3px;padding:6px 11px;margin:4px 0;font-size:13.5px}
+.scene .bubble.me{background:#e5f5ec;color:#125c3c;border-radius:12px 12px 3px 12px}
+.scene .snsq{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px}
+.scene .snsq b{display:block;font-size:13.5px}
+.scene .snsq .r{color:var(--ink-3);font-size:12px;margin-top:4px}
+.quotes{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;margin:10px 0}
+.quotes p{margin:4px 0;font-size:14.5px}
+.quotes p::before{content:"“ ";color:var(--ink-3)}
+.vs{display:grid;grid-template-columns:1fr 40px 1fr;gap:8px;align-items:center;margin:12px 0}
+.vs .fr{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.vs .fr .fh{padding:8px 12px;font-size:12.5px;font-weight:600;background:var(--line-2)}
+.vs .fr .fb{padding:14px;font-size:14px;min-height:96px}
+.vs .fr.after .fh{background:#fdeaf1;color:#b81f56}
+.vs .mid{text-align:center;font-size:11px;color:var(--ink-3);font-weight:600}
+.spread{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+.spread .sp{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px}
+.spread .sp b{display:block;font-size:13px;margin-bottom:3px}
+.spectrum{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:10px 0 4px}
+.spectrum .sg{padding:10px 8px;border-radius:8px;font-size:12.5px;text-align:center;font-weight:600;line-height:1.35}
+.spectrum .sg.k{background:var(--blue-soft);color:var(--blue-ink)}
+.spectrum .sg.m{background:#fdeaf1;color:#b81f56}
+.spectrum-lab{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-3);margin-bottom:8px}
+.spectrum-lab span:last-child{color:#b81f56;font-weight:600}
+.persp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.persp .pc{border-radius:12px;padding:14px 16px;border:1.5px solid}
+.persp .pc.v{border-color:#e0457b;background:#fff7fa}
+.persp .pc.m{border-color:#2f6fed;background:#f5f8ff}
+.persp .pc b.t{display:block;font-size:15px;margin-bottom:8px}
+.persp .pc ol{margin:0 0 8px;padding-left:20px;font-size:14px}
+.persp .pc li{margin-bottom:4px}
+.persp .pc .qt{font-size:14px;font-style:italic;color:var(--ink-2)}
+@media (max-width:820px){.scenes,.spread,.persp{grid-template-columns:1fr}.vs{grid-template-columns:1fr}.vs .mid{display:none}.spectrum{grid-template-columns:repeat(3,1fr)}}
+
+#printView{display:none}
+@media print{
+  @page{size:A4;margin:16mm 15mm}
+  body{background:#fff;font-size:11.5pt;color:#000}
+  .app{display:none!important}
+  #printView{display:block}
+  .pv h1{font-size:17pt;margin:0 0 2pt}
+  .pv .meta{font-size:10pt;color:#444;margin-bottom:10pt;display:flex;justify-content:space-between;border-bottom:1.5px solid #000;padding-bottom:6pt}
+  .pv .kq{border-left:3pt solid #2457d6;padding:5pt 9pt;margin:6pt 0 10pt;font-weight:600;background:none;border-radius:0;color:#000}
+  .pv h2{font-size:13pt;margin:14pt 0 5pt;padding-bottom:3pt;border-bottom:1px solid #999;break-after:avoid}
+  .pv h3{font-size:11.5pt;margin:9pt 0 4pt;break-after:avoid}
+  .pv .item{margin:0 0 7pt;break-inside:avoid}
+  .pv .item .l{font-weight:600;font-size:10.5pt;color:#333}
+  .pv .item .v{border:1px solid #bbb;padding:5pt 7pt;min-height:22pt;white-space:pre-wrap;margin-top:2pt;border-radius:3pt}
+  .pv .item .v.inline{border:0;padding:0;min-height:0;margin-top:0;white-space:normal;line-height:1.9}
+  .pv .blank{border-bottom:1px solid #000;padding:0 4pt;font-weight:600}
+  .pv .blank.empty{color:#999;font-weight:400}
+  .pv .empty{color:#999}
+  .pv .stamp{font-size:9pt;color:#666;margin-left:6pt;font-weight:400}
+  .pv table{width:100%;border-collapse:collapse;font-size:10.5pt;margin:4pt 0 8pt}
+  .pv th,.pv td{border:1px solid #999;padding:4pt 6pt;vertical-align:top;white-space:pre-wrap}
+  .pv th{background:#eee;text-align:left}
+  .pv .summary{border:1.5px solid #000;padding:8pt 10pt;margin:10pt 0 4pt;break-inside:avoid}
+  .pv .summary h2{border:0;margin:0 0 6pt;padding:0}
+  .pv .pb{break-before:page}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="rail">
+    <div class="unit" id="railUnit"></div>
+    <h1 class="title" id="railTitle"></h1>
+    <ul class="steps" id="steps"></ul>
+    <div class="who">
+      <label for="cls">학번</label><input id="cls" placeholder="예: 10315">
+      <label for="nm">이름</label><input id="nm" placeholder="이름">
+    </div>
+    <div class="tools">
+      <button class="btn" id="btnPrint">PDF로 저장</button>
+      <button class="btn ghost sm" id="btnReset">처음부터 다시 하기</button>
+      <div class="save" id="saveMsg"></div>
+    </div>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+<div id="printView"></div>
+
+<script>
+/* =====================================================================
+   모듈 정의 — 교재(학생용 V3, 5. 딥페이크 대응)의 장 구조를 그대로 옮김
+   ===================================================================== */
+const MODULE = {
+  key:"ai-ethics-05-deepfake",
+  unit:"고등학교 AI 윤리 · 5차시",
+  railTitle:"AI 변형 콘텐츠의<br>공개와 피해 대응",
+  printTitle:"5. 딥페이크 대응 — AI 변형 콘텐츠의 공개와 피해 대응",
+  keyQuestion:"AI로 실제 사람의 모습이나 목소리를 바꿔 공개하려면 어떤 동의가 필요하고, 문제가 생기면 누가 어떻게 대응해야 할까?",
+  compare:{firstKey:"s1.judge", firstWhy:"s1.judgeWhy", firstStage:"s1", firstLabel:"1단계 · 1차 판단", lastKey:"s4.final", lastWhy:"s4.finalWhy", lastStage:"s4", lastLabel:"4단계 · 최종 판단"},
+  summary:[
+    ["1차 판단 (1단계 ②)","s1.judge"],
+    ["판단 갱신 흐름 (2단계 조사 1→4)",["s2.u1","s2.u2","s2.u3","s2.u4"]],
+    ["다르게 느껴진 지점 (3단계)","s3.spot"],
+    ["최종 판단 (4단계)","s4.final"],
+    ["영상 처리 결정 (5단계 ①)","s5.decide"],
+    ["판단 변화 (6단계 ①)","s6.change"]
+  ]
+};
+
+const UPDATE=["유지 — 처음 판단과 같다.","수정 — 다른 처리 방법이 더 적절하다고 본다.","조건 추가 — 특정 조건이 충족되어야 한다고 본다.","판단 보류 — 중요한 정보가 더 필요하다."];
+const HANDLE=["게시를 유지한다.","우선 비공개한다.","해당 장면을 수정한 뒤 다시 게시한다.","삭제한다.","추가 정보를 확인한 뒤 결정한다."];
+
+const STAGES = [
+/* ---------------- 1. 주제 만나기 ---------------- */
+{
+  id:"s1", short:"주제 만나기", title:"1. 주제 만나기", sub:"딥페이크 대응",
+  blocks:[
+    {kind:"kq"},
+    {kind:"h2", text:"생각 열기 — 사건 01. 축제 홍보영상에서 무슨 일이 있었을까?"},
+    {kind:"html", html:`
+      <p>학교 축제 홍보영상에서 문제가 생겼습니다. 세 장면을 보고 무슨 일이 있었는지 추론해 봅시다.</p>
+      <div class="scenes">
+        <div class="scene"><div class="sh">장면 1 · 축제 준비 현장</div><div class="sb">카메라를 든 학생회 학생이 묻습니다.<br><span class="bubble">축제 홍보영상에 잠깐 나와도 될까?</span><br>학생이 답합니다.<br><span class="bubble me">응.</span></div></div>
+        <div class="scene"><div class="sh">장면 2 · 학교 공식 SNS</div><div class="sb"><div class="snsq"><b>OO고 축제 하이라이트, 함께 만드는 특별한 하루!</b>#OO고등학교 #학교축제 #청춘은지금여기<br><span style="color:var(--ink-2)">영상 속 학생이 활짝 웃으며 손을 흔들고 있다. (1:30)</span><div class="r">♡ 1.2천 · 💬 238 · ↗ 76 · “너무 보기 좋아요!” “OO고 최고!”</div></div></div></div>
+        <div class="scene"><div class="sh">장면 3 · 그날 밤, 학생의 방</div><div class="sb">영상에 나온 학생이 휴대전화를 보다가 메시지를 보냅니다.<br><span class="bubble me">이 영상은 내려 줬으면 좋겠어.</span><br><span class="note">오후 9:14</span></div></div>
+      </div>`},
+    {kind:"h2", text:"먼저 생각해 보기"},
+    {kind:"pair", title:"1. 세 장면에서 확인할 수 있는 사실과, 아직 추측에 불과한 것을 구분해 봅시다.", la:"지금 확인할 수 있는 사실", lb:"내가 추측하는 것", a:[{key:"s1.fact", type:"text", rows:4}], b:[{key:"s1.guess", type:"text", rows:4}]},
+    {kind:"field", key:"s1.judge", no:"2.", label:"지금 알고 있는 정보만으로 판단한다면 게시된 영상을 어떻게 처리하는 것이 좋을까요?", type:"radio", required:true, options:HANDLE},
+    {kind:"field", key:"s1.judgeWhy", label:"그렇게 판단한 가장 중요한 이유", type:"text"},
+    {kind:"field", key:"s1.check", no:"3.", label:"이 사건을 판단하려면 가장 먼저 무엇을 확인해야 할까요?", type:"text"}
+  ]
+},
+/* ---------------- 2. 근거 탐구하기 ---------------- */
+{
+  id:"s2", short:"근거 탐구하기", title:"2. 근거 탐구하기", sub:"사건 조사 — 새로운 정보가 나오면 판단도 달라질까?",
+  lead:"처음에는 사건의 일부만 알고 있었습니다. 이제 조사 기록을 차례로 확인해 봅시다. 각 자료에서 정답을 찾기보다 새로운 정보가 내 판단에 어떤 영향을 주는지 생각해 보세요.",
+  blocks:[
+    {kind:"echo", items:[["나의 1차 판단","s1.judge"]]},
+    {kind:"reveal", id:"i1", need:[], text:"조사 1. 촬영 당시에는 어떤 이야기를 했을까?", btn:"조사 1 열기"},
+    {kind:"h2", gate:"i1", text:"조사 1. 촬영 당시에는 어떤 이야기를 했을까?"},
+    {kind:"html", gate:"i1", html:`<div class="quotes"><div class="note" style="margin-bottom:4px">촬영 당시 대화 기록</div><p><b>학생회:</b> 축제 홍보영상에 잠깐 나와도 될까? 편집해서 학교 SNS에도 올릴 거야.”</p><p><b>학생:</b> 응, 괜찮아.”</p></div>`},
+    {kind:"field", gate:"i1", key:"s2.c1", label:"이 대화만으로 확인할 수 있는 내용을 모두 고르세요.", type:"check", options:["촬영한다는 사실을 알았다.","영상을 편집한다는 사실을 알았다.","학교 SNS에 게시한다는 사실을 알았다.","어떤 방식과 범위로 편집할지 구체적으로 설명을 들었다."]},
+    {kind:"field", gate:"i1", key:"s2.u1", label:"이 자료를 확인한 뒤 내 판단은?", type:"radio", required:true, options:UPDATE},
+    {kind:"field", gate:"i1", key:"s2.w1", label:"판단에 영향을 준 정보", type:"text", rows:2},
+
+    {kind:"reveal", id:"i2", gate:"i1", need:["s2.u1"], text:"조사 2. 영상에서 무엇을 바꿨을까?", btn:"조사 2 열기"},
+    {kind:"h2", gate:"i2", text:"조사 2. 영상에서 무엇을 바꿨을까?"},
+    {kind:"html", gate:"i2", html:`<div class="vs">
+        <div class="fr"><div class="fh">실제 촬영 (0:15)</div><div class="fb">축제 현수막 앞에 선 학생. 차분한 표정으로 카메라를 바라보고 있다. 손은 내린 채 별다른 동작이 없다.</div></div>
+        <div class="mid">생성형 AI 편집 →</div>
+        <div class="fr after"><div class="fh">학교 공식 SNS 게시 영상 (0:15)</div><div class="fb">같은 장소, 같은 학생. 활짝 웃는 표정으로 카메라를 향해 손을 흔들고 있다. 배경과 색감도 한층 밝게 정리되었다.</div></div>
+      </div>`},
+    {kind:"field", gate:"i2", key:"s2.u2", label:"이 자료를 확인한 뒤 내 판단은?", type:"radio", required:true, options:UPDATE},
+    {kind:"field", gate:"i2", key:"s2.w2", label:"판단에 영향을 준 정보", type:"text", rows:2},
+
+    {kind:"reveal", id:"i3", gate:"i2", need:["s2.u2"], text:"조사 3. 영상 제작 학생은 왜 그렇게 편집했을까?", btn:"조사 3 열기"},
+    {kind:"h2", gate:"i3", text:"조사 3. 영상 제작 학생은 왜 그렇게 편집했을까?"},
+    {kind:"html", gate:"i3", html:`<div class="quotes"><div class="note" style="margin-bottom:4px">영상 제작 학생 설명</div>
+      <p>영상 전체를 밝은 축제 분위기로 만들고 싶었어요.”</p>
+      <p>다른 장면에서도 색이나 배경을 정리하는 AI 기능을 사용했습니다.”</p>
+      <p>촬영 전에 편집해서 학교 SNS에 올린다고 설명했기 때문에, 이런 AI 편집도 그 범위에 포함된다고 생각했어요.”</p>
+      <p>학생을 놀리거나 속일 의도는 없었습니다.”</p></div>`},
+    {kind:"field", gate:"i3", key:"s2.u3", label:"이 설명을 확인한 뒤 내 판단은?", type:"radio", required:true, options:UPDATE},
+    {kind:"field", gate:"i3", key:"s2.w3", label:"제작 학생의 설명에서 고려할 점이 있었나요?", type:"radio", options:[{etc:"있었다 → 어떤 점인가요?"},"없었다"]},
+
+    {kind:"reveal", id:"i4", gate:"i3", need:["s2.u3"], text:"조사 4. 영상이 게시된 뒤에는 어떤 상황이 생겼을까?", btn:"조사 4 열기"},
+    {kind:"h2", gate:"i4", text:"조사 4. 영상이 게시된 뒤에는 어떤 상황이 생겼을까?"},
+    {kind:"html", gate:"i4", html:`<p>여러 동아리가 이미 학교 공식 홍보영상 링크를 자신의 홍보 글에 사용했고, 영상은 학생들의 개인 SNS와 단체 채팅방에도 다시 공유되었습니다.</p>
+      <div class="spread">
+        <div class="sp"><b>📣 동아리 계정</b>“축제에서 만나요!” #OO고축제 #동아리와함께 — 공식 영상 링크 첨부</div>
+        <div class="sp"><b>📷 학생 개인 SNS</b>“우리 학교 축제 최고!” #OO고축제 #우리더빛나는오늘 — 영상 재공유</div>
+        <div class="sp"><b>💬 단체 채팅방</b>“내일 축제 꼭 가자!” — 영상 다시 공유</div>
+      </div>
+      <div class="box tint"><b>D-1</b> 축제는 다음 날입니다.</div>
+      <div class="quotes"><div class="note" style="margin-bottom:4px">영상 출현 학생 설명</div>
+      <p>축제 홍보에 참여한 걸 후회하는 건 아니야.”</p>
+      <p>학교 SNS에 올리는 것도 알고 있었어.”</p>
+      <p>하지만 내가 하지 않은 행동을 내가 한 것처럼 만드는 건 다른 문제라고 생각해.”</p></div>`},
+    {kind:"field", gate:"i4", key:"s2.u4", label:"조사를 마친 지금, 내 판단은?", type:"radio", required:true, options:UPDATE},
+    {kind:"field", gate:"i4", key:"s2.w4", label:"지금까지 확인한 정보 중 내 판단에 가장 큰 영향을 준 것은 무엇인가요?", type:"text"}
+  ]
+},
+/* ---------------- 3. 개념으로 다시 보기 ---------------- */
+{
+  id:"s3", short:"개념으로 다시 보기", title:"3. 개념으로 다시 보기", sub:"‘편집에 동의했다’면 어디까지 바꿔도 될까?",
+  blocks:[
+    {kind:"html", html:`<p>아래 여섯 단계를 보고, 처음 들은 ‘편집’과 다르게 느껴지는 지점에 표시해 보세요.</p>
+      <div class="spectrum-lab"><span>기존 촬영을 정리하는 변화</span><span>실제로 없던 표현이나 행동을 만드는 변화</span></div>
+      <div class="spectrum"><div class="sg k">밝기와<br>색 조절</div><div class="sg k">배경<br>정리</div><div class="sg k">잡음<br>제거</div><div class="sg m">웃는 표정<br>만들기</div><div class="sg m">손 흔드는<br>행동 만들기</div><div class="sg m">말하지 않은<br>대사 만들기</div></div>`},
+    {kind:"field", key:"s3.spot", label:"여기부터 처음 들은 ‘편집’과 다르게 느껴진다", type:"radio", inline:true, required:true, options:["밝기와 색 조절","배경 정리","잡음 제거","웃는 표정 만들기","손 흔드는 행동 만들기","말하지 않은 대사 만들기"]},
+    {kind:"field", key:"s3.spotWhy", label:"왜 그렇게 생각했나요?", type:"text"},
+    {kind:"html", html:`<div class="two">
+        <div class="concept"><b class="t">01 동의의 범위</b><p>동의의 범위는 당사자가 무엇을, 어떤 목적으로, 어떤 방식과 범위에서 허락했는지를 살펴보는 관점입니다. 같은 ‘편집’이라는 설명을 들었더라도, 구체적으로 어떤 변화를 예상했는지에 따라 동의의 범위를 다르게 볼 수 있습니다.</p><div class="box tint" style="margin:0"><b>이 사건에 던지는 질문</b><br>촬영 전에 말한 ‘편집’에는 실제로 하지 않은 표정과 행동을 만드는 것까지 포함된다고 볼 수 있을까?</div></div>
+        <div class="concept"><b class="t">02 인격권</b><p>인격권은 얼굴이나 목소리, 명예와 정체성처럼 한 사람의 인격적 가치와 관련된 권리입니다. 이 관점에서는 AI로 바뀐 모습이 그 사람을 어떻게 표현하고, 다른 사람들이 그 사람을 어떻게 받아들이게 하는지를 살펴봅니다.</p><div class="box tint" style="margin:0"><b>이 사건에 던지는 질문</b><br>실제로 하지 않은 행동이 자신의 모습으로 공개되는 것은 영상 속 학생에게 어떤 의미가 있을까?</div></div>
+      </div><p class="note">※ 이 개념만으로 법적 책임이나 위법 여부가 자동으로 결정되는 것은 아닙니다.</p>`},
+    {kind:"h2", text:"개념을 적용해 사건을 다시 보면?"},
+    {kind:"field", key:"s3.apply", label:"두 개념을 살펴본 뒤, 새롭게 고려할 필요가 있다고 생각한 점이 있나요?", type:"radio", required:true, options:[{etc:"있다 → 어떤 점인가요?"},"없다"]}
+  ]
+},
+/* ---------------- 4. 근거로 판단하기 ---------------- */
+{
+  id:"s4", short:"근거로 판단하기", title:"4. 근거로 판단하기", sub:"두 관점을 함께 놓고 보면",
+  blocks:[
+    {kind:"html", html:`<div class="persp">
+        <div class="pc v"><b class="t">영상에 나온 학생의 관점</b><ol><li>촬영과 편집, 학교 SNS 게시에 대해서는 알고 있었다.</li><li>실제로 하지 않은 표정과 행동을 만드는 편집은 예상하지 못했다.</li><li>홍보 참여 자체보다, 하지 않은 행동이 자신의 모습으로 공개된 점을 문제로 보고 있다.</li></ol><div class="qt">“내가 하지 않은 행동을 내가 한 것처럼 만드는 건 다르다고 생각해.”</div></div>
+        <div class="pc m"><b class="t">영상 제작 학생의 관점</b><ol><li>촬영과 편집, 학교 SNS 게시까지는 미리 설명했다.</li><li>밝은 축제 분위기를 만들기 위한 편집이었고, 학생을 놀리거나 속일 의도는 없었다.</li><li>이런 AI 편집도 처음 설명한 ‘편집’의 범위에 포함된다고 생각했다.</li></ol><div class="qt">“학생을 일부러 왜곡하거나 속일 생각은 없었어요.”</div></div>
+      </div>
+      <div class="box"><b>함께 고려할 상황</b> — 축제는 다음 날이며, 영상은 이미 다른 곳에도 다시 공유된 상태입니다.</div>`},
+    {kind:"h2", text:"다른 관점까지 검토하기"},
+    {kind:"field", key:"s4.other", label:"두 관점을 살펴본 뒤, 내 판단에서 고려할 필요가 있다고 본 점이 있나요?", type:"radio", required:true, options:[{etc:"있다 → 어떤 점인가요?"},"없다"]},
+    {kind:"h2", text:"최종 판단"},
+    {kind:"html", html:`<p>지금까지 확인한 사건 자료와 필요한 핵심 개념, 다른 관점을 바탕으로 최종 판단을 내려 보세요.</p>`},
+    {kind:"echo", items:[["나의 1차 판단","s1.judge"],["조사 4 이후 판단","s2.u4"]]},
+    {kind:"field", key:"s4.final", label:"나의 최종 판단", type:"radio", required:true, options:HANDLE},
+    {kind:"field", key:"s4.finalWhy", label:"최종 판단에서 가장 중요하게 본 근거", type:"text", rows:4}
+  ]
+},
+/* ---------------- 5. 산출물 완성하기 ---------------- */
+{
+  id:"s5", short:"산출물 완성하기", title:"5. 산출물 완성하기", sub:"딥페이크 사건 판단 및 대응 결정서 — 학생회 AI 윤리위원회 | 사건 01",
+  lead:"지금까지의 조사와 판단을 바탕으로, 이번 사건에서 해야 할 일과 앞으로 지켜야 할 기준을 정해 봅시다.",
+  blocks:[
+    {kind:"echo", items:[["4단계 최종 판단","s4.final"]]},
+    {kind:"field", key:"s5.decide", no:"①", label:"영상 처리 결정", help:"현재 게시된 영상을 어떻게 처리할 것인가?", type:"radio", required:true, options:HANDLE},
+    {kind:"h2", text:"② 결정한 뒤 무엇을 해야 할까?"},
+    {kind:"html", html:`<p>선택한 영상 처리 결정을 실행하려면 무엇을 해야 할까요?</p>`},
+    {kind:"rows", rows:[["먼저 해야 할 일","s5.first","text"],["확인하거나 조정해야 할 일","s5.adjust","text"]]},
+    {kind:"h2", text:"③ 추가로 대응해야 할 것은 무엇일까?"},
+    {kind:"html", html:`<p>결정 이후에도 남아 있는 문제에 어떻게 대응할까요?</p><p class="note">※ 추가 대응이 필요하지 않다고 판단한 경우에는 ‘없음’이라고 적어도 됩니다.</p>`},
+    {kind:"rows", title:"확인할 문제 → 필요한 대응", rows:[["이미 다른 곳에 공유된 영상","s5.shared","text"],["영상에 나온 학생의 문제 제기","s5.claim","text"]]},
+    {kind:"h2", text:"④ 다음 학교 홍보영상부터 지킬 기준"},
+    {kind:"html", html:`<p>이번 사건을 바탕으로, 앞으로 학생이 등장하는 영상을 만들 때 확인할 기준을 정해 봅시다.</p>`},
+    {kind:"rows", title:"언제 → 무엇을 확인하거나 해야 할까?", rows:[["촬영 전","s5.r1","text"],["AI로 모습이나 행동을 바꾸기 전","s5.r2","text"],["게시 전","s5.r3","text"],["게시 뒤 문제가 제기되면","s5.r4","text"]]}
+  ]
+},
+/* ---------------- 6. 돌아보기 ---------------- */
+{
+  id:"s6", short:"돌아보기", title:"6. 돌아보기", sub:"처음과 지금, 나의 판단은 어떻게 달라졌을까?",
+  lead:"처음 사건을 보았을 때의 판단과, 사건을 조사하고 개념과 다른 관점을 살펴본 뒤의 판단을 비교해 봅시다.",
+  blocks:[
+    {kind:"compare"},
+    {kind:"trail", title:"판단 갱신 흔적", items:[["1차 판단","s1.judge"],["조사 1","s2.u1"],["조사 2","s2.u2"],["조사 3","s2.u3"],["조사 4","s2.u4"],["최종 판단","s4.final"]]},
+    {kind:"field", key:"s6.change", no:"①", label:"처음과 비교하면 나의 판단은", type:"radio", inline:true, required:true, options:["유지되었다.","수정되었다.","조건이 추가되었다.","아직 판단을 유보한다."]},
+    {kind:"field", key:"s6.key", no:"②", label:"무엇이 내 판단에 가장 중요했을까?", help:"이번 사건을 판단할 때 특히 중요했다고 생각한 것을 1~2개 고르세요.", type:"check", max:2, options:["촬영 전에 나눈 대화","AI가 실제로 바꾼 내용","영상 제작 학생의 설명","영상이 다른 곳으로 다시 공유된 상황","영상에 나온 학생의 설명","동의의 범위","인격권","다른 관점 검토"]},
+    {kind:"field", key:"s6.keyWhy", label:"이것은 내 판단에 어떤 영향을 주었나요?", type:"text"},
+    {kind:"field", key:"s6.more", no:"③", label:"아직 더 확인하고 싶은 것이 있을까?", help:"더 정확하게 판단하려면 추가로 확인할 정보가 있나요? 없다면 ‘현재 자료로 판단할 수 있다’고 적어도 됩니다.", type:"text"},
+    {kind:"h2", text:"스스로 확인하기"},
+    {kind:"matrix", key:"s6.self", cols:["충분히 수행함","대체로 수행함","보완 필요"], rows:[
+      "새로운 정보를 확인하면서 처음의 판단을 계속 검토하였다.",
+      "동의의 범위와 인격권을 사건의 구체적인 상황에 적용하였다.",
+      "다른 관점을 고려하여 사건의 처리와 대응 기준을 구체적으로 제안하였다."]}
+  ]
+}
+];
+
+/* =====================================================================
+   엔진 — 상태
+   ===================================================================== */
+const KEY=MODULE.key;
+let S=load();
+function blank(){ return {answers:{},current:0,locked:[],clues:{},stamps:{},meta:{}}; }
+function load(){ try{ const j=JSON.parse(localStorage.getItem(KEY)); if(j&&j.answers) return Object.assign(blank(),j);}catch(e){} return blank(); }
+let saveT=null;
+function save(){ clearTimeout(saveT); saveT=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); const d=new Date(); msg(`자동 저장됨 ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`);}catch(e){ msg("저장 실패: 브라우저 저장 공간을 확인하세요."); } },250); }
+function msg(t){ document.getElementById("saveMsg").textContent=t; }
+const pad=n=>String(n).padStart(2,"0");
+const get=k=>S.answers[k];
+const set=(k,v)=>{ S.answers[k]=v; save(); };
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+
+/* 필드 색인 (인쇄·검증용) */
+const JUDGE=[];
+const FIELDS={};
+function collectFields(){
+  STAGES.forEach(st=>st.blocks.forEach(b=>{
+    const add=f=>{ if(f&&f.key) FIELDS[f.key]=f; };
+    if(b.kind==="field") add(b);
+    if(b.kind==="pair"){ b.a.forEach(add); b.b.forEach(add); }
+    if(b.kind==="clue") b.fields.forEach(add);
+    if(b.kind==="rows") b.rows.forEach(r=>add({key:r[1],label:r[0],type:r[2]||"line"}));
+    if(b.kind==="claims") b.rows.forEach(r=>{ add({key:r.ok,label:r.lb+" 자료로 확인할 수 있는 것",type:"text"}); add({key:r.not,label:r.lb+" 아직 확정해서 말하기 어려운 것",type:"text"}); add({key:r.src,label:r.lb+" 근거 자료",type:"check",options:r.srcOpts}); });
+    if(b.kind==="judge") b.rows.forEach(r=>{ add({key:r[1],label:r[0]+" 판정",type:"select",options:JUDGE}); add({key:r[2],label:r[0]+" 이 판정을 가른 가장 중요한 이유",type:"text"}); });
+  }));
+}
+collectFields();
+
+/* =====================================================================
+   렌더링
+   ===================================================================== */
+const main=document.getElementById("main");
+function isOpen(gate){ return !gate || !!S.clues[gate]; }
+function render(){
+  main.innerHTML="";
+  STAGES.forEach((st,i)=>{
+    const sec=document.createElement("section");
+    sec.className="stage"+(i===S.current?" active":"")+(S.locked.includes(i)?" locked":"");
+    sec.dataset.i=i;
+    let h=`<h1><small>${esc(st.sub||"")}</small>${esc(st.title)}</h1>`;
+    if(S.locked.includes(i)) h+=`<div class="lockbar">이 단계는 ${esc(S.stamps[st.id]||"")}에 제출되어 잠겼습니다. 답은 읽기만 할 수 있습니다.</div>`;
+    if(st.lead) h+=`<p class="lead">${esc(st.lead)}</p>`;
+    h+=st.blocks.map(b=>{ if(!isOpen(b.gate)) return ""; return renderBlock(b,st,i); }).join("");
+    h+=renderNav(i);
+    sec.innerHTML=h;
+    main.appendChild(sec);
+  });
+  bind(); renderSteps(); lockInputs();
+  if(STAGES[S.current].blocks.some(b=>b.kind==="compare")) renderCompare();
+  window.scrollTo({top:0});
+}
+function renderBlock(b){
+  switch(b.kind){
+    case "kq": return `<div class="kq"><span class="tag">핵심 질문</span>${esc(MODULE.keyQuestion)}</div>`;
+    case "h2": return `<h2>${esc(b.text)}</h2>`;
+    case "h3": return `<h3>${esc(b.text)}</h3>`;
+    case "html": return `<div>${b.html}</div>`;
+    case "field": return `<div class="q">${fieldHead(b)}${fieldInput(b)}</div>`;
+    case "pair": return `<div class="q">${b.title?`<div class="ql">${esc(b.title)}</div>`:""}<div class="grid2">
+        <div><div class="lab">${esc(b.la||"A")}</div>${b.a.map(f=>`<div style="margin-bottom:10px">${f.label?`<div class="qh">${esc(f.label)}</div>`:""}${fieldInput(f)}</div>`).join("")}</div>
+        <div><div class="lab">${esc(b.lb||"B")}</div>${b.b.map(f=>`<div style="margin-bottom:10px">${f.label?`<div class="qh">${esc(f.label)}</div>`:""}${fieldInput(f)}</div>`).join("")}</div></div></div>`;
+    case "rows": return `<div class="q rows3">${b.title?`<div class="ql">${esc(b.title)}</div>`:""}${b.rows.map(r=>`<div class="row"><div class="lb">${esc(r[0])}</div>${fieldInput({key:r[1],type:r[2]||"line",rows:2})}</div>`).join("")}</div>`;
+    case "trail": return `<div class="q"><div class="ql">${esc(b.title)}</div><table class="mtx"><tr>${b.items.map(it=>`<th>${esc(it[0])}</th>`).join("")}</tr><tr>${b.items.map(it=>{const v=get(it[1]);const t=v&&v.value?v.value.split(" — ")[0]:"—";return `<td style="text-align:center;font-weight:600">${esc(t)}</td>`;}).join("")}</tr></table></div>`;
+    case "echo": return `<div class="echo">${b.items.map(it=>{ const v=get(it[1]); return `<div><b>${esc(it[0])}</b><span class="${v?"":"empty"}">${esc(v||"(아직 입력하지 않음)")}</span></div>`; }).join("")}</div>`;
+    case "reveal": {
+      if(S.clues[b.id]) return "";
+      const ready=b.need.every(k=>!isEmpty(FIELDS[k]||{type:"line"},get(k)));
+      return `<div class="reveal"><div class="rt">${esc(b.text)}${ready?"":"<br><span class='note'>위 항목을 먼저 입력하세요.</span>"}</div><button class="btn primary" data-reveal="${b.id}" ${ready?"":"disabled"}>${esc(b.btn)}</button></div>`;
+    }
+    case "clue": {
+      const open=!!S.clues[b.id];
+      return `<div class="clue${open?" open":""}" data-clue="${b.id}"><div class="ch"><b>${esc(b.title)}</b><span class="st">${open?"확인함":"아직 열지 않음"}</span>${open?"":`<button class="btn sm primary" data-reveal="${b.id}">열기</button>`}</div>
+        <div class="cb">${b.html}${b.fields.map(f=>`<div class="q" style="margin-bottom:0">${fieldHead(f)}${fieldInput(f)}</div>`).join("")}</div></div>`;
+    }
+    case "claims": return `<div class="q"><div class="claimgrid"><div></div><div class="hd">자료로 확인할 수 있는 것</div><div class="hd">아직 확정해서 말하기 어려운 것</div><div class="hd">근거 자료</div>
+      ${b.rows.map(r=>`<div class="lb">${esc(r.lb)}</div><div>${fieldInput({key:r.ok,type:"text",rows:3})}</div><div>${fieldInput({key:r.not,type:"text",rows:3})}</div><div>${fieldInput({key:r.src,type:"check",options:r.srcOpts})}</div>`).join("")}</div></div>`;
+    case "judge": return `<div class="q"><div class="judge"><div></div><div class="hd" style="font-size:12.5px;font-weight:600;color:var(--ink-2)">판정</div><div class="hd" style="font-size:12.5px;font-weight:600;color:var(--ink-2)">이 판정을 가른 가장 중요한 이유</div>
+      ${b.rows.map(r=>`<div class="lb">${esc(r[0])}</div><div>${fieldInput({key:r[1],type:"select",options:JUDGE})}</div><div>${fieldInput({key:r[2],type:"text",rows:2})}</div>`).join("")}</div></div>`;
+    case "matrix": return `<div class="q"><table class="mtx"><thead><tr><th>확인할 내용</th>${b.cols.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>
+      ${b.rows.map((r,ri)=>`<tr><td>${esc(r)}</td>${b.cols.map(c=>`<td><input type="radio" name="${b.key}.${ri}" data-key="${b.key}.${ri}" value="${esc(c)}" ${get(b.key+"."+ri)===c?"checked":""}></td>`).join("")}</tr>`).join("")}
+      </tbody></table></div>`;
+    case "compare": return `<div class="q"><div class="ql">처음 판단과 지금 판단</div><div class="compare" id="cmp"></div></div>`;
+  }
+  return "";
+}
+function fieldHead(b){ return `${b.label?`<div class="ql">${b.no?`<span class="no">${esc(b.no)}</span>`:""}<span>${esc(b.label)}</span></div>`:""}${b.help?`<div class="qh">${esc(b.help)}</div>`:""}`; }
+function fieldInput(b){
+  const v=get(b.key);
+  switch(b.type){
+    case "text": return `<textarea data-key="${b.key}" rows="${b.rows||3}" placeholder="${esc(b.placeholder||"")}">${esc(v||"")}</textarea>`;
+    case "line": return `<input type="text" data-key="${b.key}" value="${esc(v||"")}" placeholder="${esc(b.placeholder||"")}">`;
+    case "select": return `<select data-key="${b.key}" data-type="select"><option value="">선택</option>${b.options.map((o,i)=>`<option value="${esc(o)}" ${v===o?"selected":""}>${i+1}. ${esc(o)}</option>`).join("")}</select>`;
+    case "radio": { const cur=v||{};
+      return `<div class="opts${b.inline?" row":""}">${b.options.map(o=>{ const isEtc=typeof o==="object"; const val=isEtc?"__etc__":o; const sel=cur.value===val;
+        return `<label class="opt${sel?" sel":""}"><input type="radio" name="${b.key}" data-key="${b.key}" data-type="radio" value="${esc(val)}" ${sel?"checked":""}>${isEtc?`<span style="flex:none">${esc(o.etc)}:</span><input class="etc" type="text" data-etc="${b.key}" value="${esc(cur.etc||"")}" placeholder="직접 쓰기">`:`<span>${esc(o)}</span>`}</label>`;}).join("")}</div>`; }
+    case "check": { const cur=v||{values:[],etc:""};
+      return `<div class="opts">${b.options.map(o=>{ const isEtc=typeof o==="object"; const val=isEtc?"__etc__":o; const sel=cur.values.includes(val);
+        return `<label class="opt${sel?" sel":""}"><input type="checkbox" data-key="${b.key}" data-type="check" data-max="${b.max||0}" value="${esc(val)}" ${sel?"checked":""}>${isEtc?`<span style="flex:none">${esc(o.etc)}:</span><input class="etc" type="text" data-etc="${b.key}" value="${esc(cur.etc||"")}" placeholder="직접 쓰기">`:`<span>${esc(o)}</span>`}</label>`;}).join("")}</div>`; }
+    case "blank": { const parts=b.tpl.split("___"); const cur=Array.isArray(v)?v:[]; let out=`<div class="blank">`;
+      parts.forEach((p,pi)=>{ out+=esc(p).replace(/\n/g,"<br>"); if(pi<parts.length-1) out+=`<input type="text" data-key="${b.key}" data-type="blank" data-idx="${pi}" value="${esc(cur[pi]||"")}">`; });
+      return out+"</div>"; }
+  }
+  return "";
+}
+function renderNav(i){
+  const last=i===STAGES.length-1, locked=S.locked.includes(i);
+  return `<div class="nav"><div>${i>0?`<button class="btn" data-go="${i-1}">이전 단계 보기</button>`:""}</div>
+    <div class="hint">${locked?"":"제출하면 이 단계의 답은 고정됩니다."}</div>
+    <div>${locked?(last?`<button class="btn primary" data-print="1">PDF로 저장</button>`:`<button class="btn primary" data-go="${i+1}">다음 단계 보기</button>`):
+      (last?`<button class="btn primary" data-submit="${i}">제출하고 PDF 만들기</button>`:`<button class="btn primary" data-submit="${i}">제출하고 다음 단계로</button>`)}</div></div>`;
+}
+function renderSteps(){
+  const ul=document.getElementById("steps"); ul.innerHTML="";
+  STAGES.forEach((st,i)=>{ const li=document.createElement("li"); const done=S.locked.includes(i);
+    li.className=(done?"done":"")+(i===S.current?" current":"");
+    li.innerHTML=`<span class="n">${done?"✓":i+1}</span><span class="lbl">${esc(st.short)}</span>`;
+    li.addEventListener("click",()=>{ if(done||i===S.current){S.current=i;save();render();} });
+    ul.appendChild(li); });
+}
+function lockInputs(){ document.querySelectorAll(".stage.locked").forEach(sec=>sec.querySelectorAll("textarea,input,select,button[data-reveal]").forEach(el=>{ if(!el.closest(".nav")) el.disabled=true; })); }
+function renderCompare(){
+  const el=document.getElementById("cmp"); if(!el) return; const c=MODULE.compare;
+  const txt=r=>{ if(!r||!r.value) return `<span class="empty">(미입력)</span>`; return r.value==="__etc__"?esc(r.etc||"(다른 설명)"):esc(r.value); };
+  el.innerHTML=`<div class="col"><div class="k">${esc(c.firstLabel)} (${esc(S.stamps[c.firstStage]||"")})</div><div class="v">${txt(get(c.firstKey))}</div><div class="k" style="margin-top:8px">이유</div><div class="v ${get(c.firstWhy)?"":"empty"}">${esc(get(c.firstWhy)||"(미입력)")}</div></div>
+  <div class="col"><div class="k">${esc(c.lastLabel)} (${esc(S.stamps[c.lastStage]||"")})</div><div class="v">${txt(get(c.lastKey))}</div><div class="k" style="margin-top:8px">이유</div><div class="v ${get(c.lastWhy)?"":"empty"}">${esc(get(c.lastWhy)||"(미입력)")}</div></div>`;
+}
+
+/* =====================================================================
+   이벤트
+   ===================================================================== */
+function bind(){
+  main.querySelectorAll("textarea,input[type=text]").forEach(el=>{
+    if(el.dataset.etc){ el.addEventListener("input",()=>{ const k=el.dataset.etc; const cur=get(k)||{}; cur.etc=el.value; set(k,cur); }); return; }
+    if(el.dataset.type==="blank"){ el.addEventListener("input",()=>{ const k=el.dataset.key; const arr=Array.isArray(get(k))?get(k).slice():[]; arr[+el.dataset.idx]=el.value; set(k,arr); refreshReveals(); }); return; }
+    if(el.dataset.key) el.addEventListener("input",()=>{ set(el.dataset.key,el.value); refreshReveals(); });
+  });
+  main.querySelectorAll("select[data-key]").forEach(el=>el.addEventListener("change",()=>set(el.dataset.key,el.value)));
+  main.querySelectorAll("input[type=radio]").forEach(el=>el.addEventListener("change",()=>{
+    const k=el.dataset.key; if(el.dataset.type==="radio"){ const cur=get(k)||{}; cur.value=el.value; set(k,cur); } else set(k,el.value);
+    el.closest(".opts")?.querySelectorAll(".opt").forEach(o=>o.classList.toggle("sel",o.querySelector("input").checked));
+    refreshReveals();
+  }));
+  main.querySelectorAll("input[type=checkbox]").forEach(el=>el.addEventListener("change",()=>{
+    const k=el.dataset.key; const cur=get(k)||{values:[],etc:""}; const max=+el.dataset.max;
+    if(el.checked){ if(max&&cur.values.length>=max){ el.checked=false; toast(`최대 ${max}개까지 선택할 수 있습니다.`); return; } cur.values.push(el.value); }
+    else cur.values=cur.values.filter(x=>x!==el.value);
+    set(k,cur); el.closest(".opt").classList.toggle("sel",el.checked);
+  }));
+  main.querySelectorAll("[data-reveal]").forEach(b=>b.addEventListener("click",()=>{ S.clues[b.dataset.reveal]=true; save(); const y=window.scrollY; render(); window.scrollTo({top:y}); }));
+  main.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{ S.current=+b.dataset.go; save(); render(); }));
+  main.querySelectorAll("[data-submit]").forEach(b=>b.addEventListener("click",()=>submit(+b.dataset.submit)));
+  main.querySelectorAll("[data-print]").forEach(b=>b.addEventListener("click",doPrint));
+}
+/* 입력에 따라 리빌 버튼 활성화만 갱신 (전체 재렌더 없이) */
+function refreshReveals(){
+  document.querySelectorAll("[data-reveal]").forEach(btn=>{
+    const st=STAGES[S.current]; const b=st.blocks.find(x=>x.kind==="reveal"&&x.id===btn.dataset.reveal); if(!b) return;
+    const ready=b.need.every(k=>!isEmpty(FIELDS[k]||{type:"line"},get(k)));
+    btn.disabled=!ready; const note=btn.parentElement.querySelector(".note"); if(note) note.style.display=ready?"none":"";
+  });
+}
+function toast(t){ msg(t); setTimeout(()=>msg(""),2500); }
+function submit(i){
+  const st=STAGES[i]; const missing=[], req=[];
+  const walk=f=>{ if(!f||!f.key) return; if(isEmpty(f,get(f.key))) (f.required?req:missing).push(f.label||f.key); };
+  st.blocks.forEach(b=>{
+    if(b.kind==="field") walk(b);
+    if(b.kind==="pair"){ b.a.forEach(f=>walk(Object.assign({label:b.la},f))); b.b.forEach(f=>walk(Object.assign({label:b.lb},f))); }
+    if(b.kind==="clue"){ b.fields.forEach(walk); if(!S.clues[b.id]) req.push(b.title); }
+    if(b.kind==="reveal"&&!S.clues[b.id]) req.push(`“${b.btn}” 열기`);
+    if(b.kind==="rows") b.rows.forEach(r=>walk(FIELDS[r[1]]));
+    if(b.kind==="claims") b.rows.forEach(r=>[r.ok,r.not,r.src].forEach(k=>walk(FIELDS[k])));
+    if(b.kind==="judge") b.rows.forEach(r=>{ walk(Object.assign({required:true},FIELDS[r[1]])); walk(FIELDS[r[2]]); });
+    if(b.kind==="matrix") b.rows.forEach((r,ri)=>{ if(!get(b.key+"."+ri)) missing.push("스스로 확인하기 "+(ri+1)); });
+  });
+  if(i===0&&!(S.meta.cls&&S.meta.name)) req.push("학번·이름 (왼쪽 입력란)");
+  if(req.length){ alert("다음 항목은 꼭 입력해야 제출할 수 있습니다:\n\n- "+req.join("\n- ")); return; }
+  const warn=missing.length?`아직 비어 있는 항목이 ${missing.length}개 있습니다:\n- ${missing.slice(0,6).join("\n- ")}${missing.length>6?"\n- …":""}\n\n`:"";
+  if(!confirm(warn+"제출하면 이 단계의 답은 더 이상 고칠 수 없습니다. 제출할까요?")) return;
+  const d=new Date(); S.stamps[st.id]=`${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if(!S.locked.includes(i)) S.locked.push(i);
+  if(i<STAGES.length-1) S.current=i+1;
+  save(); render();
+  if(i===STAGES.length-1) setTimeout(doPrint,300);
+}
+function isEmpty(f,v){
+  if(v==null) return true;
+  if(f.type==="radio") return !v.value||(v.value==="__etc__"&&!(v.etc||"").trim());
+  if(f.type==="check") return !v.values||!v.values.length;
+  if(f.type==="blank") return !Array.isArray(v)||v.every(x=>!(x||"").trim());
+  return !String(v).trim();
+}
+
+/* =====================================================================
+   인쇄(PDF) 뷰 — STAGES 정의에서 자동 생성
+   ===================================================================== */
+function ans(f){
+  const v=get(f.key);
+  if(f.type==="radio"){ if(!v||!v.value) return `<span class="empty">(미입력)</span>`; return v.value==="__etc__"?`다른: ${esc(v.etc||"")}`:esc(v.value); }
+  if(f.type==="check"){ if(!v||!v.values.length) return `<span class="empty">(미선택)</span>`; return v.values.map(x=>x==="__etc__"?`☑ 다른: ${esc(v.etc||"")}`:`☑ ${esc(x)}`).join("<br>"); }
+  if(f.type==="blank"){ const parts=f.tpl.split("___"); const cur=Array.isArray(v)?v:[]; let o=""; parts.forEach((p,pi)=>{ o+=esc(p).replace(/\n/g,"<br>"); if(pi<parts.length-1) o+=`<span class="blank${(cur[pi]||"").trim()?"":" empty"}">${esc((cur[pi]||"").trim()||"　　　　　　")}</span>`; }); return o; }
+  return v&&String(v).trim()?esc(v):`<span class="empty">(미입력)</span>`;
+}
+function item(f){ return `<div class="item">${f.label?`<div class="l">${f.no?esc(f.no)+" ":""}${esc(f.label)}</div>`:""}<div class="v${f.type==="blank"?" inline":""}">${ans(f)}</div></div>`; }
+function plain(k){ const f=FIELDS[k]; const v=get(k); if(!f||v==null) return "—";
+  if(f.type==="radio") return v.value?(v.value==="__etc__"?(v.etc||"다른"):v.value):"—";
+  if(f.type==="check") return v.values&&v.values.length?v.values.map(x=>x==="__etc__"?(v.etc||"다른"):x).join(" / "):"—";
+  if(f.type==="blank") return Array.isArray(v)?v.filter(x=>x&&x.trim()).join(" / ")||"—":"—";
+  return String(v).trim()||"—"; }
+function buildPrint(){
+  const pv=document.getElementById("printView");
+  const stamp=id=>S.stamps[id]?`<span class="stamp">제출 ${esc(S.stamps[id])}</span>`:`<span class="stamp">(미제출)</span>`;
+  let h=`<div class="pv"><h1>${esc(MODULE.printTitle)}</h1>
+    <div class="meta"><span>고등학교 AI 윤리 교육 · 학생 활동지</span><span>${esc(S.meta.cls||"")} ${esc(S.meta.name||"")}</span></div>
+    <div class="kq">핵심 질문 — ${esc(MODULE.keyQuestion)}</div>
+    <div class="summary"><h2>답변 요약</h2><table>${MODULE.summary.map(([l,k])=>`<tr><th style="width:36%">${esc(l)}</th><td>${Array.isArray(k)?k.map((kk)=>esc(plain(kk).split(" — ")[0])).join(" → "):esc(plain(k))}</td></tr>`).join("")}</table>
+      <div style="font-size:9pt;color:#555">제출 단계 ${S.locked.length}/${STAGES.length}</div></div>`;
+  STAGES.forEach((st,si)=>{
+    h+=`<h2${si===3?" class='pb'":""}>${esc(st.title)}${st.sub?" — "+esc(st.sub):""} ${stamp(st.id)}</h2>`;
+    st.blocks.forEach(b=>{
+      switch(b.kind){
+        case "h2": if(/^[①-⑩0-9]/.test(b.text)||/확인하기|적용|원칙|단계/.test(b.text)) h+=`<h3>${esc(b.text)}</h3>`; break;
+        case "field": h+=item(b); break;
+        case "rows": h+=`<table>${b.rows.map(r=>`<tr><th style="width:18%">${esc(r[0])}</th><td>${ans(FIELDS[r[1]])}</td></tr>`).join("")}</table>`; break;
+        case "pair": h+=`<table><tr><th style="width:50%">${esc(b.la||"A")}</th><th>${esc(b.lb||"B")}</th></tr><tr><td>${b.a.map(f=>`${f.label?"<b>"+esc(f.label)+"</b><br>":""}${ans(f)}`).join("<br>")}</td><td>${b.b.map(f=>`${f.label?"<b>"+esc(f.label)+"</b><br>":""}${ans(f)}`).join("<br>")}</td></tr></table>`; break;
+        case "clue": b.fields.forEach(f=>h+=item(f)); break;
+        case "claims": h+=`<table><tr><th style="width:12%"></th><th>자료로 확인할 수 있는 것</th><th>아직 확정해서 말하기 어려운 것</th><th style="width:16%">근거 자료</th></tr>${b.rows.map(r=>`<tr><th>${esc(r.lb)}</th><td>${ans(FIELDS[r.ok])}</td><td>${ans(FIELDS[r.not])}</td><td>${ans(FIELDS[r.src])}</td></tr>`).join("")}</table>`; break;
+        case "judge": h+=`<table><tr><th style="width:12%"></th><th style="width:22%">판정</th><th>이 판정을 가른 가장 중요한 이유</th></tr>${b.rows.map(r=>`<tr><th>${esc(r[0])}</th><td>${esc(get(r[1])||"—")}</td><td>${ans(FIELDS[r[2]])}</td></tr>`).join("")}</table>`; break;
+        case "trail": h+=`<table><tr>${b.items.map(it=>`<th>${esc(it[0])}</th>`).join("")}</tr><tr>${b.items.map(it=>{const v=get(it[1]);return `<td>${esc(v&&v.value?v.value.split(" — ")[0]:"—")}</td>`;}).join("")}</tr></table>`; break;
+        case "matrix": h+=`<table><tr><th>확인할 내용</th><th style="width:22%">평가</th></tr>${b.rows.map((r,ri)=>`<tr><td>${esc(r)}</td><td>${esc(get(b.key+"."+ri)||"—")}</td></tr>`).join("")}</table>`; break;
+      }
+    });
+  });
+  pv.innerHTML=h+"</div>";
+}
+function doPrint(){
+  const left=STAGES.length-S.locked.length;
+  if(left>0&&!confirm(`아직 제출하지 않은 단계가 ${left}개 있습니다. 지금 상태로 PDF를 만들까요?`)) return;
+  buildPrint(); setTimeout(()=>window.print(),100);
+}
+window.addEventListener("beforeprint",buildPrint);
+
+/* =====================================================================
+   초기화
+   ===================================================================== */
+document.getElementById("railUnit").textContent=MODULE.unit;
+document.getElementById("railTitle").innerHTML=MODULE.railTitle;
+document.getElementById("btnPrint").addEventListener("click",doPrint);
+document.getElementById("btnReset").addEventListener("click",()=>{
+  if(!confirm("모든 답과 진행 상태가 지워집니다. 처음부터 다시 할까요?")) return;
+  if(!confirm("정말 지울까요? 되돌릴 수 없습니다.")) return;
+  localStorage.removeItem(KEY); S=blank(); document.getElementById("cls").value=""; document.getElementById("nm").value=""; render(); msg("초기화됨");
+});
+[["cls","cls"],["nm","name"]].forEach(([id,k])=>{ const el=document.getElementById(id); el.value=S.meta[k]||""; el.addEventListener("input",()=>{ S.meta[k]=el.value; save(); }); });
+render();
+</script>
+</body>
+</html>

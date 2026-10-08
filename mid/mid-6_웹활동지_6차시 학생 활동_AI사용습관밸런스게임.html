@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>6차시 활동 - AI 사용 습관 밸런스 게임</title>
+<style>
+:root{
+  --navy:#18408f;--blue:#4a8fff;--sky:#eef6ff;--line:#d7e4fb;--card:#ffffff;
+  --green:#4dc993;--green-bg:#eefaf4;--yellow:#ffd761;--yellow-bg:#fff9e8;
+  --red:#ff7f97;--red-bg:#fff2f5;--purple:#8d7cff;--text:#1f2b3d;--muted:#60708c;
+  --shadow:0 14px 34px rgba(69,106,170,.12)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 10% 5%,rgba(100,213,255,.25),transparent 18%),radial-gradient(circle at 90% 10%,rgba(255,215,97,.20),transparent 18%),radial-gradient(circle at 14% 90%,rgba(255,127,151,.16),transparent 20%),linear-gradient(180deg,#fafdff 0%,#f3f8ff 45%,#eef6ff 100%)}
+.wrap{max-width:1240px;margin:0 auto;padding:24px 16px 60px}.hero{border-radius:30px;background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(255,255,255,.76)),linear-gradient(135deg,#dfeeff,#cfe4ff 60%,#d8f3ff);border:1px solid var(--line);box-shadow:var(--shadow);padding:26px;position:relative;overflow:hidden}.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;pointer-events:none}.hero:before{width:220px;height:220px;right:-50px;top:-70px;background:rgba(116,165,255,.10)}.hero:after{width:170px;height:170px;left:-50px;bottom:-80px;background:rgba(100,213,255,.16)}
+.kicker{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;background:#fff;border:1px solid #d5e4fb;color:#2f5ea2;font-size:13px;font-weight:1000}.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:center}h1{margin:14px 0 8px;font-size:clamp(34px,5vw,58px);line-height:1.05;letter-spacing:-1.7px;color:#173b7a}.hero .sub{font-size:clamp(18px,2vw,26px);line-height:1.45;color:#2b569a;font-weight:800}.hero .desc{margin-top:12px;max-width:760px;line-height:1.8;color:#4d668d;font-size:15px}.hero-side{background:rgba(255,255,255,.88);border:1px solid #d8e6fb;border-radius:26px;padding:18px;backdrop-filter:blur(6px)}.hero-side h3{margin:0 0 12px;font-size:20px;color:#173d8f}.hero-side ul{margin:0;padding-left:18px;line-height:1.8;color:#557095;font-size:14px}
+.panel{margin-top:18px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:28px;padding:22px}.section-title{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}.badge-num{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:1000;font-size:20px;background:linear-gradient(135deg,var(--purple),#4d7dff);box-shadow:0 10px 22px rgba(83,92,255,.25)}.section-title h2{margin:0;font-size:32px;letter-spacing:-1px;color:#153a81}.help{margin:6px 0 0;color:var(--muted);line-height:1.75;font-size:14px}
+.top-grid{display:grid;grid-template-columns:260px 1fr;gap:16px;margin-top:14px}.time-card,.how-card,.score-card,.answer-card,.principles{border-radius:24px;padding:18px;border:1px solid #dde8ff;background:linear-gradient(180deg,#fbfdff,#f6faff)}.time-card h3,.how-card h3,.score-card h3,.answer-card h3,.principles h3{margin:0 0 10px;color:#173d8f;font-size:22px}.time-face{width:120px;height:120px;margin:10px auto 0;border-radius:50%;border:8px solid #eaf2ff;background:#fff;position:relative;box-shadow:inset 0 0 0 2px #cfe0ff}.time-face:before{content:"";position:absolute;width:4px;height:35px;background:#193d8b;left:calc(50% - 2px);top:24px;border-radius:99px}.time-face:after{content:"";position:absolute;width:28px;height:4px;background:#64d5ff;left:50%;top:50%;transform:translateY(-50%);border-radius:99px}.time-card .t2{text-align:center;font-size:34px;font-weight:1000;margin-top:12px;color:#11284f}.status-chip{margin-top:10px;border-radius:13px;padding:10px 12px;font-size:13px;font-weight:900;background:#f2f6ff;border:1px solid #dfe8f7;color:#4b5c77}
+.how-card ul{margin:0;padding-left:20px;line-height:1.8;color:#4f607d}.mode-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.mode{border-radius:18px;padding:12px;border:2px solid #e2ebff;background:#fff}.mode h4{margin:0 0 6px;font-size:19px}.mode p{margin:0;color:#54637c;line-height:1.55;font-size:13px}.mode.m1{border-color:#bcebd3;background:#f1fbf6}.mode.m1 h4{color:#1f8f5c}.mode.m2{border-color:#c6dbff;background:#f2f7ff}.mode.m2 h4{color:#245db6}.mode.m3{border-color:#ffd0d9;background:#fff4f6}.mode.m3 h4{color:#d53f59}
+.rounds{margin-top:18px;display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.round-card{position:relative;overflow:hidden;border:1px solid #dce6fb;border-radius:24px;padding:18px;background:radial-gradient(circle at 100% 0%,rgba(136,86,255,.08),transparent 22%),linear-gradient(180deg,#fff,#fbfdff)}.round-card:before{content:"";position:absolute;right:-20px;top:-20px;width:110px;height:110px;border-radius:50%;background:rgba(43,127,255,.06)}.round-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.r-badge{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#1b5fbf,#64d5ff);color:#fff;font-size:30px;font-weight:1000;box-shadow:0 10px 20px rgba(34,102,194,.18)}.round-card h3{margin:0;font-size:28px;letter-spacing:-.5px;color:#133c84}.round-card .scenario{margin-top:10px;padding:14px 16px;border-radius:18px;background:#f7faff;border:1px solid #e3edff;font-size:19px;line-height:1.7;font-weight:800;color:#24324c;min-height:104px}.select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.choice-btn{border:2px solid #dfe8f7;border-radius:16px;padding:12px 10px;background:#fff;cursor:pointer;font:inherit;font-weight:1000;font-size:15px;color:#495770;transition:.15s ease}.choice-btn:hover{transform:translateY(-1px)}.choice-btn.m1.on{background:var(--green-bg);border-color:var(--green);color:#247047}.choice-btn.m2.on{background:#eef5ff;border-color:var(--blue);color:#2155a8}.choice-btn.m3.on{background:var(--red-bg);border-color:var(--red);color:#b03249}.reason-area{margin-top:12px}.reason-area label,.principles label{display:block;margin:0 0 7px;font-size:13px;font-weight:1000;color:#41526e}input[type="text"],textarea{width:100%;border:1px solid #d7e1f0;border-radius:14px;padding:11px 12px;font:inherit;background:#fff}textarea{resize:vertical;min-height:84px}.round-status{margin-top:10px;border-radius:13px;padding:10px 12px;font-size:13px;font-weight:900;background:#f2f6ff;border:1px solid #dfe8f7;color:#4b5c77}
+.bottom-grid{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:16px}.score-box{display:flex;align-items:center;justify-content:center;margin-top:10px;border-radius:20px;padding:18px;background:linear-gradient(135deg,#183d8c,#4a8fff 60%,#64d5ff);color:#fff;font-size:38px;font-weight:1000;box-shadow:0 16px 34px rgba(38,86,180,.18)}.score-caption{text-align:center;margin-top:8px;color:#5b6b84;font-size:14px}.criteria{margin-top:12px;border:1px solid #dbe7f9;border-radius:20px;overflow:hidden}.criteria table{width:100%;border-collapse:collapse}.criteria th,.criteria td{border-bottom:1px solid #e2ebf7;border-right:1px solid #e2ebf7;padding:10px 8px;text-align:center;font-size:13px;line-height:1.55}.criteria th:last-child,.criteria td:last-child{border-right:none}.criteria tr:last-child td{border-bottom:none}.criteria th{background:#eff5ff;color:#31558e;font-size:14px}.criteria td:first-child{font-weight:1000;color:#46597b;background:#fbfdff}.principles h3{font-size:28px}.principles .line{display:grid;grid-template-columns:220px 1fr;gap:10px;align-items:center;margin-bottom:10px}.principles .tag{border-radius:999px;padding:10px 12px;font-weight:1000;color:#fff;text-align:center}.tag.t1{background:linear-gradient(90deg,#43b67b,#2ec5ff)}.tag.t2{background:linear-gradient(90deg,#3d84ff,#7a68ff)}.tag.t3{background:linear-gradient(90deg,#ff8d3b,#ff5c77)}
+.actions{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}button.main,button.sub,button.gold{border:none;border-radius:16px;padding:13px 18px;font:inherit;font-weight:1000;cursor:pointer}button.main{background:linear-gradient(90deg,#204ea0,#2ec5ff);color:#fff}button.sub{background:#edf4ff;color:#35527f;border:1px solid #d8e5fa}button.gold{background:linear-gradient(90deg,#ffd25b,#ffac38);color:#603d00}.notice{margin-top:12px;border-radius:14px;padding:12px 13px;background:#f2f7ff;border:1px solid #dde8f8;color:#4f617e;font-size:14px;font-weight:900}.notice.warn{background:#fff5f6;border-color:#ffd7df;color:#a2394f}.notice.ok{background:#eefaf4;border-color:#ccefdc;color:#276f4a}
+.result{display:none;margin-top:18px;border-radius:24px;padding:18px;background:radial-gradient(circle at 90% 10%,rgba(255,201,60,.18),transparent 20%),linear-gradient(135deg,#fefcff,#f4f8ff 60%,#effbf4);border:1px solid #dce6fb}.result.show{display:block}.result h3{margin:0 0 10px;font-size:30px;color:#123b82}.result-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.result-box{border-radius:18px;padding:14px;background:#fff;border:1px solid #dfe8f7}.result-box b{display:block;margin-bottom:6px;color:#31558e}.result-box span{color:#576986;line-height:1.65;font-size:14px}.item-feedback{margin-top:14px;display:grid;gap:10px}.feedback-card{border-radius:16px;padding:13px;background:#fff;border:1px solid #e1e9f7}.feedback-card b{color:#31558e}.summary{margin-top:12px;border-radius:18px;padding:16px;background:#fff;border:1px dashed #cddbf1;color:#455674;line-height:1.8}.footer{margin-top:14px;text-align:center;color:#7890b2;font-size:12px}
+@media(max-width:980px){.hero-grid,.top-grid,.rounds,.bottom-grid,.result-grid{grid-template-columns:1fr}.mode-row,.select-grid{grid-template-columns:1fr}.principles .line{grid-template-columns:1fr}}@media print{body{background:#fff}.hero,.panel{box-shadow:none}.actions,.notice{display:none!important}}
+
+.bottom-grid.single{grid-template-columns:1fr}
+.score-details{
+  margin-top:16px;
+  border:1px solid #dbe7f9;
+  border-radius:20px;
+  background:#fbfdff;
+  padding:0 16px 16px;
+}
+.score-details summary{
+  cursor:pointer;
+  list-style:none;
+  padding:16px 2px 8px;
+  font-weight:1000;
+  color:#173d8f;
+  font-size:18px;
+}
+.score-details summary::-webkit-details-marker{display:none}
+.score-details summary:after{content:"＋";float:right;color:#4a8fff;font-size:22px}
+.score-details[open] summary:after{content:"－"}
+
+</style>
+</head>
+<body>
+<main class="wrap">
+<section class="hero">
+  <div class="kicker">🎮 함께 실습하기 · 6차시 활동</div>
+  <div class="hero-grid">
+    <div>
+      <h1>AI 사용 습관 밸런스 게임</h1>
+      <div class="sub">“이 상황에서 AI를 어디까지 사용하면 좋을까?”</div>
+      <div class="desc">학생은 상황마다 <b>내가 먼저 / AI와 함께 / AI에게 맡김</b> 중 하나를 고르고 이유를 적습니다. 점수는 학생이 직접 매기지 않고, <b>상황별 역할 기준에 따라 페이지가 자동 계산</b>합니다.</div>
+    </div>
+    <div class="hero-side">
+      <h3>🌈 이번 활동 포인트</h3>
+      <ul>
+        <li>AI 없이도 자동 점수 계산</li>
+        <li>상황에 따라 적절한 사람·AI 역할이 달라짐</li>
+        <li>선택 이유를 반드시 자신의 말로 작성</li>
+        <li>점수는 정답 판정이 아니라 역할 구분을 돌아보는 참고 자료</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="section-title"><div class="badge-num">1</div><h2>활동 준비</h2></div>
+  <p class="help">각 상황을 읽고 실제로 할 행동을 선택한 뒤, 왜 그렇게 선택했는지 구체적으로 적어 보세요.</p>
+  <div class="top-grid">
+    <div class="time-card"><h3>⏰ 활동 시간</h3><div class="time-face"></div><div class="t2">15분</div><div class="status-chip">선택도 중요하지만 이유는 꼭 적어요!</div></div>
+    <div class="how-card">
+      <h3>🕹️ 활동 방법</h3>
+      <ul>
+        <li>페이지를 열 때마다 각 라운드 상황이 새롭게 바뀝니다.</li>
+        <li>세 가지 선택지 중 실제로 할 행동을 고릅니다.</li>
+        <li>왜 그렇게 선택했는지 자신의 말로 적습니다.</li>
+        <li>6개 라운드를 모두 마치고 <b>결과 확인하기</b>를 누르면 자동으로 점수가 계산됩니다.</li>
+        <li>결과를 확인한 뒤 <b>자동 점수 기준</b>을 펼쳐 각 상황의 역할 기준을 확인합니다.</li>
+      </ul>
+      <div class="mode-row">
+        <div class="mode m1"><h4>🧠 내가 먼저</h4><p>AI를 바로 쓰지 않고 먼저 스스로 생각해 봅니다.</p></div>
+        <div class="mode m2"><h4>🤝 AI와 함께</h4><p>내가 방향을 잡고 필요한 부분에서 AI의 도움을 받습니다.</p></div>
+        <div class="mode m3"><h4>🤖 AI에게 맡김</h4><p>처음부터 끝까지 AI에게 해결을 맡기는 선택입니다.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:18px"><div class="badge-num">2</div><h2>ROUND 미션</h2></div>
+  <p class="help">중학생이 자주 겪을 수 있는 6가지 상황입니다. 각 라운드마다 하나를 선택하고 이유를 적어 보세요.</p>
+  <div class="rounds" id="rounds"></div>
+  <div class="bottom-grid single">
+    <div class="principles">
+      <h3>📜 나의 AI 사용 원칙 세우기</h3>
+      <div class="help">모든 라운드를 해 본 뒤, 아래 세 문장을 나만의 말로 완성해 보세요.</div>
+      <div class="line"><div class="tag t1">1. 내가 먼저 생각하기 →</div><input type="text" id="p1" placeholder="예: 중요한 아이디어는 먼저 내 생각으로 시작한다."></div>
+      <div class="line"><div class="tag t2">2. AI의 도움은 도구로 사용하기 →</div><input type="text" id="p2" placeholder="예: 설명, 점검, 예시가 필요할 때 활용한다."></div>
+      <div class="line"><div class="tag t3">3. 최종 선택과 책임은 내가 하기 →</div><input type="text" id="p3" placeholder="예: 마지막 결정은 내가 한다."></div>
+      <div class="actions">
+        <button class="main" id="calcBtn" type="button">🎯 결과 확인하기</button>
+        <button class="sub" id="rerollBtn" type="button">🎲 새 상황 다시 뽑기</button>
+        <button class="sub" id="sampleBtn" type="button">예시 답안 채우기</button>
+        <button class="gold" id="resetBtn" type="button">다시 작성하기</button>
+      </div>
+      <div class="notice" id="notice">💡 점수보다 “왜 그렇게 선택했는지”를 설명하는 것이 더 중요합니다.</div>
+    </div>
+  </div>
+
+  <div class="result" id="resultBox">
+    <h3>🌟 나의 활동 결과</h3>
+    <div class="result-grid">
+      <div class="result-box"><b>참고 점수</b><span id="resultScore">-</span></div>
+      <div class="result-box"><b>결과 안내</b><span id="resultMessage">-</span></div>
+    </div>
+    <div class="item-feedback" id="itemFeedback"></div>
+
+    <details class="score-details">
+      <summary>📊 자동 점수 기준 확인하기</summary>
+      <div class="help" style="margin:10px 0 12px">
+        활동을 모두 마친 뒤 채점 기준을 확인해 보세요. 같은 선택이라도 상황에 따라 점수가 달라집니다.
+      </div>
+      <div class="criteria"><table>
+        <thead><tr><th>상황</th><th>2점 기준</th><th>핵심 이유</th></tr></thead>
+        <tbody>
+          <tr><td>아이디어·제목</td><td>AI와 함께</td><td>아이디어를 넓히되 최종 선택은 내가 함</td></tr>
+          <tr><td>과제 글쓰기</td><td>내가 먼저</td><td>생각과 표현의 출발은 내가 담당함</td></tr>
+          <tr><td>친구 관계</td><td>내가 먼저</td><td>감정·관계·책임이 필요한 판단은 직접 함</td></tr>
+          <tr><td>어려운 개념</td><td>AI와 함께</td><td>설명 도구로 활용하되 이해·확인은 내가 함</td></tr>
+          <tr><td>진로 결정</td><td>내가 먼저</td><td>정보는 참고하되 가치 판단과 결정은 내가 함</td></tr>
+          <tr><td>맞춤법·표현 점검</td><td>AI와 함께</td><td>내가 쓴 글을 AI로 점검하는 보조 활용이 적절함</td></tr>
+        </tbody>
+      </table></div>
+      <div class="status-chip">
+        ※ 2점은 가장 적절한 역할, 1점은 가능한 다른 선택, 0점은 판단이나 과정을 AI에게 지나치게 맡긴 경우입니다.
+      </div>
+    </details>
+    <div class="summary"><b>나의 AI 사용 원칙</b><br><span id="resultPrinciples">-</span></div>
+  </div>
+</section>
+<div class="footer">6차시 활동 · AI 사용 습관 밸런스 게임 · 상황별 역할 기준 자동 점수</div>
+</main>
+
+<script>
+const roundPools = [
+  [
+    {icon:"💡", situation:"영어 발표 제목이 잘 떠오르지 않는다."},
+    {icon:"🎤", situation:"발표 시작 멘트가 너무 평범해서 더 눈에 띄게 바꾸고 싶다."},
+    {icon:"📚", situation:"국어 시간 발표 주제를 정했는데 소제목이 잘 떠오르지 않는다."}
+  ],
+  [
+    {icon:"📝", situation:"수행평가 보고서의 첫 문장을 어떻게 시작할지 모르겠다."},
+    {icon:"📄", situation:"독서감상문의 첫 단락을 자연스럽게 쓰고 싶다."},
+    {icon:"✍️", situation:"프로젝트 보고서 서론 문장이 막혀서 어떻게 시작할지 모르겠다."}
+  ],
+  [
+    {icon:"💬", situation:"친구와 크게 다퉜다. 관계를 계속할지 말지 고민된다."},
+    {icon:"😥", situation:"단체 채팅방에서 친구와 오해가 생겼다. 어떻게 말해야 할지 고민된다."},
+    {icon:"🤝", situation:"친한 친구에게 서운한 일이 있었는데 바로 말할지 고민된다."}
+  ],
+  [
+    {icon:"➗", situation:"수학 풀이를 세 번 봐도 이해되지 않는다."},
+    {icon:"🧪", situation:"과학 개념이 어려워서 교과서만 봐서는 잘 이해되지 않는다."},
+    {icon:"🌍", situation:"사회 수행평가 자료를 읽었지만 핵심 내용이 잘 정리되지 않는다."}
+  ],
+  [
+    {icon:"🧭", situation:"진로 선택을 두고 고민하고 있다."},
+    {icon:"🏫", situation:"고등학교 진학 방향을 정하려는데 무엇을 우선 고려해야 할지 고민된다."},
+    {icon:"💼", situation:"내가 좋아하는 일과 잘하는 일이 달라서 진로 고민이 된다."}
+  ],
+  [
+    {icon:"🔍", situation:"내가 쓴 글의 맞춤법과 어색한 문장을 점검하고 싶다."},
+    {icon:"📱", situation:"학급 게시판에 올릴 글을 썼는데 표현이 자연스러운지 확인하고 싶다."},
+    {icon:"🗣️", situation:"발표 대본을 썼는데 문장이 너무 길고 어색한지 점검하고 싶다."}
+  ]
+];
+
+const scoring = {
+  1:{"내가 먼저":1,"AI와 함께":2,"AI에게 맡김":0,best:"AI와 함께",why:"아이디어를 넓히는 데 AI를 활용하되, 최종 선택과 표현은 내가 하는 것이 적절합니다."},
+  2:{"내가 먼저":2,"AI와 함께":1,"AI에게 맡김":0,best:"내가 먼저",why:"과제의 생각과 글쓰기 출발은 내가 하고, 필요할 때 AI를 보조적으로 활용하는 것이 적절합니다."},
+  3:{"내가 먼저":2,"AI와 함께":1,"AI에게 맡김":0,best:"내가 먼저",why:"친구 관계는 감정과 맥락, 책임이 중요하므로 내가 직접 생각하고 판단하는 것이 중요합니다."},
+  4:{"내가 먼저":1,"AI와 함께":2,"AI에게 맡김":0,best:"AI와 함께",why:"어려운 개념은 AI에게 다른 방식의 설명을 요청할 수 있지만, 이해하고 확인하는 과정은 내가 해야 합니다."},
+  5:{"내가 먼저":2,"AI와 함께":1,"AI에게 맡김":0,best:"내가 먼저",why:"진로 정보는 AI의 도움을 받을 수 있지만, 가치 판단과 최종 결정은 내가 해야 합니다."},
+  6:{"내가 먼저":1,"AI와 함께":2,"AI에게 맡김":0,best:"AI와 함께",why:"내가 먼저 글을 쓴 뒤 맞춤법과 표현을 점검하는 보조 도구로 AI를 활용하는 것이 적절합니다."}
+};
+
+let roundData=[];
+const choices={};
+const reasons={};
+const roundsEl=document.getElementById("rounds");
+
+function buildRoundData(){
+  roundData=roundPools.map((pool,idx)=>{
+    const picked=pool[Math.floor(Math.random()*pool.length)];
+    return {no:idx+1,title:`ROUND ${idx+1}`,icon:picked.icon,situation:picked.situation};
+  });
+}
+
+function renderRounds(){
+  roundsEl.innerHTML=roundData.map(r=>`
+    <section class="round-card" id="round-${r.no}">
+      <div class="round-head"><div><h3>${r.title}</h3><div class="help">상황 ${r.no}</div></div><div class="r-badge">${r.icon}</div></div>
+      <div class="scenario">${r.situation}</div>
+      <div class="select-grid">
+        <button class="choice-btn m1 ${choices[r.no]==="내가 먼저"?"on":""}" data-no="${r.no}" data-type="내가 먼저">내가 먼저</button>
+        <button class="choice-btn m2 ${choices[r.no]==="AI와 함께"?"on":""}" data-no="${r.no}" data-type="AI와 함께">AI와 함께</button>
+        <button class="choice-btn m3 ${choices[r.no]==="AI에게 맡김"?"on":""}" data-no="${r.no}" data-type="AI에게 맡김">AI에게 맡김</button>
+      </div>
+      <div class="reason-area"><label for="reason-${r.no}">선택 이유</label><textarea id="reason-${r.no}" data-no="${r.no}" placeholder="왜 그렇게 선택했는지 적어 보세요.">${reasons[r.no]||""}</textarea></div>
+      <div class="round-status">${choices[r.no]?`선택 완료: ${choices[r.no]}`:"아직 선택하지 않았어요."}</div>
+    </section>`).join("");
+
+  document.querySelectorAll(".choice-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      choices[Number(btn.dataset.no)]=btn.dataset.type;
+      renderRounds();
+    });
+  });
+  document.querySelectorAll("textarea[data-no]").forEach(ta=>{
+    ta.addEventListener("input",()=>{reasons[Number(ta.dataset.no)]=ta.value;});
+  });
+}
+
+function validateAll(){
+  const notice=document.getElementById("notice");
+  for(const r of roundData){
+    if(!choices[r.no]){
+      notice.className="notice warn";
+      notice.textContent=`⚠️ ROUND ${r.no}의 선택이 비어 있어요.`;
+      document.getElementById(`round-${r.no}`).scrollIntoView({behavior:"smooth",block:"center"});
+      return false;
+    }
+    if(!(reasons[r.no]||"").trim()){
+      notice.className="notice warn";
+      notice.textContent=`⚠️ ROUND ${r.no}의 선택 이유를 적어 주세요.`;
+      document.getElementById(`reason-${r.no}`).focus();
+      return false;
+    }
+  }
+  const p1=document.getElementById("p1").value.trim(),p2=document.getElementById("p2").value.trim(),p3=document.getElementById("p3").value.trim();
+  if(!p1||!p2||!p3){
+    notice.className="notice warn";
+    notice.textContent="⚠️ 나의 AI 사용 원칙 3가지를 모두 작성해 주세요.";
+    return false;
+  }
+  return true;
+}
+
+function resultMessage(score){
+  if(score>=10) return "상황에 따라 내가 할 일과 AI가 도울 일을 잘 구분했습니다. 점수와 함께 각 선택 이유도 다시 살펴보세요.";
+  if(score>=7) return "대체로 역할을 잘 구분했습니다. 몇몇 상황에서는 AI에게 맡길 범위와 내가 직접 할 일을 조금 더 생각해 보세요.";
+  return "AI가 도울 수 있는 일과 내가 직접 판단해야 하는 일을 다시 구분해 보세요. 점수는 참고용이며 선택 이유가 더 중요합니다.";
+}
+
+function escapeHtml(str){return String(str).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
+
+document.getElementById("calcBtn").addEventListener("click",()=>{
+  if(!validateAll())return;
+  let total=0;
+  const feedback=[];
+  roundData.forEach(r=>{
+    const rule=scoring[r.no];
+    const score=rule[choices[r.no]];
+    total+=score;
+    let msg;
+    if(score===2) msg=`이 상황에서는 ‘${choices[r.no]}’ 선택이 가장 적절한 역할 구분입니다.`;
+    else if(score===1) msg=`가능한 선택입니다. 다만 이 상황에서는 ‘${rule.best}’가 더 적절한 역할 구분으로 볼 수 있습니다.`;
+    else msg=`이 상황은 처음부터 끝까지 AI에게 맡기기보다 ‘${rule.best}’처럼 역할을 나누는 것이 좋습니다.`;
+    feedback.push(`<div class="feedback-card"><b>ROUND ${r.no} · ${score}점</b><div style="margin-top:5px;color:#586984;line-height:1.65">${escapeHtml(msg)}<br><span style="color:#7283a0">${escapeHtml(rule.why)}</span></div></div>`);
+  });
+  document.getElementById("resultScore").textContent=`${total} / 12점`;
+  document.getElementById("resultMessage").textContent=resultMessage(total);
+  document.getElementById("itemFeedback").innerHTML=feedback.join("");
+  const p1=document.getElementById("p1").value.trim(),p2=document.getElementById("p2").value.trim(),p3=document.getElementById("p3").value.trim();
+  document.getElementById("resultPrinciples").innerHTML=`① ${escapeHtml(p1)}<br>② ${escapeHtml(p2)}<br>③ ${escapeHtml(p3)}`;
+  document.querySelector(".score-details").open = false;
+  document.getElementById("resultBox").classList.add("show");
+  const notice=document.getElementById("notice");
+  notice.className="notice ok";
+  notice.textContent="✅ 자동 계산이 완료되었습니다. 점수보다 각 상황에서 왜 그런 역할 구분이 필요한지 살펴보세요.";
+  document.getElementById("resultBox").scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+
+document.getElementById("sampleBtn").addEventListener("click",()=>{
+  Object.assign(choices,{1:"AI와 함께",2:"내가 먼저",3:"내가 먼저",4:"AI와 함께",5:"내가 먼저",6:"AI와 함께"});
+  Object.assign(reasons,{1:"내가 먼저 발표의 방향을 생각한 뒤 제목 아이디어를 더 얻기 위해 AI의 도움을 받을 수 있다.",2:"보고서 내용과 주제는 내가 먼저 생각한 뒤 문장을 작성해 보는 것이 중요하다.",3:"친구 관계는 내 감정과 책임이 중요하므로 AI보다 내가 먼저 충분히 생각해야 한다.",4:"내가 어디에서 막혔는지 확인한 뒤 AI에게 다른 방식으로 설명해 달라고 요청할 수 있다.",5:"진로는 내 관심과 가치가 중요하므로 먼저 스스로 생각하고 필요한 정보만 참고한다.",6:"내가 글을 먼저 작성한 뒤 맞춤법과 표현을 점검하는 도구로 AI를 활용할 수 있다."});
+  document.getElementById("p1").value="중요한 아이디어와 판단은 먼저 내 생각으로 시작한다.";
+  document.getElementById("p2").value="설명, 점검, 예시가 필요할 때 AI를 보조 도구로 활용한다.";
+  document.getElementById("p3").value="최종 선택과 책임은 내가 진다.";
+  renderRounds();
+  const n=document.getElementById("notice");n.className="notice ok";n.textContent="✨ 예시 답안을 채웠습니다. 결과 확인하기를 눌러 보세요.";
+});
+
+document.getElementById("rerollBtn").addEventListener("click",()=>{
+  Object.keys(choices).forEach(k=>delete choices[k]);Object.keys(reasons).forEach(k=>delete reasons[k]);
+  document.getElementById("resultBox").classList.remove("show");
+  buildRoundData();renderRounds();
+  const n=document.getElementById("notice");n.className="notice ok";n.textContent="🎲 새로운 상황으로 다시 뽑았습니다.";
+});
+
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  Object.keys(choices).forEach(k=>delete choices[k]);Object.keys(reasons).forEach(k=>delete reasons[k]);
+  document.getElementById("p1").value="";document.getElementById("p2").value="";document.getElementById("p3").value="";
+  document.getElementById("resultBox").classList.remove("show");
+  document.getElementById("notice").className="notice";document.getElementById("notice").textContent="💡 점수보다 “왜 그렇게 선택했는지”를 설명하는 것이 더 중요합니다.";
+  buildRoundData();renderRounds();window.scrollTo({top:0,behavior:"smooth"});
+});
+
+buildRoundData();renderRounds();
+</script>
+</body>
+</html>
